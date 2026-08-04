@@ -2,7 +2,8 @@
 
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Image as ImageIcon, X, Check, Loader2 } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, X, Check, Loader2, AlertCircle } from 'lucide-react';
+import { getCloudinaryOptimizedUrl } from '@/lib/cloudinary';
 
 interface ImageUploaderProps {
   name?: string;
@@ -20,14 +21,22 @@ export function ImageUploader({
   const [url, setUrl] = useState<string>(defaultValue);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Client-side validation
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File exceeds maximum size of 10MB');
+      return;
+    }
+
     setUploading(true);
     setError(null);
+    setSuccess(false);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -40,17 +49,22 @@ export function ImageUploader({
 
       const data = await res.json();
 
-      if (res.ok && data.url) {
-        setUrl(data.url);
+      if (res.ok && (data.secure_url || data.url)) {
+        const finalUrl = data.secure_url || data.url;
+        setUrl(finalUrl);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
       } else {
-        setError(data.error || 'Upload failed');
+        setError(data.error || 'Cloudinary upload failed');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to upload image file');
+      setError(err.message || 'Failed to upload media asset');
     } finally {
       setUploading(false);
     }
   };
+
+  const optimizedUrl = getCloudinaryOptimizedUrl(url, 400);
 
   return (
     <div className="space-y-2 font-sans">
@@ -58,15 +72,21 @@ export function ImageUploader({
         {label}
       </label>
 
-      {/* Hidden input to pass value in FormData */}
+      {/* Hidden form value */}
       <input type="hidden" name={name} value={url} />
 
-      {/* Upload Zone */}
+      {/* Upload Box */}
       <div className="border-2 border-dashed border-stone-300 hover:border-amber-500 bg-stone-50 hover:bg-amber-50/20 rounded-2xl p-4 transition-all flex flex-col sm:flex-row items-center gap-4 relative">
-        {/* Preview Thumbnail */}
+        {/* Preview Container */}
         {url ? (
-          <div className="w-20 h-20 rounded-xl bg-slate-900 border border-amber-400/40 relative overflow-hidden shrink-0 shadow-md">
-            <Image src={url} alt="Preview" fill className="object-cover object-top" />
+          <div className="w-20 h-20 rounded-xl bg-slate-900 border border-amber-400/40 relative overflow-hidden shrink-0 shadow-md group">
+            <Image
+              src={optimizedUrl}
+              alt="Cloudinary Media Preview"
+              fill
+              className="object-cover object-top"
+              unoptimized={url.startsWith('/uploads/')}
+            />
             <button
               type="button"
               onClick={() => setUrl('')}
@@ -94,35 +114,39 @@ export function ImageUploader({
               ) : (
                 <UploadCloud className="w-4 h-4 text-amber-400" />
               )}
-              <span>{uploading ? 'Uploading File...' : 'Choose File to Upload'}</span>
+              <span>{uploading ? 'Uploading to Cloudinary...' : 'Upload Image / Media'}</span>
             </button>
           </div>
 
           <p className="text-[11px] text-slate-500 font-light">
-            Upload JPG, PNG, WEBP files up to 10MB directly from your device.
+            Cloudinary production storage. Supports JPG, PNG, WEBP, GIF, PDF (Max 10MB).
           </p>
 
-          {url && (
-            <p className="text-[10px] font-mono text-emerald-700 truncate max-w-xs flex items-center gap-1">
-              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-              {url}
+          {success && (
+            <p className="text-[10px] font-bold text-emerald-700 flex items-center gap-1">
+              <Check className="w-3 h-3 text-emerald-600" />
+              Cloudinary Media Upload Successful!
             </p>
           )}
 
-          {error && <p className="text-[11px] font-bold text-rose-600">{error}</p>}
+          {error && (
+            <p className="text-[11px] font-bold text-rose-600 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3 text-rose-600" />
+              {error}
+            </p>
+          )}
         </div>
 
-        {/* Hidden File Input */}
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,application/pdf"
           onChange={handleFileChange}
           className="hidden"
         />
       </div>
 
-      {/* Optional Presets */}
+      {/* Preset Quick Selectors */}
       {presets.length > 0 && (
         <div className="space-y-1 pt-1">
           <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">

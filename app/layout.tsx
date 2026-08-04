@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     'Nigeria',
   ],
   authors: [{ name: 'Yoruba Students\' Union (YOSU) Federal University Dutse Chapter' }],
+  icons: {
+    icon: '/images/logo.png',
+    shortcut: '/images/logo.png',
+    apple: '/images/logo.png',
+  },
   openGraph: {
     title: 'Yoruba Students\' Union (YOSU) — Federal University Dutse Chapter',
     description: 'Official digital platform, constitution, press releases, leadership, and student welfare.',
