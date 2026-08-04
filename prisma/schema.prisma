@@ -2,7 +2,7 @@
 // Compatible with SQLite (Local Dev) & PostgreSQL (Production)
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,7 +17,17 @@ generator client {
 enum RoleCode {
   SUPER_ADMIN
   ADMIN
+  PRESIDENT
+  VICE_PRESIDENT
+  SECRETARY_GENERAL
   PUBLISHER
+  EDITOR
+  TREASURER
+  AUDITOR
+  EXECUTIVE_MEMBER
+  LEGISLATIVE_MEMBER
+  MODERATOR
+  GUEST_ADMIN
   MEMBER
 }
 
@@ -690,4 +700,20 @@ model MemberProfile {
   updatedAt        DateTime  @updatedAt
 
   @@index([membershipStatus])
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  type        String    @default("INFO") // INFO, URGENT, EVENT, MARQUEE
+  isPinned    Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  startDate   DateTime?
+  expiryDate  DateTime?
+  linkUrl     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isActive, isPinned])
 }

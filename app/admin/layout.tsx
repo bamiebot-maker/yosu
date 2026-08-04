@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { Sidebar } from '@/components/admin/sidebar';
 import { Header } from '@/components/admin/header';
+import { CommandPalette } from '@/components/admin/command-palette';
 
 export default async function AdminLayout({
   children,
@@ -17,11 +18,14 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-stone-100 font-sans text-slate-900 flex">
+      {/* Global Keyboard Command Palette (Ctrl + K) */}
+      <CommandPalette />
+
       {/* Sidebar Navigation */}
       <Sidebar session={session} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 pl-20 lg:pl-64">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 pl-0 lg:pl-64">
         <Header session={session} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">

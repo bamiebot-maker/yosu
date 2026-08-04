@@ -43,6 +43,8 @@ export function Sidebar({ session }: SidebarProps) {
       group: 'CONTENT & NEWSROOM',
       items: [
         { name: 'News Gazettes', href: '/admin/news', icon: Newspaper },
+        { name: 'Announcements', href: '/admin/announcements', icon: Layers },
+        { name: 'Central Media Library', href: '/admin/media', icon: Layers },
         { name: 'Transparency Projects', href: '/admin/projects', icon: FolderGit2 },
         { name: 'Interactive Constitution', href: '/admin/constitution', icon: BookOpen },
       ],
@@ -51,11 +53,13 @@ export function Sidebar({ session }: SidebarProps) {
       group: 'GOVERNANCE & ROSTER',
       items: [
         { name: 'Executive Offices', href: '/admin/executives', icon: Users },
+        { name: 'Sessions & Timeline', href: '/admin/sessions', icon: BarChart3 },
       ],
     },
     {
       group: 'SYSTEM & SECURITY',
       items: [
+        { name: 'User Accounts', href: '/admin/users', icon: Users },
         { name: 'Feature Flags', href: '/admin/feature-flags', icon: Sliders },
 
         ...(isSuperAdmin
@@ -73,7 +77,7 @@ export function Sidebar({ session }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-40 h-screen bg-slate-950 text-white border-r border-slate-800 transition-all duration-300 flex flex-col justify-between ${
+      className={`fixed top-0 left-0 z-40 h-screen bg-slate-950 text-white border-r border-slate-800 transition-all duration-300 hidden lg:flex flex-col justify-between ${
         collapsed ? 'w-20' : 'w-64'
       }`}
     >

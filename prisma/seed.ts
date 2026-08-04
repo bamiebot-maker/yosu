@@ -37,6 +37,7 @@ async function main() {
   await prisma.person.deleteMany();
   await prisma.sessionAchievement.deleteMany();
   await prisma.albumMedia.deleteMany();
+  await prisma.announcement.deleteMany();
   await prisma.album.deleteMany();
   await prisma.media.deleteMany();
   await prisma.administrationSession.deleteMany();
@@ -54,38 +55,29 @@ async function main() {
     },
   });
 
-  await prisma.role.upsert({
-    where: { code: RoleCode.ADMIN },
-    update: {},
-    create: {
-      code: RoleCode.ADMIN,
-      name: 'Administrator',
-      description: 'Website content management & leadership publishing',
-      isSystem: true,
-    },
-  });
+  const rolesToSeed = [
+    { code: RoleCode.ADMIN, name: 'Administrator', description: 'Website content management & leadership publishing' },
+    { code: RoleCode.PRESIDENT, name: 'Executive President', description: 'Chief Executive Officer of YOSU SUG FUD' },
+    { code: RoleCode.VICE_PRESIDENT, name: 'Vice President', description: 'Deputy Executive Officer & Welfare Overseer' },
+    { code: RoleCode.SECRETARY_GENERAL, name: 'Secretary General', description: 'Chief Administrative Secretariat Officer' },
+    { code: RoleCode.PUBLISHER, name: 'Content Publisher', description: 'News creation, announcements & media uploader' },
+    { code: RoleCode.EDITOR, name: 'Editorial Reviewer', description: 'Draft article editor and content reviewer' },
+    { code: RoleCode.TREASURER, name: 'Treasurer', description: 'Fiscal officer managing financial records' },
+    { code: RoleCode.AUDITOR, name: 'Auditor General', description: 'Independent auditor for union accounts' },
+    { code: RoleCode.EXECUTIVE_MEMBER, name: 'Executive Council Member', description: 'Sworn Executive Council Officer' },
+    { code: RoleCode.LEGISLATIVE_MEMBER, name: 'Legislative Representative', description: 'House of Representatives Delegate' },
+    { code: RoleCode.MODERATOR, name: 'Community Moderator', description: 'Moderator for student forum & submissions' },
+    { code: RoleCode.GUEST_ADMIN, name: 'Guest Admin (Read Only)', description: 'Read-only access to admin dashboards' },
+    { code: RoleCode.MEMBER, name: 'Bona Fide Member', description: 'Registered student member of YOSU FUD' },
+  ];
 
-  await prisma.role.upsert({
-    where: { code: RoleCode.PUBLISHER },
-    update: {},
-    create: {
-      code: RoleCode.PUBLISHER,
-      name: 'Content Publisher',
-      description: 'News creation, announcements & media uploader',
-      isSystem: true,
-    },
-  });
-
-  await prisma.role.upsert({
-    where: { code: RoleCode.MEMBER },
-    update: {},
-    create: {
-      code: RoleCode.MEMBER,
-      name: 'Bona Fide Member',
-      description: 'Registered student member of YOSU FUD',
-      isSystem: true,
-    },
-  });
+  for (const r of rolesToSeed) {
+    await prisma.role.upsert({
+      where: { code: r.code },
+      update: { name: r.name, description: r.description },
+      create: { code: r.code, name: r.name, description: r.description, isSystem: true },
+    });
+  }
 
   // 2. CENTRAL MEDIA LIBRARY ASSETS & REAL INAUGURATION PHOTOS
   console.log('  -> Seeding Real Inauguration & Leadership Media Assets...');
