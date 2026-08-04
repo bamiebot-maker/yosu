@@ -1,0 +1,55 @@
+import React from 'react';
+import { db } from '@/lib/db';
+import { Download, FileText, ShieldCheck } from 'lucide-react';
+
+export const revalidate = 60;
+
+export default async function DownloadsPage() {
+  const downloads = await db.downloadResource.findMany({
+    where: { isPublic: true },
+    include: { fileMedia: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <div className="emerald-gradient-bg text-white rounded-2xl p-8 sm:p-12 shadow-xl">
+        <div className="max-w-3xl space-y-3">
+          <span className="bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1 rounded border border-amber-400/30 uppercase tracking-wider">
+            OFFICIAL GAZETTES & DOCUMENTS
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white">YOSU Downloads & Gazette Portal</h1>
+          <p className="text-stone-200 text-sm sm:text-base font-light">
+            Access official constitution PDF documents, executive gazettes, membership registration forms, and reports.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {downloads.map((dl) => (
+          <div key={dl.id} className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="space-y-2">
+              <span className="bg-amber-100 text-amber-900 font-bold text-[10px] uppercase px-2.5 py-0.5 rounded">
+                {dl.category}
+              </span>
+              <h3 className="font-serif font-bold text-lg text-slate-900 leading-snug">{dl.title}</h3>
+              {dl.description && <p className="text-xs text-slate-600">{dl.description}</p>}
+            </div>
+
+            <div className="pt-4 border-t border-stone-100 flex justify-between items-center text-xs">
+              <span className="text-slate-500 font-medium">{dl.downloadsCount} Downloads</span>
+              <a
+                href={dl.fileMedia.url}
+                download
+                className="px-4 py-2 bg-emerald-900 hover:bg-emerald-800 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5 text-amber-400" />
+                <span>Download PDF</span>
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

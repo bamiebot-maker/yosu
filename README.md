@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Yoruba Students' Union (YOSU) Enterprise Digital Portal
+**Chapter:** Federal University Dutse (FUD) Chapter  
+**Motto:** *"Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ"*  
+
+---
 
 ## Getting Started
 
@@ -6,31 +10,52 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the public site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Executive Portal & Developer Authentication
 
-## Learn More
+The Executive Administration CMS is accessible exclusively via direct navigation to the secure login route:
 
-To learn more about Next.js, take a look at the following resources:
+```
+http://localhost:3000/login
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> **Security Note**: Public navigation elements do NOT expose links to the executive administration interface. Access requires direct URL entry.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Seeded Developer Credentials
 
-## Deploy on Vercel
+For local development and testing, the database seeder initializes the following accounts:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Role | Email | Default Password | Access Level |
+| :--- | :--- | :--- | :--- |
+| **Super Administrator** | `admin@yosu.fud.edu.ng` | `AdminPassword2026!` | Unrestricted System & Audit Access |
+| **President** | `president@yosu.fud.edu.ng` | Defined via Admin | Executive Officer |
+| **Speaker of the House** | `speaker@yosu.fud.edu.ng` | Defined via Admin | Legislative Officer |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Database Management & Seeding
+
+```bash
+# Push Prisma Schema to SQLite
+npx prisma db push
+
+# Run Database Seeder
+npx tsx prisma/seed.ts
+```
+
+---
+
+## Production Build & Type Checking
+
+```bash
+# Run TypeScript compilation check
+npx tsc --noEmit
+
+# Build production application
+npm run build
+```
