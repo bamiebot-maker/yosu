@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'bamiebot@gmail.com';
+  const email = 'bamiebot@gmail.com'.toLowerCase().trim();
   const rawPassword = 'Akidah22#';
   const roleCode: RoleCode = 'SUPER_ADMIN';
 
@@ -31,9 +31,13 @@ async function main() {
     });
   }
 
-  // Check if target user exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
+  // Check if target user exists (case-insensitive check)
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: email,
+      },
+    },
     include: {
       userRoles: true,
       person: true,
@@ -46,6 +50,7 @@ async function main() {
     await prisma.user.update({
       where: { id: existingUser.id },
       data: {
+        email, // Standardize lowercase email
         passwordHash,
         isActive: true,
       },
@@ -68,13 +73,16 @@ async function main() {
     console.log(`[RECOVERY] User ${email} not found. Creating new Super Admin account...`);
 
     // Create associated Person record if missing
-    const person = await prisma.person.create({
-      data: {
-        fullName: 'Super Admin Secretariat',
-        email,
-        stateOfOrigin: 'Oyo',
-      },
-    });
+    let person = await prisma.person.findFirst({ where: { email } });
+    if (!person) {
+      person = await prisma.person.create({
+        data: {
+          fullName: 'Super Admin Secretariat',
+          email,
+          stateOfOrigin: 'Oyo',
+        },
+      });
+    }
 
     // Create User record
     const newUser = await prisma.user.create({

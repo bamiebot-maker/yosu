@@ -22,11 +22,11 @@ export async function loginAction(
   prevState: AuthState | null,
   formData: FormData
 ): Promise<AuthState> {
-  const email = formData.get('email') as string;
+  const emailRaw = (formData.get('email') as string || '').toLowerCase().trim();
   const password = formData.get('password') as string;
   const callbackUrl = (formData.get('callbackUrl') as string) || '/admin/dashboard';
 
-  const validated = loginSchema.safeParse({ email, password });
+  const validated = loginSchema.safeParse({ email: emailRaw, password });
   if (!validated.success) {
     return { error: validated.error.issues[0].message };
   }
@@ -36,9 +36,13 @@ export async function loginAction(
   const userAgent = reqHeaders.get('user-agent') || 'Unknown Browser';
 
   try {
-    // Look up user with person details & roles
-    const user = await db.user.findUnique({
-      where: { email: validated.data.email },
+    // Look up user with person details & roles (case-insensitive email match)
+    const user = await db.user.findFirst({
+      where: {
+        email: {
+          equals: validated.data.email,
+        },
+      },
       include: {
         person: {
           include: { avatarMedia: true },
@@ -54,7 +58,7 @@ export async function loginAction(
       await db.auditLog.create({
         data: {
           action: 'AUTH_LOGIN_FAILED',
-          details: `Failed login attempt for non-existent or inactive email: ${email}`,
+          details: `Failed login attempt for non-existent or inactive email: ${emailRaw}`,
           ipAddress,
           userAgent,
         },
@@ -69,7 +73,7 @@ export async function loginAction(
         data: {
           userId: user.id,
           action: 'AUTH_LOGIN_FAILED',
-          details: `Failed password authentication for user: ${email}`,
+          details: `Failed password authentication for user: ${emailRaw}`,
           ipAddress,
           userAgent,
         },
