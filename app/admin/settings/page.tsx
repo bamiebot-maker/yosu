@@ -1,17 +1,19 @@
 import React from 'react';
 import { db } from '@/lib/db';
-import { Settings } from 'lucide-react';
+import { requireRole } from '@/lib/auth';
 
 export const revalidate = 0;
 
 export default async function AdminSettingsPage() {
+  await requireRole(['SUPER_ADMIN']);
+
   const settings = await db.siteSetting.findMany({ orderBy: { group: 'asc' } });
 
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
         <h2 className="font-serif font-bold text-xl text-slate-900">Site Settings & Branding Configurations</h2>
-        <p className="text-xs text-slate-500">Configure global metadata, motto, hero copy, contact details, and SEO defaults</p>
+        <p className="text-xs text-slate-500">Configure global metadata, motto, hero copy, contact details, and SEO defaults (Super Admin Exclusive)</p>
       </div>
 
       <div className="bg-white rounded-xl border border-stone-200 p-6 space-y-4">

@@ -16,21 +16,30 @@ import {
   CheckCircle2,
   Eye,
   Sliders,
+  ShieldAlert,
+  Activity,
+  UserCheck,
+  UserX,
+  Lock,
 } from 'lucide-react';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export default async function AdminDashboardPage() {
   const session = await getSession();
+  const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN') ?? false;
 
-  // Execute real database metrics queries
+  // Execute database metrics queries
   const [
     totalPersonsCount,
     activeAppointmentsCount,
     newsArticlesCount,
     projectsCount,
     downloadsCount,
-    eventsCount,
+    totalUsersCount,
+    activeUsersCount,
+    inactiveUsersCount,
+    failedLoginCount,
     latestNews,
     activeProject,
     recentAuditLogs,
@@ -41,7 +50,10 @@ export default async function AdminDashboardPage() {
     db.newsArticle.count(),
     db.project.count(),
     db.downloadResource.count(),
-    db.event.count(),
+    db.user.count(),
+    db.user.count({ where: { isActive: true } }),
+    db.user.count({ where: { isActive: false } }),
+    db.auditLog.count({ where: { action: 'AUTH_LOGIN_FAILED' } }),
     db.newsArticle.findMany({
       take: 4,
       orderBy: { createdAt: 'desc' },
@@ -97,54 +109,117 @@ export default async function AdminDashboardPage() {
       icon: Download,
       color: 'bg-stone-200 text-slate-900 border-stone-300',
     },
-    {
-      label: 'Cultural Events',
-      value: eventsCount,
-      change: 'Heritage Festival',
-      icon: Calendar,
-      color: 'bg-rose-100 text-rose-900 border-rose-200',
-    },
   ];
 
   return (
     <div className="space-y-8 font-sans">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-emerald-800 relative overflow-hidden">
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/20 border border-amber-400/40 rounded-full text-amber-300 text-xs font-bold">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>SESSION: {activeSession?.title || '2025/2026 Session'}</span>
+      {/* Header Banner */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm relative overflow-hidden">
+        <div className="relative z-10 space-y-2 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-300">
+              {isSuperAdmin ? 'SUPER ADMIN SECURITY GOVERNANCE' : 'EXECUTIVE DIGITAL WORKSPACE'}
+            </span>
+            <span className="text-xs text-slate-500 font-semibold">• {activeSession?.title || '2025/2026 Session'}</span>
           </div>
 
-          <h1 className="font-serif text-2xl sm:text-4xl font-bold tracking-tight">
-            Welcome back, {session?.fullName}
+          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+            Greetings, {session?.fullName || 'Executive Administrator'}
           </h1>
-
-          <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed font-serif italic">
-            "{activeSession?.theme || 'Unification, Institutional Identity, and Constitutional Integrity'}"
+          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+            Manage institutional publications, constitutional archives, executive rosters, and central media assets with full audit trail capabilities.
           </p>
+        </div>
 
-          <div className="pt-2 flex flex-wrap gap-3">
-            <Link
-              href="/admin/news"
-              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl transition-colors shadow-md flex items-center gap-1.5"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Publish Gazette Release</span>
-            </Link>
-            <Link
-              href="/admin/constitution"
-              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors border border-emerald-600 flex items-center gap-1.5"
-            >
-              <BookOpen className="w-4 h-4 text-amber-400" />
-              <span>Manage 2026 Constitution</span>
-            </Link>
-          </div>
+        <div className="flex flex-wrap items-center gap-3 relative z-10">
+          <Link
+            href="/admin/news"
+            className="px-4 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+          >
+            <PlusCircle className="w-4 h-4 text-amber-400" />
+            <span>Publish Gazette</span>
+          </Link>
+          <Link
+            href="/"
+            target="_blank"
+            className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl border border-stone-300 transition-all flex items-center gap-2"
+          >
+            <span>Live Portal</span>
+            <Eye className="w-4 h-4 text-slate-500" />
+          </Link>
         </div>
       </div>
 
-      {/* 6 Key Enterprise Metrics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Super Admin Exclusive Security Dashboard Widget */}
+      {isSuperAdmin && (
+        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-white">System Security & User Governance</h3>
+                <p className="text-xs text-slate-400">Exclusive Super Admin system telemetry & authentication metrics</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <Activity className="w-3 h-3 text-emerald-400 animate-pulse" /> System Health: 100% Operational
+              </span>
+              <Link
+                href="/admin/audit"
+                className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
+              >
+                <span>Audit Logs</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
+              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+                <span>Total System Accounts</span>
+                <Users className="w-4 h-4 text-amber-400" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-white">{totalUsersCount}</p>
+              <span className="text-[10px] text-slate-400 font-mono">Provisioned Admin Users</span>
+            </div>
+
+            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
+              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+                <span>Active Accounts</span>
+                <UserCheck className="w-4 h-4 text-emerald-400" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-emerald-400">{activeUsersCount}</p>
+              <span className="text-[10px] text-slate-400 font-mono">Status: ACTIVE</span>
+            </div>
+
+            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
+              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+                <span>Suspended Accounts</span>
+                <UserX className="w-4 h-4 text-rose-400" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-rose-400">{inactiveUsersCount}</p>
+              <span className="text-[10px] text-slate-400 font-mono">Status: SUSPENDED</span>
+            </div>
+
+            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
+              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+                <span>Failed Auth Attempts</span>
+                <Lock className="w-4 h-4 text-amber-400" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-amber-400">{failedLoginCount}</p>
+              <span className="text-[10px] text-slate-400 font-mono">Logged Security Events</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
@@ -169,7 +244,7 @@ export default async function AdminDashboardPage() {
         })}
       </div>
 
-      {/* Active Project & Milestone Grid */}
+      {/* Active Project Grid */}
       {activeProject && (
         <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-3">
@@ -284,7 +359,7 @@ export default async function AdminDashboardPage() {
               <h3 className="font-serif text-lg font-bold text-slate-900">Security Audit Trail</h3>
               <p className="text-xs text-slate-500">Live operational event logs</p>
             </div>
-            {session?.roleCodes.includes('SUPER_ADMIN') && (
+            {isSuperAdmin && (
               <Link
                 href="/admin/audit"
                 className="text-xs font-bold text-amber-700 hover:underline"

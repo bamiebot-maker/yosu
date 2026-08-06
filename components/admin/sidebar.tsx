@@ -63,9 +63,11 @@ export function Sidebar({ session }: SidebarProps) {
         { name: 'Feature Flags', href: '/admin/feature-flags', icon: Sliders },
 
         ...(isSuperAdmin
-          ? [{ name: 'Audit Security Log', href: '/admin/audit', icon: ShieldAlert, highlight: true }]
+          ? [
+              { name: 'Audit Security Log', href: '/admin/audit', icon: ShieldAlert, highlight: true },
+              { name: 'Site Settings', href: '/admin/settings', icon: Settings },
+            ]
           : []),
-        { name: 'Site Settings', href: '/admin/settings', icon: Settings },
       ],
     },
   ];

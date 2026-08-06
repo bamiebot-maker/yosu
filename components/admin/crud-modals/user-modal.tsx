@@ -7,9 +7,10 @@ import { createUserAction } from '@/app/admin/actions';
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isSuperAdmin?: boolean;
 }
 
-export function UserModal({ isOpen, onClose }: UserModalProps) {
+export function UserModal({ isOpen, onClose, isSuperAdmin = false }: UserModalProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -110,6 +111,7 @@ export function UserModal({ isOpen, onClose }: UserModalProps) {
               defaultValue="SECRETARY_GENERAL"
               className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold focus:outline-none"
             >
+              {isSuperAdmin && <option value="SUPER_ADMIN">SUPER_ADMIN (System Administrator)</option>}
               <option value="ADMIN">ADMIN (Full Content Manager)</option>
               <option value="PRESIDENT">PRESIDENT (Executive Chief)</option>
               <option value="VICE_PRESIDENT">VICE_PRESIDENT (Deputy Executive)</option>

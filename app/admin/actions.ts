@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { ArticleStatus, ProjectStatus, OfficeCategory } from '@prisma/client';
 import { hashPassword } from '@/lib/password';
+import { getSession } from '@/lib/auth';
 
 // ==========================================
 // 1. NEWS GAZETTES ACTIONS
@@ -112,7 +113,21 @@ export async function updateNewsArticleAction(id: string, formData: FormData) {
 
 export async function deleteNewsArticleAction(id: string) {
   try {
-    await db.newsArticle.delete({ where: { id } });
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+    if (!isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can delete News Gazettes permanently.' };
+    }
+
+    const article = await db.newsArticle.delete({ where: { id } });
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'NEWS_DELETE',
+        details: `Super Admin permanently deleted News Gazette: ${article.title}`,
+      },
+    });
+
     revalidatePath('/admin/news');
     revalidatePath('/news');
     revalidatePath('/');
@@ -315,7 +330,25 @@ export async function updateExecutiveAppointmentAction(appointmentId: string, fo
 
 export async function deleteExecutiveAppointmentAction(appointmentId: string) {
   try {
-    await db.officeAppointment.delete({ where: { id: appointmentId } });
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+    if (!isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can delete Executive records permanently.' };
+    }
+
+    const appointment = await db.officeAppointment.delete({
+      where: { id: appointmentId },
+      include: { person: true },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'EXECUTIVE_DELETE',
+        details: `Super Admin permanently deleted Executive record: ${appointment.person?.fullName || appointmentId}`,
+      },
+    });
+
     revalidatePath('/admin/executives');
     revalidatePath('/leadership');
     revalidatePath('/');
@@ -495,7 +528,21 @@ export async function createConstitutionVersionAction(formData: FormData) {
 
 export async function deleteConstitutionVersionAction(id: string) {
   try {
-    await db.constitutionVersion.delete({ where: { id } });
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+    if (!isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can delete Constitution versions permanently.' };
+    }
+
+    const version = await db.constitutionVersion.delete({ where: { id } });
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'CONSTITUTION_DELETE',
+        details: `Super Admin permanently deleted Constitution version: ${version.versionName}`,
+      },
+    });
+
     revalidatePath('/admin/constitution');
     revalidatePath('/constitution');
     return { success: true, message: 'Constitution version deleted successfully!' };
@@ -509,10 +556,18 @@ export async function deleteConstitutionVersionAction(id: string) {
 // ==========================================
 export async function createUserAction(formData: FormData) {
   try {
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+
     const fullName = formData.get('fullName') as string;
     const email = (formData.get('email') as string).toLowerCase().trim();
     const password = formData.get('password') as string;
     const roleCode = (formData.get('roleCode') as string) || 'SECRETARY_GENERAL';
+
+    // Restrict SUPER_ADMIN role assignment to existing Super Admins
+    if (roleCode === 'SUPER_ADMIN' && !isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can assign the Super Admin role.' };
+    }
 
     const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) throw new Error('A user with this email address already exists.');
@@ -526,7 +581,6 @@ export async function createUserAction(formData: FormData) {
     });
 
     const role = await db.role.findFirst({ where: { code: roleCode as any } });
-
     const passwordHash = await hashPassword(password);
 
     const user = await db.user.create({
@@ -547,6 +601,15 @@ export async function createUserAction(formData: FormData) {
       });
     }
 
+    // Audit Log
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'USER_CREATE',
+        details: `Provisioned user account for ${email} with role ${roleCode}`,
+      },
+    });
+
     revalidatePath('/admin/users');
     return { success: true, message: `User account for ${fullName} provisioned successfully!` };
   } catch (error: any) {
@@ -556,14 +619,34 @@ export async function createUserAction(formData: FormData) {
 
 export async function toggleUserStatusAction(userId: string) {
   try {
-    const user = await db.user.findUnique({ where: { id: userId } });
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: { userRoles: { include: { role: true } } },
+    });
     if (!user) throw new Error('User account not found');
+
+    const targetIsSuperAdmin = user.userRoles.some((ur) => ur.role.code === 'SUPER_ADMIN');
+    if (targetIsSuperAdmin && !isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can modify another Super Admin account status.' };
+    }
 
     const newActiveState = !user.isActive;
 
     await db.user.update({
       where: { id: userId },
       data: { isActive: newActiveState },
+    });
+
+    // Audit Log
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'USER_UPDATE_STATUS',
+        details: `Toggled user status for ${user.email} to ${newActiveState ? 'ACTIVE' : 'SUSPENDED'}`,
+      },
     });
 
     revalidatePath('/admin/users');
@@ -575,12 +658,35 @@ export async function toggleUserStatusAction(userId: string) {
 
 export async function resetUserPasswordAction(userId: string) {
   try {
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: { userRoles: { include: { role: true } } },
+    });
+    if (!user) throw new Error('User account not found');
+
+    const targetIsSuperAdmin = user.userRoles.some((ur) => ur.role.code === 'SUPER_ADMIN');
+    if (targetIsSuperAdmin && !isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can reset a Super Admin password.' };
+    }
+
     const defaultPassword = 'YosuReset2026!';
     const passwordHash = await hashPassword(defaultPassword);
 
     await db.user.update({
       where: { id: userId },
       data: { passwordHash },
+    });
+
+    // Audit Log
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'USER_PASSWORD_RESET',
+        details: `Reset password for user ${user.email}`,
+      },
     });
 
     revalidatePath('/admin/users');
@@ -590,8 +696,68 @@ export async function resetUserPasswordAction(userId: string) {
   }
 }
 
+export async function deleteUserAction(userId: string) {
+  try {
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+
+    if (!isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can delete user accounts.' };
+    }
+
+    if (session?.userId === userId) {
+      return { success: false, error: 'Security Guard: You cannot delete your currently logged-in Super Admin account.' };
+    }
+
+    const targetUser = await db.user.findUnique({
+      where: { id: userId },
+      include: { userRoles: { include: { role: true } } },
+    });
+
+    if (!targetUser) throw new Error('Target user account not found.');
+
+    const targetIsSuperAdmin = targetUser.userRoles.some((ur) => ur.role.code === 'SUPER_ADMIN');
+    if (targetIsSuperAdmin) {
+      const superAdminCount = await db.userRole.count({
+        where: { role: { code: 'SUPER_ADMIN' } },
+      });
+      if (superAdminCount <= 1) {
+        return { success: false, error: 'Security Guard: Cannot delete the last remaining Super Admin account.' };
+      }
+    }
+
+    // Delete user (cascades userRoles)
+    await db.user.delete({ where: { id: userId } });
+
+    // Clean person record if detached
+    if (targetUser.personId) {
+      await db.person.delete({ where: { id: targetUser.personId } }).catch(() => {});
+    }
+
+    // Audit Log
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'USER_DELETE',
+        details: `Super Admin permanently deleted user account: ${targetUser.email}`,
+      },
+    });
+
+    revalidatePath('/admin/users');
+    return { success: true, message: `Account ${targetUser.email} permanently deleted.` };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete user account' };
+  }
+}
+
 export async function deleteMediaAction(id: string) {
   try {
+    const session = await getSession();
+    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
+    if (!isSuperAdmin) {
+      return { success: false, error: '403 Forbidden: Only a Super Admin can delete media assets.' };
+    }
+
     await db.media.delete({ where: { id } });
     revalidatePath('/admin/media');
     return { success: true, message: 'Media asset deleted successfully!' };
