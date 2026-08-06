@@ -1,5 +1,5 @@
 import { PrismaClient, RoleCode } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../lib/password';
 
 const prisma = new PrismaClient();
 
@@ -8,19 +8,25 @@ async function main() {
   const rawPassword = 'Akidah22#';
   const roleCode: RoleCode = 'SUPER_ADMIN';
 
-  console.log(`[RECOVERY] Initiating Super Admin account recovery for: ${email}`);
+  const dbUrl = process.env.DATABASE_URL || 'NOT_SET';
+  const dbHost = dbUrl.includes('@') ? dbUrl.split('@')[1].split('/')[0] : 'Local/SQLite';
 
-  // Generate bcrypt hash
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash(rawPassword, salt);
+  console.log('===========================================================');
+  console.log(`[RECOVERY] YOSU Platform Super Admin Account Recovery`);
+  console.log(`[DATABASE] Target Database Host: ${dbHost}`);
+  console.log(`[TARGET EMAIL]: ${email}`);
+  console.log('===========================================================');
 
-  // Ensure SUPER_ADMIN role exists in database
+  // Hash password using unified hashPassword helper
+  const passwordHash = await hashPassword(rawPassword);
+
+  // 1. Ensure SUPER_ADMIN Role exists
   let superAdminRole = await prisma.role.findUnique({
     where: { code: roleCode },
   });
 
   if (!superAdminRole) {
-    console.log(`[RECOVERY] Creating missing SUPER_ADMIN role entry...`);
+    console.log(`[RECOVERY] Creating missing SUPER_ADMIN role...`);
     superAdminRole = await prisma.role.create({
       data: {
         code: roleCode,
@@ -31,84 +37,66 @@ async function main() {
     });
   }
 
-  // Check if target user exists (case-insensitive check)
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      email: {
-        equals: email,
+  // 2. Ensure Person record exists
+  let person = await prisma.person.findFirst({
+    where: { email },
+  });
+
+  if (!person) {
+    console.log(`[RECOVERY] Creating Person record for ${email}...`);
+    person = await prisma.person.create({
+      data: {
+        fullName: 'Super Admin Secretariat',
+        email,
+        stateOfOrigin: 'Oyo',
       },
+    });
+  }
+
+  // 3. Upsert User account
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {
+      passwordHash,
+      isActive: true,
+      personId: person.id,
+      deletedAt: null,
     },
-    include: {
-      userRoles: true,
-      person: true,
+    create: {
+      email,
+      passwordHash,
+      isActive: true,
+      personId: person.id,
     },
   });
 
-  if (existingUser) {
-    console.log(`[RECOVERY] User ${email} found (ID: ${existingUser.id}). Updating credentials...`);
+  console.log(`[RECOVERY] User record verified (ID: ${user.id}, Status: ACTIVE).`);
 
-    await prisma.user.update({
-      where: { id: existingUser.id },
-      data: {
-        email, // Standardize lowercase email
-        passwordHash,
-        isActive: true,
-      },
-    });
-
-    // Ensure user has SUPER_ADMIN role
-    const hasRole = existingUser.userRoles.some((ur) => ur.roleId === superAdminRole.id);
-    if (!hasRole) {
-      console.log(`[RECOVERY] Assigning SUPER_ADMIN role to user...`);
-      await prisma.userRole.create({
-        data: {
-          userId: existingUser.id,
-          roleId: superAdminRole.id,
-        },
-      });
-    }
-
-    console.log(`[SUCCESS] Super Admin account (${email}) password and permissions recovered successfully!`);
-  } else {
-    console.log(`[RECOVERY] User ${email} not found. Creating new Super Admin account...`);
-
-    // Create associated Person record if missing
-    let person = await prisma.person.findFirst({ where: { email } });
-    if (!person) {
-      person = await prisma.person.create({
-        data: {
-          fullName: 'Super Admin Secretariat',
-          email,
-          stateOfOrigin: 'Oyo',
-        },
-      });
-    }
-
-    // Create User record
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        isActive: true,
-        personId: person.id,
-      },
-    });
-
-    // Assign SUPER_ADMIN role
-    await prisma.userRole.create({
-      data: {
-        userId: newUser.id,
+  // 4. Ensure SUPER_ADMIN UserRole binding exists
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: user.id,
         roleId: superAdminRole.id,
       },
-    });
+    },
+    update: {},
+    create: {
+      userId: user.id,
+      roleId: superAdminRole.id,
+    },
+  });
 
-    console.log(`[SUCCESS] Super Admin account (${email}) created and provisioned successfully!`);
-  }
+  console.log(`[RECOVERY] SUPER_ADMIN role assignment verified.`);
+  console.log('-----------------------------------------------------------');
+  console.log(`[SUCCESS] Account ${email} is now ACTIVE with SUPER_ADMIN role.`);
+  console.log(`[CREDENTIALS] Email: ${email} | Password: ${rawPassword}`);
+  console.log('===========================================================');
 }
 
 main()
   .catch((e) => {
-    console.error('[ERROR] Recovery failed:', e);
+    console.error('[ERROR] Super Admin Recovery failed:', e);
     process.exit(1);
   })
   .finally(async () => {

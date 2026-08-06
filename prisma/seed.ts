@@ -5,7 +5,7 @@ import {
   ArticleStatus,
   ProjectStatus,
 } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../lib/password';
 
 const prisma = new PrismaClient();
 
@@ -517,14 +517,35 @@ async function main() {
   });
 
   // Hash password for default Super Admin
-  const hashedPassword = await bcrypt.hash('AdminPassword2026!', 12);
+  const hashedPassword = await hashPassword('AdminPassword2026!');
+  const bamiebotPasswordHash = await hashPassword('Akidah22#');
 
-  // Create User first
+  // Create User accounts
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@yosu.fud.edu.ng',
       passwordHash: hashedPassword,
       isActive: true,
+      userRoles: {
+        create: { roleId: superAdminRole.id },
+      },
+    },
+  });
+
+  const bamiebotPerson = await prisma.person.create({
+    data: {
+      fullName: 'Super Admin Secretariat',
+      email: 'bamiebot@gmail.com',
+      stateOfOrigin: 'Oyo',
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      email: 'bamiebot@gmail.com',
+      passwordHash: bamiebotPasswordHash,
+      isActive: true,
+      personId: bamiebotPerson.id,
       userRoles: {
         create: { roleId: superAdminRole.id },
       },

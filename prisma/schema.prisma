@@ -2,7 +2,7 @@
 // Compatible with SQLite (Local Dev) & PostgreSQL (Production)
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

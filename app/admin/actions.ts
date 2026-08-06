@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { ArticleStatus, ProjectStatus, OfficeCategory } from '@prisma/client';
+import { hashPassword } from '@/lib/password';
 
 // ==========================================
 // 1. NEWS GAZETTES ACTIONS
@@ -526,7 +527,7 @@ export async function createUserAction(formData: FormData) {
 
     const role = await db.role.findFirst({ where: { code: roleCode as any } });
 
-    const passwordHash = `$2b$10$yosuDevHash_${Buffer.from(password).toString('base64')}`;
+    const passwordHash = await hashPassword(password);
 
     const user = await db.user.create({
       data: {
@@ -574,11 +575,12 @@ export async function toggleUserStatusAction(userId: string) {
 
 export async function resetUserPasswordAction(userId: string) {
   try {
-    const newHash = `$2b$10$yosuDevHash_${Buffer.from('YosuReset2026!').toString('base64')}`;
+    const defaultPassword = 'YosuReset2026!';
+    const passwordHash = await hashPassword(defaultPassword);
 
     await db.user.update({
       where: { id: userId },
-      data: { passwordHash: newHash },
+      data: { passwordHash },
     });
 
     revalidatePath('/admin/users');

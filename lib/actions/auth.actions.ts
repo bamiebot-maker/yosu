@@ -2,10 +2,10 @@
 
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { encryptSession } from '@/lib/auth';
+import { verifyPassword } from '@/lib/password';
 
 const loginSchema = z.object({
   email: z.string().email('Please provide a valid official email address.'),
@@ -35,8 +35,10 @@ export async function loginAction(
   const userAgent = reqHeaders.get('user-agent') || 'Unknown Browser';
 
   try {
-    // Look up user with person details & roles (case-insensitive email match)
-    const user = await db.user.findFirst({
+    console.log(`[AUTH TRACE] Initiating login attempt for email: "${validated.data.email}"`);
+
+    // Lookup user with exact or case-insensitive query fallback
+    let user = await db.user.findFirst({
       where: {
         email: {
           equals: validated.data.email,
@@ -52,8 +54,24 @@ export async function loginAction(
       },
     });
 
+    if (!user) {
+      user = await db.user.findUnique({
+        where: { email: validated.data.email },
+        include: {
+          person: {
+            include: { avatarMedia: true },
+          },
+          userRoles: {
+            include: { role: true },
+          },
+        },
+      });
+    }
+
+    console.log(`[AUTH TRACE] User search result for "${validated.data.email}": Found = ${!!user}, ID = ${user?.id || 'N/A'}, isActive = ${user?.isActive}`);
+
     if (!user || !user.isActive) {
-      // Audit log failed login
+      console.warn(`[AUTH REJECTED] User record missing or inactive for email: "${validated.data.email}"`);
       await db.auditLog.create({
         data: {
           action: 'AUTH_LOGIN_FAILED',
@@ -65,9 +83,11 @@ export async function loginAction(
       return { error: 'Invalid email credentials or account is deactivated.' };
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    const isValidPassword = await verifyPassword(password, user.passwordHash);
+    console.log(`[AUTH TRACE] Password comparison result for "${validated.data.email}": ${isValidPassword}`);
+
     if (!isValidPassword) {
-      // Audit log failed password match
+      console.warn(`[AUTH REJECTED] Password hash mismatch for user: "${validated.data.email}"`);
       await db.auditLog.create({
         data: {
           userId: user.id,
