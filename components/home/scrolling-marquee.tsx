@@ -3,7 +3,7 @@
 import React from 'react';
 import { Sparkles, ShieldCheck } from 'lucide-react';
 
-export function ScrollingMarquee() {
+export function ScrollingMarquee({ text }: { text?: string }) {
   const items = [
     { code: 'NAKSS (KWARA)', name: 'National Association of Kwara State Students' },
     { code: 'FOSSU (OYO)', name: 'Federation of Oyo State Students Union' },

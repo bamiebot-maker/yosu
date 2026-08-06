@@ -8,16 +8,17 @@ interface HeroBackgroundSliderProps {
     url: string;
     alt: string;
   }[];
+  intervalMs?: number;
 }
 
-export function HeroBackgroundSlider({ images }: HeroBackgroundSliderProps) {
+export function HeroBackgroundSlider({ images, intervalMs = 5000 }: HeroBackgroundSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (!images || images.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
+    }, intervalMs);
     return () => clearInterval(interval);
   }, [images]);
 

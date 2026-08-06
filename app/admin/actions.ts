@@ -765,3 +765,247 @@ export async function deleteMediaAction(id: string) {
     return { success: false, error: error.message || 'Failed to delete media asset' };
   }
 }
+
+// ==========================================
+// 8. DYNAMIC HOUSE OF REPRESENTATIVES ACTIONS
+// ==========================================
+export async function createRepresentativeAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    const fullName = formData.get('fullName') as string;
+    const stateOfOrigin = formData.get('stateOfOrigin') as string;
+    const positionTitle = (formData.get('positionTitle') as string) || 'Representative';
+    const photoUrl = (formData.get('photoUrl') as string) || null;
+    const sessionId = formData.get('sessionId') as string;
+
+    let targetSessionId = sessionId;
+    if (!targetSessionId) {
+      const activeSession = await db.administrationSession.findFirst({ where: { isCurrent: true } })
+        || await db.administrationSession.findFirst();
+      if (!activeSession) throw new Error('No administration session found.');
+      targetSessionId = activeSession.id;
+    }
+
+    await db.houseRepresentative.create({
+      data: {
+        fullName,
+        stateOfOrigin,
+        positionTitle,
+        photoUrl,
+        sessionId: targetSessionId,
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'REPRESENTATIVE_CREATE',
+        details: `Created House Representative ${fullName} for state ${stateOfOrigin}`,
+      },
+    });
+
+    revalidatePath('/admin/representatives');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'House Representative added successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to add representative' };
+  }
+}
+
+export async function updateRepresentativeAction(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    const fullName = formData.get('fullName') as string;
+    const stateOfOrigin = formData.get('stateOfOrigin') as string;
+    const positionTitle = formData.get('positionTitle') as string;
+    const photoUrl = (formData.get('photoUrl') as string) || null;
+
+    await db.houseRepresentative.update({
+      where: { id },
+      data: {
+        fullName,
+        stateOfOrigin,
+        positionTitle,
+        ...(photoUrl ? { photoUrl } : {}),
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'REPRESENTATIVE_UPDATE',
+        details: `Updated House Representative ${fullName}`,
+      },
+    });
+
+    revalidatePath('/admin/representatives');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'House Representative updated successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update representative' };
+  }
+}
+
+export async function deleteRepresentativeAction(id: string) {
+  try {
+    const session = await getSession();
+    const rep = await db.houseRepresentative.delete({ where: { id } });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'REPRESENTATIVE_DELETE',
+        details: `Deleted House Representative ${rep.fullName}`,
+      },
+    });
+
+    revalidatePath('/admin/representatives');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'House Representative deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete representative' };
+  }
+}
+
+// ==========================================
+// 9. DYNAMIC ACHIEVEMENTS SYSTEM ACTIONS
+// ==========================================
+export async function createAchievementAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const progressPercentage = parseInt((formData.get('progressPercentage') as string) || '0', 10);
+    const imageUrl = (formData.get('imageUrl') as string) || null;
+    const sessionId = formData.get('sessionId') as string;
+
+    let targetSessionId = sessionId;
+    if (!targetSessionId) {
+      const activeSession = await db.administrationSession.findFirst({ where: { isCurrent: true } })
+        || await db.administrationSession.findFirst();
+      if (!activeSession) throw new Error('No administration session found.');
+      targetSessionId = activeSession.id;
+    }
+
+    const status = progressPercentage >= 100 ? 'COMPLETED' : progressPercentage > 0 ? 'ONGOING' : 'UPCOMING';
+
+    await db.achievement.create({
+      data: {
+        title,
+        description,
+        progressPercentage,
+        status,
+        imageUrl,
+        sessionId: targetSessionId,
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'ACHIEVEMENT_CREATE',
+        details: `Created Achievement: ${title} (${progressPercentage}% complete)`,
+      },
+    });
+
+    revalidatePath('/admin/achievements');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'Achievement record created successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to create achievement' };
+  }
+}
+
+export async function updateAchievementAction(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const progressPercentage = parseInt((formData.get('progressPercentage') as string) || '0', 10);
+    const imageUrl = (formData.get('imageUrl') as string) || null;
+
+    const status = progressPercentage >= 100 ? 'COMPLETED' : progressPercentage > 0 ? 'ONGOING' : 'UPCOMING';
+
+    await db.achievement.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        progressPercentage,
+        status,
+        ...(imageUrl ? { imageUrl } : {}),
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'ACHIEVEMENT_UPDATE',
+        details: `Updated Achievement: ${title} (${progressPercentage}% complete)`,
+      },
+    });
+
+    revalidatePath('/admin/achievements');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'Achievement updated successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update achievement' };
+  }
+}
+
+export async function deleteAchievementAction(id: string) {
+  try {
+    const session = await getSession();
+    const ach = await db.achievement.delete({ where: { id } });
+
+    await db.auditLog.create({
+      data: {
+        userId: session?.userId || null,
+        action: 'ACHIEVEMENT_DELETE',
+        details: `Deleted Achievement: ${ach.title}`,
+      },
+    });
+
+    revalidatePath('/admin/achievements');
+    revalidatePath('/leadership');
+    revalidatePath('/');
+    return { success: true, message: 'Achievement deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete achievement' };
+  }
+}
+
+// ==========================================
+// 10. NEWS INTERACTION ACTIONS (LIKES & SHARES)
+// ==========================================
+export async function likeArticleAction(articleId: string) {
+  try {
+    const article = await db.newsArticle.update({
+      where: { id: articleId },
+      data: { likeCount: { increment: 1 } },
+    });
+    revalidatePath(`/news/${article.slug}`);
+    revalidatePath('/news');
+    return { success: true, likeCount: article.likeCount };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to register like' };
+  }
+}
+
+export async function shareArticleAction(articleId: string) {
+  try {
+    const article = await db.newsArticle.update({
+      where: { id: articleId },
+      data: { shareCount: { increment: 1 } },
+    });
+    revalidatePath(`/news/${article.slug}`);
+    return { success: true, shareCount: article.shareCount };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to register share' };
+  }
+}

@@ -8,9 +8,17 @@ import {
   Building2,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
   Crown,
   GraduationCap,
+  Award,
+  CheckCircle2,
+  Clock,
+  Newspaper,
+  Calendar,
+  FileText,
+  ImageIcon,
+  Download,
+  Flame,
 } from 'lucide-react';
 import { ExecutiveCarousel, ExecutiveOfficerItem } from '@/components/home/executive-carousel';
 import { HeroBackgroundSlider } from '@/components/home/hero-background-slider';
@@ -20,23 +28,24 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal';
 export const revalidate = 60; // ISR 60 seconds
 
 export default async function HomePage() {
-  // Database Queries
+  // 1. Current Session & Executive Appointments
   const currentSession = await db.administrationSession.findFirst({
     where: { isCurrent: true },
-  });
+  }) || await db.administrationSession.findFirst();
+
+  const activeSessionId = currentSession?.id;
 
   const allAppointments = await db.officeAppointment.findMany({
-    where: { status: 'ACTIVE' },
+    where: {
+      status: 'ACTIVE',
+      ...(activeSessionId ? { sessionId: activeSessionId } : {}),
+    },
     include: {
       person: { include: { avatarMedia: true } },
       office: true,
     },
     orderBy: { displayOrder: 'asc' },
   });
-
-  const presidentAppt = allAppointments.find(
-    (a) => a.office.title.toLowerCase().includes('president') && !a.office.title.toLowerCase().includes('vice')
-  );
 
   const carouselOfficers: ExecutiveOfficerItem[] = allAppointments.map((a) => ({
     id: a.id,
@@ -54,15 +63,57 @@ export default async function HomePage() {
     instagramUrl: a.person.instagramUrl,
   }));
 
-  const featuredNews = await db.newsArticle.findFirst({
-    where: { status: 'PUBLISHED', isFeatured: true },
-    include: { category: true, featuredMedia: true },
+  // 2. Dynamic News (Hero Article + 3 Sub-featured Articles) - TASK 4
+  const [heroNews, subNewsArticles] = await Promise.all([
+    db.newsArticle.findFirst({
+      where: { status: 'PUBLISHED' },
+      orderBy: [{ isFeatured: 'desc' }, { publishedAt: 'desc' }],
+      include: { category: true, featuredMedia: true },
+    }),
+    db.newsArticle.findMany({
+      where: { status: 'PUBLISHED' },
+      skip: 1,
+      take: 3,
+      orderBy: { publishedAt: 'desc' },
+      include: { category: true, featuredMedia: true },
+    }),
+  ]);
+
+  // 3. Dynamic Achievements for Active Session - TASK 3
+  const dynamicAchievements = await db.achievement.findMany({
+    where: {
+      ...(activeSessionId ? { sessionId: activeSessionId } : {}),
+    },
+    orderBy: [{ progressPercentage: 'desc' }, { createdAt: 'desc' }],
+    take: 4,
   });
 
-  const activeProjects = await db.project.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 2,
-  });
+  // 4. Dynamic Statistics Queries - TASK 10
+  const [
+    excoCount,
+    repCount,
+    achieveCount,
+    newsCount,
+    mediaCount,
+    downloadCount,
+    constVersionCount,
+    userCount,
+  ] = await Promise.all([
+    db.officeAppointment.count({
+      where: { status: 'ACTIVE', ...(activeSessionId ? { sessionId: activeSessionId } : {}) },
+    }),
+    db.houseRepresentative.count({
+      where: { ...(activeSessionId ? { sessionId: activeSessionId } : {}) },
+    }),
+    db.achievement.count({
+      where: { ...(activeSessionId ? { sessionId: activeSessionId } : {}) },
+    }),
+    db.newsArticle.count({ where: { status: 'PUBLISHED' } }),
+    db.media.count(),
+    db.downloadResource.count(),
+    db.constitutionVersion.count(),
+    db.user.count({ where: { isActive: true } }),
+  ]);
 
   const heroBackgroundImages = [
     {
@@ -118,177 +169,310 @@ export default async function HomePage() {
       badge: 'Royal Advisory',
     },
     {
-      title: 'Grand Royal Pillar',
-      name: 'His Imperial Majesty, The Alaafin of Oyo',
-      role: 'Traditional Pillar of Oòduà',
-      badge: 'Royal Advisory',
+      title: 'YOSU Royal Monarch',
+      name: 'OBA Fouad Adegoke Adedotun',
+      role: 'Kabiyesi — Sovereign Cultural Custodian',
+      badge: 'Yoruba Student Throne',
     },
   ];
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden font-sans pb-20">
-      {/* 1. HERO SECTION WITH LEFT-ALIGNED CONTENT & HIGH-VISIBILITY BACKGROUND SLIDER */}
-      <section className="relative min-h-[calc(100vh-80px)] lg:min-h-[calc(100vh-96px)] w-full max-w-full overflow-hidden flex items-center justify-start py-20 px-4 sm:px-6 lg:px-12">
-        <HeroBackgroundSlider images={heroBackgroundImages} />
+    <div className="flex flex-col min-h-screen bg-[#FDFBF7] font-sans antialiased text-slate-900 selection:bg-amber-200 selection:text-emerald-950 overflow-x-hidden">
+      {/* 1. HERO SECTION */}
+      <section className="relative w-full h-[88vh] min-h-[580px] max-h-[900px] flex items-center justify-center overflow-hidden bg-slate-950">
+        <HeroBackgroundSlider images={heroBackgroundImages} intervalMs={6500} />
 
-        <div className="max-w-7xl mx-auto w-full relative z-20">
-          <ScrollReveal animation="fade-up" durationMs={900}>
-            <div className="max-w-2xl text-left space-y-6">
-              <div className="inline-flex items-center gap-2 bg-emerald-950/90 border border-amber-400/50 text-amber-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-lg animate-glow-pulse">
-                <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>{currentSession?.title ? `${currentSession.title} — Progress Era` : '2026/2027 Progress Era Session'}</span>
-              </div>
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-amber-400/60 backdrop-blur-md shadow-lg animate-pulse-subtle">
+            <Crown className="w-4 h-4 text-amber-400" />
+            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300">
+              YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
+            </span>
+          </div>
 
-              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12] text-left drop-shadow-md">
-                Preserving Heritage, <br />
-                <span className="gold-gradient-text font-black">Advancing Excellence</span>
-              </h1>
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] max-w-4xl mx-auto drop-shadow-md">
+            Promoting Heritage, Unity & Academic Excellence
+          </h1>
 
-              <p className="text-slate-100 text-sm sm:text-lg max-w-xl font-normal leading-relaxed text-left drop-shadow-md">
-                The official digital portal for all Yoruba students at Federal University Dutse. Fostering unified leadership, academic integrity, and cultural dignity.
-              </p>
+          <p className="text-sm sm:text-lg text-slate-200 max-w-2xl mx-auto font-light leading-relaxed drop-shadow">
+            Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting constituent Yoruba states across academic frontiers.
+          </p>
 
-              <div className="flex flex-col sm:flex-row items-center sm:items-start justify-start gap-4 pt-2">
-                <Link
-                  href="/constitution"
-                  className="w-full sm:w-auto px-8 py-4 bg-[#E5A91A] hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-2xl transition-all flex items-center justify-center gap-2 min-h-[48px] hover:scale-105"
-                >
-                  <BookOpen className="w-4.5 h-4.5" />
-                  <span>Read 2026 Constitution</span>
-                </Link>
-                <Link
-                  href="/leadership"
-                  className="w-full sm:w-auto px-8 py-4 bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700 text-white font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-2 min-h-[48px] backdrop-blur-md hover:scale-105 shadow-xl"
-                >
-                  <Users className="w-4.5 h-4.5 text-amber-400" />
-                  <span>Executive Roster</span>
-                </Link>
-              </div>
-            </div>
-          </ScrollReveal>
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <Link
+              href="/leadership"
+              className="px-6 py-3.5 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition-all hover:scale-105 flex items-center gap-2"
+            >
+              <span>Explore Executive Roster</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/constitution"
+              className="px-6 py-3.5 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-xl backdrop-blur-md transition-all hover:scale-105 flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4 text-amber-400" />
+              <span>Interactive Constitution</span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* 2. INFINITE SCROLLING MARQUEE BANNER IMMEDIATELY AFTER HERO */}
-      <div className="w-full">
-        <ScrollingMarquee />
-      </div>
+      {/* MARQUEE ANNOUNCEMENTS */}
+      <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Interactive Supreme Constitution v2.1 Ratified • Central Media Library & Transparency Projects Online" />
 
-      {/* 3. EXECUTIVE PRESIDENTIAL SHOWCASE SECTION (SCROLL ANIMATED) */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="w-full max-w-full overflow-hidden bg-[#070D18] text-white border-b border-emerald-900/60 shadow-2xl relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] w-full">
-            
-            {/* LEFT SIDE: FULL-HEIGHT EDGE-TO-EDGE PORTRAIT WITH GLOWING EMERALD SLIT EDGE */}
-            <div className="lg:col-span-6 relative h-96 sm:h-[480px] lg:h-full overflow-hidden bg-slate-950">
-              {presidentAppt?.person.avatarMedia?.url ? (
-                <Image
-                  src={presidentAppt.person.avatarMedia.url}
-                  alt={presidentAppt.person.fullName}
-                  fill
-                  priority
-                  className="object-cover object-top hover:scale-105 transition-transform duration-700"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white font-bold text-5xl">
-                  {presidentAppt?.person.fullName.charAt(0) || 'P'}
-                </div>
-              )}
-              
-              {/* Subtle Gradient Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent lg:hidden" />
-
-              {/* Glowing Neon Emerald Skewed Slit Divider (Visible on Desktop) */}
-              <div className="absolute top-0 bottom-0 -right-4 w-10 bg-emerald-500 transform -skew-x-6 shadow-[0_0_25px_#10B981] hidden lg:block z-20 pointer-events-none" />
-            </div>
-
-            {/* RIGHT SIDE: DARK SLATE/EMERALD CONTENT PANEL */}
-            <div className="lg:col-span-6 p-8 sm:p-12 lg:p-16 flex flex-col justify-center space-y-6 bg-[#0B132B] relative z-10 text-left">
-              {/* Emerald Pill Badge */}
-              <div>
-                <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-500/50 text-[11px] font-extrabold tracking-widest px-4 py-1.5 rounded-full uppercase inline-flex items-center gap-2 shadow-inner">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  PRESIDENT
-                </span>
-              </div>
-
-              {/* Huge Bold Title */}
-              <div className="space-y-1">
-                <h2 className="font-sans font-black text-3xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-white leading-[1.05]">
-                  {presidentAppt?.person.fullName || 'CMRD. IBRAHIM SOBUR BAMIDELE'}
-                </h2>
-                <p className="text-xs sm:text-sm font-semibold tracking-wider text-slate-400 uppercase pt-1">
-                  STUDENTS UNION GOVERNMENT • FEDERAL UNIVERSITY DUTSE
-                </p>
-              </div>
-
-              {/* Quote / Motto */}
-              <p className="text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-lg">
-                "Leading with dedication, integrity, and an unyielding commitment to every Yoruba student's success."
-              </p>
-
-              {/* Vibrant Green Action CTA Button */}
-              <div className="pt-2">
-                <Link
-                  href="#executive-council-section"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-full shadow-lg hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-300"
-                >
-                  <span>MEET THE COUNCIL</span>
-                  <ArrowRight className="w-4 h-4 text-slate-950 stroke-[3]" />
-                </Link>
-              </div>
-            </div>
-
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* 4. NUMBERS THAT TELL THE STORY - Glowing Impact Counter */}
+      {/* 2. DYNAMIC STATISTICAL METRICS BAR (TASK 10) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-emerald-950 text-white p-6 rounded-2xl border border-emerald-800 shadow-xl text-center space-y-2 hover-lift">
-              <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center mx-auto">
-                <Building2 className="w-5 h-5" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white">8</div>
-              <div className="text-xs font-semibold text-amber-300 uppercase tracking-wider">Constituent States</div>
-              <p className="text-[11px] text-slate-400">Full Yoruba State Representation</p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Constituent</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">8 States</div>
+              <div className="text-[9px] text-slate-400 font-medium">100% Yoruba</div>
             </div>
 
-            <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-xl text-center space-y-2 hover-lift">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                <Users className="w-5 h-5" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white">17</div>
-              <div className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">Executive Offices</div>
-              <div className="text-[11px] text-slate-400">Active Exco Portfolio</div>
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Executives</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{excoCount} Exco</div>
+              <div className="text-[9px] text-slate-400 font-medium">Active Portfolio</div>
             </div>
 
-            <div className="bg-emerald-950 text-white p-6 rounded-2xl border border-emerald-800 shadow-xl text-center space-y-2 hover-lift">
-              <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center mx-auto">
-                <GraduationCap className="w-5 h-5" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white">16</div>
-              <div className="text-xs font-semibold text-amber-300 uppercase tracking-wider">House Delegates</div>
-              <div className="text-[11px] text-slate-400">Legislative Representatives</div>
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Delegates</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{repCount} Reps</div>
+              <div className="text-[9px] text-slate-400 font-medium">House Assembly</div>
             </div>
 
-            <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-xl text-center space-y-2 hover-lift">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                <BookOpen className="w-5 h-5" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-amber-400">100%</div>
-              <div className="text-xs font-semibold text-white uppercase tracking-wider">Constitutional Compliance</div>
-              <div className="text-[11px] text-slate-400">Ratified 2026 Gazette</div>
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Achievements</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{achieveCount} Goals</div>
+              <div className="text-[9px] text-slate-400 font-medium">Progress Era</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Gazettes</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{newsCount} News</div>
+              <div className="text-[9px] text-slate-400 font-medium">Published</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Media Assets</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{mediaCount} Media</div>
+              <div className="text-[9px] text-slate-400 font-medium">Cloudinary CDN</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Downloads</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{downloadCount} PDFs</div>
+              <div className="text-[9px] text-slate-400 font-medium">Resource Center</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Registered</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{userCount} Users</div>
+              <div className="text-[9px] text-slate-400 font-medium">Admin Accounts</div>
             </div>
           </div>
         </section>
       </ScrollReveal>
 
-      {/* 5. EXECUTIVE COUNCIL SHOWCASE - Interactive Slider & Pop-Up Modal Component */}
+      {/* 3. MODERN NEWSROOM BROADCAST (TASK 4 - BBC / CHANNELS TV STYLE) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
-        <section id="executive-council-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12 space-y-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center border border-amber-500/30">
+                <Newspaper className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">OFFICIAL PRESS BROADCAST</span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">National YOSU Newsroom</h2>
+              </div>
+            </div>
+
+            <Link
+              href="/news"
+              className="text-xs font-bold text-emerald-950 hover:text-amber-600 flex items-center gap-1.5 transition-colors"
+            >
+              <span>View Newsroom Archive</span>
+              <ArrowRight className="w-4 h-4 text-amber-500" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Left 7 Columns: Hero Feature Article */}
+            {heroNews ? (
+              <div className="lg:col-span-7 bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
+                <div>
+                  {heroNews.featuredMedia?.url && (
+                    <div className="relative w-full h-64 sm:h-80 overflow-hidden">
+                      <Image
+                        src={heroNews.featuredMedia.url}
+                        alt={heroNews.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        priority
+                      />
+                      <div className="absolute top-4 left-4 bg-emerald-950 text-white font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/50 shadow-md">
+                        {heroNews.category.name}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-6 sm:p-8 space-y-3">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+                      <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{heroNews.publishedAt ? new Date(heroNews.publishedAt).toLocaleDateString() : 'Recent'}</span>
+                    </div>
+
+                    <h3 className="font-serif font-bold text-xl sm:text-2xl text-slate-900 group-hover:text-emerald-900 transition-colors leading-tight">
+                      {heroNews.title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                      {heroNews.summary}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-6 sm:p-8 pt-0">
+                  <Link
+                    href={`/news/${heroNews.slug}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl transition-all shadow-md"
+                  >
+                    <span>Read Full Gazette</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="lg:col-span-7 bg-white p-8 rounded-3xl border border-stone-200 text-slate-500 text-xs">
+                No featured news gazette published yet.
+              </div>
+            )}
+
+            {/* Right 5 Columns: 3 Latest Sub-Featured News Cards */}
+            <div className="lg:col-span-5 flex flex-col gap-4">
+              {subNewsArticles.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/news/${article.slug}`}
+                  className="group bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-all flex items-start gap-4"
+                >
+                  {article.featuredMedia?.url ? (
+                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden shrink-0">
+                      <Image
+                        src={article.featuredMedia.url}
+                        alt={article.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-xl bg-slate-950 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">
+                      YOSU
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-amber-100 text-amber-900 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded">
+                        {article.category.name}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-semibold">
+                        {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : 'Recent'}
+                      </span>
+                    </div>
+
+                    <h4 className="font-serif font-bold text-sm text-slate-900 line-clamp-2 group-hover:text-emerald-900 transition-colors leading-snug">
+                      {article.title}
+                    </h4>
+
+                    <p className="text-xs text-slate-500 line-clamp-1 font-light">{article.summary}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* 4. DYNAMIC EXECUTIVE ACHIEVEMENTS SHOWCASE (TASK 3) */}
+      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
+        <section className="bg-slate-950 text-white py-16 px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">
+                  PROFILES IN EXCELLENCE
+                </span>
+                <h2 className="font-serif text-2xl sm:text-4xl font-bold text-white">
+                  Key Achievements of the {currentSession?.title || 'Progress Era'}
+                </h2>
+              </div>
+              <span className="text-xs font-bold text-slate-400 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                Official Administration Metrics
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {dynamicAchievements.map((ach) => {
+                const isCompleted = ach.progressPercentage >= 100;
+                return (
+                  <div
+                    key={ach.id}
+                    className="bg-slate-900/90 border border-slate-800 hover:border-amber-400/60 rounded-2xl p-6 space-y-4 hover-lift transition-all flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/30">
+                          <Award className="w-5 h-5" />
+                        </div>
+                        <span
+                          className={`text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase flex items-center gap-1 ${
+                            isCompleted
+                              ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-500/40'
+                              : 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                          }`}
+                        >
+                          {isCompleted ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Clock className="w-3 h-3 text-amber-400" />}
+                          {isCompleted ? 'Completed' : `${ach.progressPercentage}% Ongoing`}
+                        </span>
+                      </div>
+
+                      <h3 className="font-serif font-bold text-base text-white leading-snug">
+                        {ach.title}
+                      </h3>
+                      <p className="text-xs text-slate-300 font-light leading-relaxed line-clamp-3">
+                        {ach.description}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5 pt-2 border-t border-slate-800">
+                      <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                        <span>Milestone Progress</span>
+                        <span className="text-amber-400">{ach.progressPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            isCompleted ? 'bg-emerald-400' : 'bg-gradient-to-r from-amber-400 to-emerald-500'
+                          }`}
+                          style={{ width: `${ach.progressPercentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* 5. EXECUTIVE COUNCIL SHOWCASE */}
+      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
+        <section id="executive-council-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
           <ExecutiveCarousel
             officers={carouselOfficers}
             sessionTitle={currentSession?.title ? `${currentSession.title} (Progress Era)` : '2026/2027 Session'}
@@ -296,148 +480,27 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 6. PATRONS & PILLARS - Distinguished Dignitaries */}
+      {/* 6. CONSTITUENT STATES & DIGNITARIES */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
-        <section className="bg-slate-950 text-white py-14 px-4 sm:px-6 lg:px-8 w-full max-w-full my-16">
-          <div className="max-w-7xl mx-auto space-y-8">
-            <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">DISTINGUISHED DIGNITARIES</span>
-              <h2 className="text-2xl sm:text-4xl font-serif font-bold text-white">
-                Patrons & Pillars of YOSU
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Honoring the esteemed institutional mentors, university leadership, and royal fathers whose wisdom guides our union.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {dignitaries.map((dig) => (
-                <div
-                  key={dig.name}
-                  className="bg-slate-900/90 border border-slate-800 hover:border-amber-400/60 rounded-2xl p-5 text-center space-y-3 hover-lift group"
-                >
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-950 border border-amber-400/40 p-2.5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                    <Crown className="w-7 h-7 text-amber-400" />
-                  </div>
-
-                  <div>
-                    <span className="bg-emerald-950 text-amber-300 text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-emerald-800 inline-block mb-1.5">
-                      {dig.badge}
-                    </span>
-                    <h3 className="font-serif font-bold text-sm text-white group-hover:text-amber-300 transition-colors leading-snug">
-                      {dig.name}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 font-medium">{dig.title}</p>
-                    <p className="text-[11px] text-emerald-400 italic mt-0.5">{dig.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* 7. PUBLIC GAZETTE & PROJECTS */}
-      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16 space-y-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Latest Gazette Announcement */}
-            {featuredNews && (
-              <div className="lg:col-span-7 bg-gradient-to-r from-amber-50 to-stone-50 rounded-2xl border border-amber-200/80 p-6 sm:p-8 space-y-4 shadow-sm hover-lift">
-                <span className="bg-amber-200/80 text-amber-900 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
-                  Ratified Press Gazette
-                </span>
-
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
-                  {featuredNews.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                  {featuredNews.summary}
-                </p>
-
-                <div>
-                  <Link
-                    href={`/news/${featuredNews.slug}`}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-colors shadow-sm hover:scale-105"
-                  >
-                    <span>Read Full Statement</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {/* Development Projects Tracker */}
-            <div className="lg:col-span-5 bg-slate-900 text-white rounded-2xl p-6 sm:p-7 space-y-4 border border-slate-800 shadow-md hover-lift">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                <div>
-                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">TRANSPARENCY TRACKER</span>
-                  <h3 className="font-serif text-lg font-bold text-white">Active Projects</h3>
-                </div>
-                <Link
-                  href="/projects"
-                  className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1"
-                >
-                  <span>View All</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
-              <div className="space-y-4">
-                {activeProjects.map((proj) => (
-                  <div key={proj.id} className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="font-serif font-bold text-xs sm:text-sm text-white">{proj.title}</h4>
-                      <span className="bg-emerald-950 text-amber-300 text-[9px] font-bold px-2 py-0.5 rounded uppercase border border-emerald-800">
-                        {proj.status}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-300 line-clamp-2">{proj.summary || proj.description}</p>
-
-                    <div className="space-y-1 pt-1">
-                      <div className="flex justify-between text-[10px] font-semibold">
-                        <span className="text-slate-400">Completion Progress</span>
-                        <span className="text-amber-400">{proj.progressPercentage}%</span>
-                      </div>
-                      <div className="w-full bg-slate-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-amber-400 to-emerald-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${proj.progressPercentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* 8. CONSTITUENT STATES REGIONAL REPRESENTATION */}
-      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16">
-          <div className="mb-6 space-y-1 text-center sm:text-left">
-            <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">REGIONAL GOVERNANCE</span>
-            <h2 className="text-xl sm:text-2xl font-serif font-bold text-emerald-950">
-              The 8 Constituent Yoruba States
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">CONSTITUENT REPUBLICS</span>
+            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-slate-900">
+              8 Constituent Yoruba States
             </h2>
+            <p className="text-xs sm:text-sm text-slate-600">
+              Representing students across the 8 Yoruba constituent states of the Federal Republic of Nigeria.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {constituentStates.map((st) => (
               <div
                 key={st.name}
-                className="bg-white p-4 rounded-2xl border border-stone-200 hover:border-amber-400 transition-all space-y-1 shadow-sm hover-lift"
+                className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow text-center space-y-1"
               >
-                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-900 font-bold text-xs flex items-center justify-center mb-2">
-                  <Building2 className="w-3.5 h-3.5" />
-                </div>
-                <h3 className="font-serif font-bold text-xs sm:text-sm text-slate-900 leading-snug">
-                  {st.name}
-                </h3>
-                <p className="text-[10px] text-slate-500 line-clamp-1">{st.tagline}</p>
+                <h3 className="font-serif font-bold text-sm text-slate-900">{st.name}</h3>
+                <p className="text-[11px] text-amber-700 font-medium italic">{st.tagline}</p>
               </div>
             ))}
           </div>

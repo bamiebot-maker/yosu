@@ -232,10 +232,12 @@ model AdministrationSession {
   committees    Committee[]
   albums        Album[]
   constitutions ConstitutionVersion[]
-  projects      Project[]
-  achievements  SessionAchievement[]
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
+  projects              Project[]
+  achievements          SessionAchievement[]
+  dynamicAchievements   Achievement[]
+  houseRepresentatives  HouseRepresentative[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
   @@index([isCurrent])
 }
@@ -340,6 +342,8 @@ model NewsArticle {
   content            String
   readingTimeMinutes Int           @default(3)
   viewCount          Int           @default(0)
+  likeCount          Int           @default(0)
+  shareCount         Int           @default(0)
   isFeatured         Boolean       @default(false)
   status             ArticleStatus @default(DRAFT)
   publishedAt        DateTime?
@@ -716,4 +720,38 @@ model Announcement {
   updatedAt   DateTime  @updatedAt
 
   @@index([isActive, isPinned])
+}
+
+// ==========================================
+// 15. DYNAMIC CMS: REPRESENTATIVES & ACHIEVEMENTS
+// ==========================================
+
+model HouseRepresentative {
+  id            String                @id @default(cuid())
+  fullName      String
+  stateOfOrigin String
+  positionTitle String                @default("Representative")
+  photoUrl      String?
+  sessionId     String
+  session       AdministrationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  displayOrder  Int                   @default(0)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([sessionId, stateOfOrigin])
+}
+
+model Achievement {
+  id                 String                @id @default(cuid())
+  title              String
+  description        String
+  progressPercentage Int                   @default(0)
+  status             String                @default("ONGOING") // ONGOING, COMPLETED, UPCOMING
+  imageUrl           String?
+  sessionId          String
+  session            AdministrationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@index([sessionId, status])
 }

@@ -53,6 +53,8 @@ export function Sidebar({ session }: SidebarProps) {
       group: 'GOVERNANCE & ROSTER',
       items: [
         { name: 'Executive Offices', href: '/admin/executives', icon: Users },
+        { name: 'House Representatives', href: '/admin/representatives', icon: FolderGit2 },
+        { name: 'Era Achievements', href: '/admin/achievements', icon: BarChart3 },
         { name: 'Sessions & Timeline', href: '/admin/sessions', icon: BarChart3 },
       ],
     },

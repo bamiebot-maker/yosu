@@ -6,7 +6,7 @@ import { Shield, Target, Eye, BookOpen, Award, Building2 } from 'lucide-react';
 export const revalidate = 60;
 
 export default async function AboutPage() {
-  const currentSession = await db.administrationSession.findFirst({ where: { isCurrent: true } });
+  const currentSession = await db.administrationSession.findFirst({ where: { isCurrent: true } }).catch(() => null);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
