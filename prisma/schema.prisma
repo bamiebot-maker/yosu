@@ -236,6 +236,7 @@ model AdministrationSession {
   achievements          SessionAchievement[]
   dynamicAchievements   Achievement[]
   houseRepresentatives  HouseRepresentative[]
+  presidentialWelcomes  PresidentialWelcome[]
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
 
@@ -754,4 +755,40 @@ model Achievement {
   updatedAt          DateTime              @updatedAt
 
   @@index([sessionId, status])
+}
+
+// ==========================================
+// 16. DYNAMIC CMS: HERO PRESIDENT & ABOUT CONTENT
+// ==========================================
+
+model PresidentialWelcome {
+  id             String                 @id @default(cuid())
+  presidentName  String
+  officeTitle    String                 @default("Executive President")
+  stateOfOrigin  String                 @default("Ekiti State")
+  sessionTitle   String                 @default("2026/2027 Progress Era Session")
+  portraitUrl    String?
+  welcomeSummary String
+  fullMessage    String
+  isActive       Boolean                @default(true)
+  sessionId      String?
+  session        AdministrationSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([isActive])
+}
+
+model AboutContent {
+  id           String   @id @default(cuid())
+  sectionKey   String   @unique
+  title        String
+  subtitle     String?
+  content      String
+  iconName     String?  @default("BookOpen")
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([sectionKey])
 }

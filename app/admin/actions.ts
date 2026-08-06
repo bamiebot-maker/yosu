@@ -1009,3 +1009,192 @@ export async function shareArticleAction(articleId: string) {
     return { success: false, error: error.message || 'Failed to register share' };
   }
 }
+
+// ==========================================
+// 11. PRESIDENTIAL WELCOME ADDRESS & CMS ACTIONS
+// ==========================================
+export async function upsertPresidentialWelcomeAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const id = formData.get('id') as string | null;
+    const presidentName = formData.get('presidentName') as string;
+    const officeTitle = (formData.get('officeTitle') as string) || 'Executive President';
+    const stateOfOrigin = (formData.get('stateOfOrigin') as string) || 'Ekiti State';
+    const sessionTitle = (formData.get('sessionTitle') as string) || '2026/2027 Progress Era Session';
+    const portraitUrl = (formData.get('portraitUrl') as string) || null;
+    const welcomeSummary = formData.get('welcomeSummary') as string;
+    const fullMessage = (formData.get('fullMessage') as string) || welcomeSummary;
+
+    // Deactivate previous active welcome messages if setting active
+    await db.presidentialWelcome.updateMany({
+      data: { isActive: false },
+    });
+
+    let welcome;
+    if (id) {
+      welcome = await db.presidentialWelcome.update({
+        where: { id },
+        data: {
+          presidentName,
+          officeTitle,
+          stateOfOrigin,
+          sessionTitle,
+          portraitUrl,
+          welcomeSummary,
+          fullMessage,
+          isActive: true,
+        },
+      });
+    } else {
+      welcome = await db.presidentialWelcome.create({
+        data: {
+          presidentName,
+          officeTitle,
+          stateOfOrigin,
+          sessionTitle,
+          portraitUrl,
+          welcomeSummary,
+          fullMessage,
+          isActive: true,
+        },
+      });
+    }
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'UPDATE_PRESIDENTIAL_WELCOME',
+        details: `Updated Presidential Welcome Message for ${presidentName}`,
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/about');
+    revalidatePath('/admin/welcome-message');
+    return { success: true, message: 'Presidential Welcome Address saved successfully!', data: welcome };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to save welcome message' };
+  }
+}
+
+// ==========================================
+// 12. DYNAMIC ABOUT CONTENT CMS ACTIONS
+// ==========================================
+export async function upsertAboutContentAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const sectionKey = formData.get('sectionKey') as string;
+    const title = formData.get('title') as string;
+    const subtitle = (formData.get('subtitle') as string) || null;
+    const content = formData.get('content') as string;
+    const iconName = (formData.get('iconName') as string) || 'BookOpen';
+    const displayOrder = parseInt((formData.get('displayOrder') as string) || '0', 10);
+
+    const about = await db.aboutContent.upsert({
+      where: { sectionKey },
+      update: {
+        title,
+        subtitle,
+        content,
+        iconName,
+        displayOrder,
+      },
+      create: {
+        sectionKey,
+        title,
+        subtitle,
+        content,
+        iconName,
+        displayOrder,
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'UPDATE_ABOUT_CONTENT',
+        details: `Updated About Content Section: ${sectionKey}`,
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/about');
+    revalidatePath('/admin/about-content');
+    return { success: true, message: 'About Content saved successfully!', data: about };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to save about content' };
+  }
+}
+
+export async function deleteAboutContentAction(id: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    await db.aboutContent.delete({ where: { id } });
+
+    revalidatePath('/');
+    revalidatePath('/about');
+    revalidatePath('/admin/about-content');
+    return { success: true, message: 'About section deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete about section' };
+  }
+}
+
+// ==========================================
+// 13. SITE SETTINGS CMS ACTIONS (CONTACT & MAP)
+// ==========================================
+export async function updateSiteSettingsAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const settingsToUpdate = [
+      { key: 'contact_address', label: 'Office Address', group: 'CONTACT' },
+      { key: 'contact_email', label: 'Official Email', group: 'CONTACT' },
+      { key: 'contact_phone', label: 'Helpline Phone', group: 'CONTACT' },
+      { key: 'contact_whatsapp', label: 'Official WhatsApp', group: 'CONTACT' },
+      { key: 'contact_map_url', label: 'Google Maps Embed URL', group: 'CONTACT' },
+      { key: 'social_facebook', label: 'Facebook URL', group: 'FOOTER' },
+      { key: 'social_twitter', label: 'Twitter/X URL', group: 'FOOTER' },
+      { key: 'social_instagram', label: 'Instagram URL', group: 'FOOTER' },
+      { key: 'social_linkedin', label: 'LinkedIn URL', group: 'FOOTER' },
+    ] as const;
+
+    for (const item of settingsToUpdate) {
+      const val = formData.get(item.key) as string | null;
+      if (val !== null) {
+        await db.siteSetting.upsert({
+          where: { key: item.key },
+          update: { value: val },
+          create: {
+            key: item.key,
+            value: val,
+            label: item.label,
+            group: item.group,
+          },
+        });
+      }
+    }
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'UPDATE_SITE_SETTINGS',
+        details: 'Updated Site Settings and Contact Preview configurations',
+      },
+    });
+
+    revalidatePath('/');
+    revalidatePath('/contact');
+    revalidatePath('/admin/settings');
+    return { success: true, message: 'Site & Contact Settings saved successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update site settings' };
+  }
+}

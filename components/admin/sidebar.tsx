@@ -19,6 +19,7 @@ import {
   HelpCircle,
   BarChart3,
   Layers,
+  Crown,
 } from 'lucide-react';
 import { SessionPayload } from '@/lib/auth';
 
@@ -42,6 +43,8 @@ export function Sidebar({ session }: SidebarProps) {
     {
       group: 'CONTENT & NEWSROOM',
       items: [
+        { name: 'President\'s Welcome', href: '/admin/welcome-message', icon: Crown },
+        { name: 'About YOSU CMS', href: '/admin/about-content', icon: BookOpen },
         { name: 'News Gazettes', href: '/admin/news', icon: Newspaper },
         { name: 'Announcements', href: '/admin/announcements', icon: Layers },
         { name: 'Central Media Library', href: '/admin/media', icon: Layers },
