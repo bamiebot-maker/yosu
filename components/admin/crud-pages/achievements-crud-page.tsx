@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Search, Trash2, Edit2, Award, CheckCircle2, Clock, X, Check } from 'lucide-react';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import {
   createAchievementAction,
   updateAchievementAction,
@@ -326,18 +327,11 @@ export function AchievementsCrudPage({
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Image URL (Optional / Cloudinary)
-                </label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  defaultValue={editingAchievement?.imageUrl || ''}
-                  placeholder="https://res.cloudinary.com/..."
-                  className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium focus:outline-none"
-                />
-              </div>
+              <ImageUploader
+                name="imageUrl"
+                defaultValue={editingAchievement?.imageUrl || ''}
+                label="Achievement Showcase Image (Upload File / Cloudinary)"
+              />
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-100">
                 <button
