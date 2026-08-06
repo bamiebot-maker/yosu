@@ -19,7 +19,6 @@ import {
   Sun,
   Moon,
   Coffee,
-  Type,
   ArrowUp,
   History,
   Layers,
@@ -30,14 +29,12 @@ import {
   UserCheck,
   Check,
   X,
-  SlidersHorizontal,
   Home,
   ChevronRight,
-  Info,
   ShieldCheck,
   Award,
-  AlertCircle,
-  Eye,
+  ListFilter,
+  Filter,
 } from 'lucide-react';
 
 export interface SerializedSection {
@@ -110,7 +107,9 @@ export function InteractiveConstitutionPortal({
   const [search, setSearch] = useState('');
   const [expandedArticles, setExpandedArticles] = useState<Record<string, boolean>>({});
   const [readingProgress, setReadingProgress] = useState(0);
-  const [activeChapterIndex, setActiveChapterIndex] = useState(0);
+  const [activeArticleId, setActiveArticleId] = useState<string>(
+    selectedVersion.articles[0]?.id || ''
+  );
   const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg' | 'xl'>('base');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'sepia'>('light');
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -124,54 +123,6 @@ export function InteractiveConstitutionPortal({
 
   const [localDownloadsCount, setLocalDownloadsCount] = useState(selectedVersion.downloadsCount);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Group Articles into 7 Official Chapters
-  const chapters = useMemo(() => {
-    return [
-      {
-        id: 'ch-1',
-        title: 'Chapter I: General Supremacy, Membership & Objectives',
-        description: 'Name, Supremacy, Autonomy, Membership Rights & Aim',
-        articleNumbers: [1, 2, 3],
-      },
-      {
-        id: 'ch-2',
-        title: 'Chapter II: Organs & Executive Council Powers',
-        description: 'Primary Organs, EXCO Composition & Officer Portfolios',
-        articleNumbers: [4, 5, 6],
-      },
-      {
-        id: 'ch-3',
-        title: 'Chapter III: Legislative Arm — House of Representatives',
-        description: 'State Delegations, Speaker Certificate & Powers',
-        articleNumbers: [7],
-      },
-      {
-        id: 'ch-4',
-        title: 'Chapter IV: Independent Constitutional Committees (CRC & NSC)',
-        description: 'Compliance Committee & Electoral Screening',
-        articleNumbers: [8, 9],
-      },
-      {
-        id: 'ch-5',
-        title: 'Chapter V: Finance Regulations & Meeting Quorums',
-        description: 'Banking, Annual Budgets, Misconduct & Congress',
-        articleNumbers: [10, 11],
-      },
-      {
-        id: 'ch-6',
-        title: 'Chapter VI: Leadership Rotation, Patrons & Discipline',
-        description: 'State Rotation Principle, Royal Court & Sanctions',
-        articleNumbers: [12, 13, 14],
-      },
-      {
-        id: 'ch-7',
-        title: 'Chapter VII: Constitutional Amendment, Vacancies & Interpretation',
-        description: 'Amendment Ratification, Succession & Schedules',
-        articleNumbers: [15, 16, 17],
-      },
-    ];
-  }, []);
 
   // Calculate Reading Time Dynamically
   const estimatedReadingTime = useMemo(() => {
@@ -187,7 +138,7 @@ export function InteractiveConstitutionPortal({
     return Math.max(1, Math.ceil(totalWords / 200));
   }, [selectedVersion]);
 
-  // Track Reading Scroll Progress & Active Chapter ScrollSpy
+  // Track Reading Scroll Progress
   useEffect(() => {
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -202,7 +153,7 @@ export function InteractiveConstitutionPortal({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Global Keyboard Shortcuts (Ctrl+F / '/' to search, Esc to reset)
+  // Global Keyboard Shortcuts (Ctrl+F to search)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
@@ -249,7 +200,6 @@ export function InteractiveConstitutionPortal({
   const isMatchingArticle = (art: SerializedArticle) => {
     if (!searchLower) return true;
 
-    // Convert Roman numerals & keywords for robust matching
     const searchTerms = searchLower.split(/\s+/);
     const artText = `article ${art.articleNumber} ${art.title} ${art.overview || ''}`.toLowerCase();
 
@@ -266,7 +216,6 @@ export function InteractiveConstitutionPortal({
     return selectedVersion.articles.filter(isMatchingArticle);
   }, [selectedVersion.articles, searchLower]);
 
-  // Calculate total matching items
   const matchCount = searchLower ? filteredArticles.length : 0;
 
   // Auto-expand all articles when searching
@@ -284,15 +233,11 @@ export function InteractiveConstitutionPortal({
     setExpandedArticles((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const scrollToChapter = (index: number) => {
-    setActiveChapterIndex(index);
-    const targetArtNum = chapters[index].articleNumbers[0];
-    const targetArticle = selectedVersion.articles.find((a) => a.articleNumber === targetArtNum);
-    if (targetArticle) {
-      const el = document.getElementById(`article-${targetArticle.id}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+  const scrollToArticle = (artId: string) => {
+    setActiveArticleId(artId);
+    const el = document.getElementById(`article-${artId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -316,12 +261,6 @@ export function InteractiveConstitutionPortal({
   };
 
   // Dynamic Theme Classes
-  const themeClasses = {
-    light: 'bg-white text-slate-900 border-slate-200',
-    dark: 'bg-slate-950 text-slate-100 border-slate-800',
-    sepia: 'bg-[#FBF0D9] text-[#4A3B2C] border-[#E2D5B8]',
-  }[themeMode];
-
   const cardThemeClasses = {
     light: 'bg-white text-slate-900 border-slate-200 shadow-sm',
     dark: 'bg-slate-900 text-slate-100 border-slate-800 shadow-md',
@@ -337,7 +276,7 @@ export function InteractiveConstitutionPortal({
 
   return (
     <div className={`space-y-8 font-sans min-h-screen transition-colors duration-200 ${themeMode === 'dark' ? 'bg-slate-950 text-white' : ''}`}>
-      {/* 1. STICKY TOP READING PROGRESS BAR */}
+      {/* STICKY TOP READING PROGRESS BAR */}
       <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-slate-200/50 backdrop-blur-sm">
         <div
           className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-400 transition-all duration-150"
@@ -355,7 +294,7 @@ export function InteractiveConstitutionPortal({
         <span className="font-semibold text-slate-900">Supreme Unification Constitution</span>
       </nav>
 
-      {/* 2. CONSTITUTION METADATA HERO BANNER */}
+      {/* CONSTITUTION METADATA HERO BANNER */}
       <header className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -432,7 +371,7 @@ export function InteractiveConstitutionPortal({
         </div>
       </header>
 
-      {/* 3. CONSTITUTION NAVIGATION TABS */}
+      {/* CONSTITUTION NAVIGATION TABS */}
       <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-wrap items-center gap-2" role="tablist">
         {[
           { id: 'text', label: 'Interactive Reader', icon: BookOpen },
@@ -542,7 +481,7 @@ export function InteractiveConstitutionPortal({
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by Article (e.g. Article 14), Section, Chapter, Roman numerals (I-XVII), President, Discipline, Finance..."
+                placeholder="Search by Article (e.g. Article 14), Section, Roman numerals, President, Discipline, Finance..."
                 className="w-full pl-12 pr-28 py-3.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-900 dark:text-white"
               />
               {searchLower && (
@@ -562,54 +501,81 @@ export function InteractiveConstitutionPortal({
             </div>
           </div>
 
-          {/* MAIN LAYOUT: STICKY CHAPTER SIDEBAR & ARTICLES STREAM */}
+          {/* MOBILE DROPDOWN ARTICLE SELECTOR (lg:hidden) */}
+          <div className="block lg:hidden bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+              <Filter className="w-4 h-4 text-amber-500" />
+              <span>Jump Directly to Article (1 - {selectedVersion.articles.length}):</span>
+            </label>
+            <select
+              value={activeArticleId}
+              onChange={(e) => scrollToArticle(e.target.value)}
+              className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500"
+            >
+              {selectedVersion.articles.map((art) => (
+                <option key={art.id} value={art.id}>
+                  Article {art.articleNumber}: {art.title} ({art.sections.length} Sections)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* MAIN LAYOUT: DESKTOP ARTICLE SIDEBAR & ARTICLES STREAM */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Sticky Sidebar Navigation */}
-            <aside className={`lg:col-span-4 lg:sticky lg:top-24 p-5 rounded-3xl border shadow-sm space-y-4 ${cardThemeClasses}`}>
+            {/* DESKTOP ARTICLES SIDEBAR (hidden on mobile, visible on lg) */}
+            <aside className={`hidden lg:block lg:col-span-4 lg:sticky lg:top-24 p-5 rounded-3xl border shadow-sm space-y-4 ${cardThemeClasses}`}>
               <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                 <BookOpen className="w-4 h-4 text-amber-500" />
-                <h3 className="font-serif font-bold text-sm">Chapters & Articles Index</h3>
+                <h3 className="font-serif font-bold text-sm">Articles Directory ({selectedVersion.articles.length})</h3>
               </div>
 
-              <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-                {chapters.map((ch, idx) => {
-                  const isActive = activeChapterIndex === idx;
+              <div className="space-y-2 max-h-[75vh] overflow-y-auto pr-1">
+                {selectedVersion.articles.map((art) => {
+                  const isActive = activeArticleId === art.id;
                   return (
                     <button
-                      key={ch.id}
+                      key={art.id}
                       type="button"
-                      onClick={() => scrollToChapter(idx)}
-                      className={`w-full text-left p-3 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
+                      onClick={() => scrollToArticle(art.id)}
+                      className={`w-full text-left p-3.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
                         isActive
-                          ? 'bg-slate-900 text-amber-300 border-slate-800 shadow-md'
+                          ? 'bg-emerald-950 text-amber-300 border-emerald-800 shadow-md'
                           : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
                       }`}
                     >
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="line-clamp-1">{ch.title}</span>
+                      <div className="flex justify-between items-center gap-2 mb-1">
+                        <span className="line-clamp-1 font-serif">
+                          Article {art.articleNumber}: {art.title}
+                        </span>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold flex-shrink-0 ${
+                            isActive
+                              ? 'bg-amber-400 text-slate-950'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {art.sections.length} Secs
+                        </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-light line-clamp-1">
-                        {ch.description}
-                      </p>
                     </button>
                   );
                 })}
               </div>
             </aside>
 
-            {/* Main Articles Stream */}
+            {/* MAIN ARTICLES CONTENT STREAM */}
             <main className="lg:col-span-8 space-y-6">
               {filteredArticles.length === 0 ? (
                 <div className={`p-12 rounded-3xl border text-center space-y-4 ${cardThemeClasses}`}>
                   <Shield className="w-12 h-12 text-slate-400 mx-auto" />
                   <h3 className="font-serif font-bold text-lg">No Matching Constitutional Provisions</h3>
                   <p className="text-xs text-slate-500 max-w-md mx-auto font-light">
-                    We couldn&apos;t find any articles or sections matching &quot;{search}&quot;. Try searching for broader terms like &quot;President&quot;, &quot;Finance&quot;, &quot;Discipline&quot;, or &quot;Chapter III&quot;.
+                    We couldn&apos;t find any articles or sections matching &quot;{search}&quot;. Try searching for broader terms like &quot;President&quot;, &quot;Finance&quot;, &quot;Discipline&quot;, or &quot;Article 14&quot;.
                   </p>
                   <button
                     type="button"
                     onClick={() => setSearch('')}
-                    className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow"
+                    className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow cursor-pointer"
                   >
                     Clear Search Query
                   </button>
@@ -629,7 +595,7 @@ export function InteractiveConstitutionPortal({
                         className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                       >
                         <div className="flex items-center gap-3.5">
-                          <span className="w-9 h-9 rounded-2xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-800 shadow-sm">
+                          <span className="w-9 h-9 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-800 shadow-sm">
                             {art.articleNumber}
                           </span>
                           <div>
@@ -653,7 +619,7 @@ export function InteractiveConstitutionPortal({
                           {art.overview && (
                             <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-300 leading-relaxed font-light">
                               <span className="font-bold block text-[10px] uppercase tracking-wider text-amber-600 mb-1">
-                                CHAPTER OVERVIEW
+                                ARTICLE OVERVIEW
                               </span>
                               {highlightText(art.overview)}
                             </div>
@@ -744,7 +710,7 @@ export function InteractiveConstitutionPortal({
                       setActiveVersionId(ver.id);
                       setActiveTab('text');
                     }}
-                    className="bg-slate-900 text-amber-300 font-bold px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="bg-slate-900 text-amber-300 font-bold px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     Read Online
                   </button>
@@ -886,20 +852,20 @@ export function InteractiveConstitutionPortal({
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-amber-500">{stats.totalChapters}</span>
-              <span className="text-xs text-slate-500 block font-medium">Chapters</span>
+              <span className="text-2xl font-extrabold font-serif text-amber-500">{selectedVersion.articles.length}</span>
+              <span className="text-xs text-slate-500 block font-medium">Enacted Articles</span>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-emerald-500">{stats.totalArticles}</span>
-              <span className="text-xs text-slate-500 block font-medium">Articles</span>
+              <span className="text-2xl font-extrabold font-serif text-emerald-500">{stats.totalSections}</span>
+              <span className="text-xs text-slate-500 block font-medium">Sub-Sections</span>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-blue-500">{stats.totalSections}</span>
-              <span className="text-xs text-slate-500 block font-medium">Sections</span>
-            </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-purple-500">{stats.totalAmendments}</span>
+              <span className="text-2xl font-extrabold font-serif text-blue-500">{stats.totalAmendments}</span>
               <span className="text-xs text-slate-500 block font-medium">Amendments</span>
+            </div>
+            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-purple-500">{allVersions.length}</span>
+              <span className="text-xs text-slate-500 block font-medium">Versions</span>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
               <span className="text-2xl font-extrabold font-serif text-teal-500">{selectedVersion.viewsCount}</span>
