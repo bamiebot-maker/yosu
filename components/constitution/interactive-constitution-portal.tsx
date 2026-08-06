@@ -16,25 +16,16 @@ import {
   Printer,
   Maximize2,
   Minimize2,
-  Sun,
-  Moon,
-  Coffee,
   ArrowUp,
   History,
-  Layers,
-  Sparkles,
-  BarChart3,
   Scale,
-  Calendar,
-  UserCheck,
-  Check,
+  Award,
+  BarChart3,
   X,
   Home,
   ChevronRight,
-  ShieldCheck,
-  Award,
-  ListFilter,
   Filter,
+  ListFilter,
 } from 'lucide-react';
 
 export interface SerializedSection {
@@ -110,19 +101,52 @@ export function InteractiveConstitutionPortal({
   const [activeArticleId, setActiveArticleId] = useState<string>(
     selectedVersion.articles[0]?.id || ''
   );
-  const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg' | 'xl'>('base');
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'sepia'>('light');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [activeTab, setActiveTab] = useState<'text' | 'archive' | 'compare' | 'amendments' | 'analytics'>('text');
   
-  // Compare Version Modal State
+  // Compare Version State
   const [compareVersionId, setCompareVersionId] = useState<string>(
     allVersions.find((v) => v.id !== selectedVersion.id)?.id || selectedVersion.id
   );
 
   const [localDownloadsCount, setLocalDownloadsCount] = useState(selectedVersion.downloadsCount);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Group Articles into 7 Official Chapters for the Dropdown Select
+  const chapterGroups = useMemo(() => {
+    const arts = selectedVersion.articles;
+    return [
+      {
+        label: 'Chapter I: General Supremacy, Membership & Objectives',
+        articles: arts.filter((a) => a.articleNumber >= 1 && a.articleNumber <= 3),
+      },
+      {
+        label: 'Chapter II: Organs & Executive Council Powers',
+        articles: arts.filter((a) => a.articleNumber >= 4 && a.articleNumber <= 6),
+      },
+      {
+        label: 'Chapter III: Legislative Arm — House of Representatives',
+        articles: arts.filter((a) => a.articleNumber === 7),
+      },
+      {
+        label: 'Chapter IV: Independent Constitutional Committees (CRC & NSC)',
+        articles: arts.filter((a) => a.articleNumber >= 8 && a.articleNumber <= 9),
+      },
+      {
+        label: 'Chapter V: Finance Regulations & Meeting Quorums',
+        articles: arts.filter((a) => a.articleNumber >= 10 && a.articleNumber <= 11),
+      },
+      {
+        label: 'Chapter VI: Leadership Rotation, Patrons & Discipline',
+        articles: arts.filter((a) => a.articleNumber >= 12 && a.articleNumber <= 14),
+      },
+      {
+        label: 'Chapter VII: Constitutional Amendment, Vacancies & Interpretation',
+        articles: arts.filter((a) => a.articleNumber >= 15 && a.articleNumber <= 17),
+      },
+    ].filter((g) => g.articles.length > 0);
+  }, [selectedVersion.articles]);
 
   // Calculate Reading Time Dynamically
   const estimatedReadingTime = useMemo(() => {
@@ -138,7 +162,7 @@ export function InteractiveConstitutionPortal({
     return Math.max(1, Math.ceil(totalWords / 200));
   }, [selectedVersion]);
 
-  // Track Reading Scroll Progress
+  // Track Scroll Progress
   useEffect(() => {
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -153,7 +177,7 @@ export function InteractiveConstitutionPortal({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Global Keyboard Shortcuts (Ctrl+F to search)
+  // Keyboard Shortcuts (Ctrl+F)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
@@ -234,6 +258,7 @@ export function InteractiveConstitutionPortal({
   };
 
   const scrollToArticle = (artId: string) => {
+    if (!artId) return;
     setActiveArticleId(artId);
     const el = document.getElementById(`article-${artId}`);
     if (el) {
@@ -260,26 +285,12 @@ export function InteractiveConstitutionPortal({
     );
   };
 
-  // Dynamic Theme Classes
-  const cardThemeClasses = {
-    light: 'bg-white text-slate-900 border-slate-200 shadow-sm',
-    dark: 'bg-slate-900 text-slate-100 border-slate-800 shadow-md',
-    sepia: 'bg-[#F4E4C1] text-[#3D2E1E] border-[#D9C49A]',
-  }[themeMode];
-
-  const fontClasses = {
-    sm: 'text-xs leading-relaxed',
-    base: 'text-sm leading-relaxed',
-    lg: 'text-base leading-relaxed',
-    xl: 'text-lg leading-relaxed',
-  }[fontSize];
-
   return (
-    <div className={`space-y-8 font-sans min-h-screen transition-colors duration-200 ${themeMode === 'dark' ? 'bg-slate-950 text-white' : ''}`}>
+    <div className="space-y-8 font-sans min-h-screen pb-16">
       {/* STICKY TOP READING PROGRESS BAR */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-slate-200/50 backdrop-blur-sm">
+      <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-stone-200/60 backdrop-blur-sm">
         <div
-          className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-amber-400 transition-all duration-150"
+          className="h-full bg-gradient-to-r from-amber-500 via-emerald-600 to-amber-400 transition-all duration-150"
           style={{ width: `${readingProgress}%` }}
         />
       </div>
@@ -372,7 +383,7 @@ export function InteractiveConstitutionPortal({
       </header>
 
       {/* CONSTITUTION NAVIGATION TABS */}
-      <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-wrap items-center gap-2" role="tablist">
+      <div className="bg-white rounded-2xl p-2 border border-stone-200 shadow-sm flex flex-wrap items-center gap-2" role="tablist">
         {[
           { id: 'text', label: 'Interactive Reader', icon: BookOpen },
           { id: 'archive', label: `Version Archive (${allVersions.length})`, icon: History },
@@ -390,7 +401,7 @@ export function InteractiveConstitutionPortal({
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 isActive
                   ? 'bg-slate-900 text-amber-300 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -403,268 +414,182 @@ export function InteractiveConstitutionPortal({
       {/* TABS CONTENT STREAM */}
       {activeTab === 'text' && (
         <div className="space-y-6">
-          {/* SEARCH BAR & READING CONTROLS TOOLBAR */}
-          <div className={`p-6 rounded-3xl border shadow-sm space-y-4 ${cardThemeClasses}`}>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          {/* SEARCH & DROPDOWN FILTER TOOLBAR */}
+          <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm space-y-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
-                  ENTERPRISE SEARCH & CUSTOMIZATION ENGINE
+                  ENTERPRISE SEARCH & INDEXING
                 </span>
-                <h2 className="font-serif text-xl sm:text-2xl font-bold">
-                  Interactive Legal Provisions Search
+                <h2 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
+                  Interactive Legal Provisions
                 </h2>
               </div>
 
-              {/* Reading Experience Customization Controls */}
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Theme Selector */}
-                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setThemeMode('light')}
-                    className={`p-1.5 rounded-lg transition-all ${themeMode === 'light' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
-                    title="Classic Light Theme"
-                  >
-                    <Sun className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setThemeMode('sepia')}
-                    className={`p-1.5 rounded-lg transition-all ${themeMode === 'sepia' ? 'bg-[#F4E4C1] text-[#3D2E1E] shadow-sm' : 'text-slate-500'}`}
-                    title="Sepia Archive Theme"
-                  >
-                    <Coffee className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setThemeMode('dark')}
-                    className={`p-1.5 rounded-lg transition-all ${themeMode === 'dark' ? 'bg-slate-950 text-amber-400 shadow-sm' : 'text-slate-500'}`}
-                    title="Dark Obsidian Theme"
-                  >
-                    <Moon className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {/* Font Size Selector */}
-                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-                  {(['sm', 'base', 'lg', 'xl'] as const).map((sz) => (
-                    <button
-                      key={sz}
-                      type="button"
-                      onClick={() => setFontSize(sz)}
-                      className={`px-2 py-1 rounded-lg font-bold uppercase transition-all ${
-                        fontSize === sz ? 'bg-slate-900 text-amber-400 dark:bg-amber-400 dark:text-slate-950 shadow-sm' : 'text-slate-500'
-                      }`}
-                    >
-                      {sz}
-                    </button>
-                  ))}
-                </div>
-
+              <div className="flex items-center gap-2">
                 {/* Fullscreen Button */}
                 <button
                   type="button"
                   onClick={toggleFullscreen}
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                  className="p-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors text-slate-700 border border-stone-200 flex items-center gap-1 text-xs font-bold"
                   title="Toggle Fullscreen Reading"
                 >
                   {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  <span className="hidden sm:inline">Fullscreen</span>
                 </button>
               </div>
             </div>
 
-            {/* Instant Search Input */}
-            <div className="relative">
-              <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by Article (e.g. Article 14), Section, Roman numerals, President, Discipline, Finance..."
-                className="w-full pl-12 pr-28 py-3.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-900 dark:text-white"
-              />
-              {searchLower && (
-                <div className="absolute right-3 top-2.5 flex items-center gap-2">
-                  <span className="text-xs font-bold text-amber-700 bg-amber-100 dark:bg-amber-900/60 dark:text-amber-300 px-2.5 py-1 rounded-xl border border-amber-300 dark:border-amber-700">
-                    {matchCount} {matchCount === 1 ? 'Match' : 'Matches'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setSearch('')}
-                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+            {/* CONTROL ROW: SEARCH INPUT + DROPDOWN INDEX SELECTOR */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+              {/* Search Input (8 cols) */}
+              <div className="md:col-span-7 relative">
+                <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search provisions (e.g. Article 14, Section 2, President, Quorum, Finance...)"
+                  className="w-full pl-12 pr-24 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-800 text-slate-900"
+                />
+                {searchLower && (
+                  <div className="absolute right-3 top-2.5 flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-lg border border-amber-300">
+                      {matchCount} Matches
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSearch('')}
+                      className="p-1 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* DROPDOWN CHAPTER/ARTICLE SELECTOR FILTER (5 cols) */}
+              <div className="md:col-span-5 relative">
+                <div className="relative">
+                  <ListFilter className="w-4 h-4 text-emerald-800 absolute left-3.5 top-3.5 pointer-events-none" />
+                  <select
+                    value={activeArticleId}
+                    onChange={(e) => scrollToArticle(e.target.value)}
+                    className="w-full pl-10 pr-8 py-3 bg-stone-50 hover:bg-stone-100 text-slate-900 border border-stone-300 rounded-2xl text-xs font-serif font-bold focus:outline-none focus:ring-2 focus:ring-emerald-800 appearance-none cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
-                  </button>
+                    <option value="" disabled>-- Select Chapter / Article to View --</option>
+                    {chapterGroups.map((grp) => (
+                      <optgroup key={grp.label} label={grp.label}>
+                        {grp.articles.map((art) => (
+                          <option key={art.id} value={art.id}>
+                            Article {art.articleNumber}: {art.title} ({art.sections.length} Secs)
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-3.5 pointer-events-none" />
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
-          {/* MOBILE DROPDOWN ARTICLE SELECTOR (lg:hidden) */}
-          <div className="block lg:hidden bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-              <Filter className="w-4 h-4 text-amber-500" />
-              <span>Jump Directly to Article (1 - {selectedVersion.articles.length}):</span>
-            </label>
-            <select
-              value={activeArticleId}
-              onChange={(e) => scrollToArticle(e.target.value)}
-              className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500"
-            >
-              {selectedVersion.articles.map((art) => (
-                <option key={art.id} value={art.id}>
-                  Article {art.articleNumber}: {art.title} ({art.sections.length} Sections)
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* MAIN LAYOUT: DESKTOP ARTICLE SIDEBAR & ARTICLES STREAM */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* DESKTOP ARTICLES SIDEBAR (hidden on mobile, visible on lg) */}
-            <aside className={`hidden lg:block lg:col-span-4 lg:sticky lg:top-24 p-5 rounded-3xl border shadow-sm space-y-4 ${cardThemeClasses}`}>
-              <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-                <BookOpen className="w-4 h-4 text-amber-500" />
-                <h3 className="font-serif font-bold text-sm">Articles Directory ({selectedVersion.articles.length})</h3>
+          {/* MAIN ARTICLES CONTENT STREAM (FULL WIDTH CLEAN LAYOUT) */}
+          <main className="space-y-6 max-w-5xl mx-auto">
+            {filteredArticles.length === 0 ? (
+              <div className="bg-white p-12 rounded-3xl border border-stone-200 text-center space-y-4 shadow-sm">
+                <Shield className="w-12 h-12 text-slate-400 mx-auto" />
+                <h3 className="font-serif font-bold text-lg text-slate-900">No Matching Constitutional Provisions</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto font-light">
+                  We couldn&apos;t find any articles or sections matching &quot;{search}&quot;. Try searching for broader terms like &quot;President&quot;, &quot;Finance&quot;, &quot;Discipline&quot;, or &quot;Article 14&quot;.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow cursor-pointer"
+                >
+                  Clear Search Query
+                </button>
               </div>
-
-              <div className="space-y-2 max-h-[75vh] overflow-y-auto pr-1">
-                {selectedVersion.articles.map((art) => {
-                  const isActive = activeArticleId === art.id;
-                  return (
-                    <button
-                      key={art.id}
-                      type="button"
-                      onClick={() => scrollToArticle(art.id)}
-                      className={`w-full text-left p-3.5 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
-                        isActive
-                          ? 'bg-emerald-950 text-amber-300 border-emerald-800 shadow-md'
-                          : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center gap-2 mb-1">
-                        <span className="line-clamp-1 font-serif">
-                          Article {art.articleNumber}: {art.title}
-                        </span>
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold flex-shrink-0 ${
-                            isActive
-                              ? 'bg-amber-400 text-slate-950'
-                              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          {art.sections.length} Secs
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </aside>
-
-            {/* MAIN ARTICLES CONTENT STREAM */}
-            <main className="lg:col-span-8 space-y-6">
-              {filteredArticles.length === 0 ? (
-                <div className={`p-12 rounded-3xl border text-center space-y-4 ${cardThemeClasses}`}>
-                  <Shield className="w-12 h-12 text-slate-400 mx-auto" />
-                  <h3 className="font-serif font-bold text-lg">No Matching Constitutional Provisions</h3>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto font-light">
-                    We couldn&apos;t find any articles or sections matching &quot;{search}&quot;. Try searching for broader terms like &quot;President&quot;, &quot;Finance&quot;, &quot;Discipline&quot;, or &quot;Article 14&quot;.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSearch('')}
-                    className="px-4 py-2 bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow cursor-pointer"
+            ) : (
+              filteredArticles.map((art) => {
+                const isExpanded = expandedArticles[art.id] ?? true;
+                return (
+                  <article
+                    key={art.id}
+                    id={`article-${art.id}`}
+                    className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden transition-all hover:shadow-md"
                   >
-                    Clear Search Query
-                  </button>
-                </div>
-              ) : (
-                filteredArticles.map((art) => {
-                  const isExpanded = expandedArticles[art.id] ?? true;
-                  return (
-                    <article
-                      key={art.id}
-                      id={`article-${art.id}`}
-                      className={`rounded-3xl border shadow-sm overflow-hidden transition-all ${cardThemeClasses}`}
+                    {/* Article Header Bar */}
+                    <div
+                      onClick={() => toggleArticle(art.id)}
+                      className="bg-stone-50/90 p-5 border-b border-stone-200 flex items-center justify-between cursor-pointer select-none hover:bg-stone-100 transition-colors"
                     >
-                      {/* Article Header */}
-                      <div
-                        onClick={() => toggleArticle(art.id)}
-                        className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3.5">
-                          <span className="w-9 h-9 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-800 shadow-sm">
-                            {art.articleNumber}
+                      <div className="flex items-center gap-3.5">
+                        <span className="w-9 h-9 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-800 shadow-sm">
+                          {art.articleNumber}
+                        </span>
+                        <div>
+                          <h3 className="font-serif font-bold text-base text-slate-900">
+                            Article {art.articleNumber}: {highlightText(art.title)}
+                          </h3>
+                          <span className="text-[10px] text-slate-500 font-semibold">
+                            {art.sections.length} Codified Sub-Sections
                           </span>
-                          <div>
-                            <h3 className="font-serif font-bold text-base">
-                              Article {art.articleNumber}: {highlightText(art.title)}
-                            </h3>
-                            <span className="text-[10px] text-slate-500 font-semibold">
-                              {art.sections.length} Codified Sub-Sections
-                            </span>
-                          </div>
                         </div>
-
-                        <button type="button" className="text-slate-400 p-1">
-                          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </button>
                       </div>
 
-                      {/* Article Body */}
-                      {isExpanded && (
-                        <div className="p-6 space-y-4">
-                          {art.overview && (
-                            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-300 leading-relaxed font-light">
-                              <span className="font-bold block text-[10px] uppercase tracking-wider text-amber-600 mb-1">
-                                ARTICLE OVERVIEW
-                              </span>
-                              {highlightText(art.overview)}
-                            </div>
-                          )}
+                      <button type="button" className="text-slate-400 hover:text-slate-700 p-1">
+                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </button>
+                    </div>
 
-                          <div className="space-y-4 pt-1">
-                            {art.sections.map((sec) => (
-                              <div
-                                key={sec.id}
-                                className={`p-4 sm:p-5 rounded-2xl border ${
-                                  themeMode === 'dark'
-                                    ? 'bg-slate-800/50 border-slate-800'
-                                    : themeMode === 'sepia'
-                                    ? 'bg-[#F9EBD0] border-[#E5D7B7]'
-                                    : 'bg-slate-50 border-slate-200'
-                                } space-y-2`}
-                              >
-                                <h4 className="font-serif font-bold text-xs sm:text-sm text-emerald-700 dark:text-emerald-400">
-                                  Section {sec.sectionNumber}: {highlightText(sec.title)}
-                                </h4>
-                                <div className={`${fontClasses} font-light whitespace-pre-line`}>
-                                  {highlightText(sec.content)}
-                                </div>
-                              </div>
-                            ))}
+                    {/* Article Body & Sections */}
+                    {isExpanded && (
+                      <div className="p-6 space-y-4">
+                        {art.overview && (
+                          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 leading-relaxed font-light">
+                            <span className="font-bold block text-[10px] uppercase tracking-wider text-amber-700 mb-1">
+                              ARTICLE OVERVIEW
+                            </span>
+                            {highlightText(art.overview)}
                           </div>
+                        )}
+
+                        <div className="space-y-4 pt-1">
+                          {art.sections.map((sec) => (
+                            <div
+                              key={sec.id}
+                              className="p-4 sm:p-5 rounded-2xl border bg-stone-50/70 border-stone-200 space-y-2"
+                            >
+                              <h4 className="font-serif font-bold text-xs sm:text-sm text-emerald-950">
+                                Section {sec.sectionNumber}: {highlightText(sec.title)}
+                              </h4>
+                              <div className="text-sm text-slate-800 font-light whitespace-pre-line leading-relaxed">
+                                {highlightText(sec.content)}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      )}
-                    </article>
-                  );
-                })
-              )}
-            </main>
-          </div>
+                      </div>
+                    )}
+                  </article>
+                );
+              })
+            )}
+          </main>
         </div>
       )}
 
       {/* TAB 2: VERSION ARCHIVE */}
       {activeTab === 'archive' && (
-        <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${cardThemeClasses}`}>
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+          <div className="border-b border-stone-100 pb-4">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
               CONSTITUTIONAL VERSION ARCHIVE
             </span>
-            <h2 className="font-serif text-2xl font-bold">Historical Ratified Editions</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900">Historical Ratified Editions</h2>
             <p className="text-xs text-slate-500">
               Browse every ratified constitution version published in the YOSU enterprise repository.
             </p>
@@ -676,8 +601,8 @@ export function InteractiveConstitutionPortal({
                 key={ver.id}
                 className={`p-6 rounded-2xl border space-y-4 transition-all ${
                   ver.id === selectedVersion.id
-                    ? 'border-2 border-emerald-500 bg-emerald-500/10 shadow-md'
-                    : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900'
+                    ? 'border-2 border-emerald-700 bg-emerald-50/20 shadow-md'
+                    : 'border-stone-200 bg-stone-50/50'
                 }`}
               >
                 <div className="flex justify-between items-start">
@@ -685,24 +610,24 @@ export function InteractiveConstitutionPortal({
                     {ver.versionName}
                   </span>
                   {ver.isCurrent ? (
-                    <span className="bg-emerald-900 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded uppercase border border-emerald-700">
+                    <span className="bg-emerald-950 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded uppercase border border-emerald-800">
                       CURRENT RATIFIED LAW
                     </span>
                   ) : (
-                    <span className="bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                    <span className="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
                       SUPERSEDED HISTORICAL
                     </span>
                   )}
                 </div>
 
                 <div>
-                  <h3 className="font-serif font-bold text-lg">{ver.versionName}</h3>
+                  <h3 className="font-serif font-bold text-lg text-slate-900">{ver.versionName}</h3>
                   <p className="text-xs text-slate-500">
                     Edition: {ver.edition || '1st Harmonized'} • Effective Date: {ver.effectiveDate}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                <div className="pt-2 border-t border-stone-200 flex items-center justify-between text-xs text-slate-600">
                   <span>Contains {ver.articles.length} Enacted Articles</span>
                   <button
                     type="button"
@@ -723,12 +648,12 @@ export function InteractiveConstitutionPortal({
 
       {/* TAB 3: VERSION COMPARISON TOOL */}
       {activeTab === 'compare' && (
-        <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${cardThemeClasses}`}>
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+          <div className="border-b border-stone-100 pb-4">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
               LEGAL CLAUSE COMPARISON TOOL
             </span>
-            <h2 className="font-serif text-2xl font-bold">Side-by-Side Version Diff</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900">Side-by-Side Version Diff</h2>
             <p className="text-xs text-slate-500">
               Compare constitutional provisions between two ratified versions.
             </p>
@@ -737,11 +662,11 @@ export function InteractiveConstitutionPortal({
           {/* Version Selector Bar */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-bold block mb-1">Base Version (Left)</label>
+              <label className="text-xs font-bold block mb-1 text-slate-700">Base Version (Left)</label>
               <select
                 value={selectedVersion.id}
                 onChange={(e) => setActiveVersionId(e.target.value)}
-                className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold"
+                className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-slate-900"
               >
                 {allVersions.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -752,11 +677,11 @@ export function InteractiveConstitutionPortal({
             </div>
 
             <div>
-              <label className="text-xs font-bold block mb-1">Compared Version (Right)</label>
+              <label className="text-xs font-bold block mb-1 text-slate-700">Compared Version (Right)</label>
               <select
                 value={compareVersionId}
                 onChange={(e) => setCompareVersionId(e.target.value)}
-                className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold"
+                className="w-full p-3 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-slate-900"
               >
                 {allVersions.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -770,27 +695,27 @@ export function InteractiveConstitutionPortal({
           {/* Comparison Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
             {/* Version A */}
-            <div className="space-y-4 border-r border-slate-200 dark:border-slate-800 pr-0 lg:pr-6">
-              <h3 className="font-serif font-bold text-base text-amber-500">
+            <div className="space-y-4 border-r border-stone-200 pr-0 lg:pr-6">
+              <h3 className="font-serif font-bold text-base text-amber-700">
                 {selectedVersion.versionName} ({selectedVersion.articles.length} Articles)
               </h3>
               {selectedVersion.articles.map((art) => (
-                <div key={art.id} className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
-                  <h4 className="font-serif font-bold text-xs">Article {art.articleNumber}: {art.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-light">{art.overview || 'Standard Enacted Provisions'}</p>
+                <div key={art.id} className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
+                  <h4 className="font-serif font-bold text-xs text-slate-900">Article {art.articleNumber}: {art.title}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed font-light">{art.overview || 'Standard Enacted Provisions'}</p>
                 </div>
               ))}
             </div>
 
             {/* Version B */}
             <div className="space-y-4">
-              <h3 className="font-serif font-bold text-base text-emerald-500">
+              <h3 className="font-serif font-bold text-base text-emerald-800">
                 {allVersions.find((v) => v.id === compareVersionId)?.versionName}
               </h3>
               {(allVersions.find((v) => v.id === compareVersionId)?.articles || []).map((art) => (
-                <div key={art.id} className="p-4 bg-emerald-50/20 dark:bg-emerald-950/20 rounded-xl border border-emerald-500/30 space-y-2">
-                  <h4 className="font-serif font-bold text-xs">Article {art.articleNumber}: {art.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed font-light">{art.overview || 'Standard Enacted Provisions'}</p>
+                <div key={art.id} className="p-4 bg-emerald-50/40 rounded-xl border border-emerald-200 space-y-2">
+                  <h4 className="font-serif font-bold text-xs text-slate-900">Article {art.articleNumber}: {art.title}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed font-light">{art.overview || 'Standard Enacted Provisions'}</p>
                 </div>
               ))}
             </div>
@@ -800,12 +725,12 @@ export function InteractiveConstitutionPortal({
 
       {/* TAB 4: AMENDMENTS MODULE */}
       {activeTab === 'amendments' && (
-        <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${cardThemeClasses}`}>
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+          <div className="border-b border-stone-100 pb-4">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
               LEGISLATIVE AMENDMENTS HISTORY
             </span>
-            <h2 className="font-serif text-2xl font-bold">Ratified Amendments</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900">Ratified Amendments</h2>
             <p className="text-xs text-slate-500">
               Chronological log of constitutional amendments passed by the House of Representatives and ratified by Congress.
             </p>
@@ -818,18 +743,18 @@ export function InteractiveConstitutionPortal({
           ) : (
             <div className="space-y-4">
               {selectedVersion.amendments.map((am) => (
-                <div key={am.id} className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                <div key={am.id} className="p-6 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
                   <div className="flex justify-between items-start gap-2">
-                    <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded uppercase">
+                    <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded uppercase border border-amber-300">
                       PROPOSED BY: {am.proposedBy}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="text-xs text-slate-500 font-medium">
                       Ratified: {am.dateRatified || 'Completed'}
                     </span>
                   </div>
 
-                  <h3 className="font-serif font-bold text-base">{am.amendmentSummary}</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-light whitespace-pre-line">{am.fullText}</p>
+                  <h3 className="font-serif font-bold text-base text-slate-900">{am.amendmentSummary}</h3>
+                  <p className="text-xs text-slate-700 leading-relaxed font-light whitespace-pre-line">{am.fullText}</p>
                 </div>
               ))}
             </div>
@@ -839,40 +764,40 @@ export function InteractiveConstitutionPortal({
 
       {/* TAB 5: CONSTITUTION ANALYTICS DASHBOARD */}
       {activeTab === 'analytics' && (
-        <div className={`p-6 sm:p-8 rounded-3xl border space-y-6 ${cardThemeClasses}`}>
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-6">
+          <div className="border-b border-stone-100 pb-4">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
               DATABASE ANALYTICS & METRICS
             </span>
-            <h2 className="font-serif text-2xl font-bold">Constitution Platform Analytics</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900">Constitution Platform Analytics</h2>
             <p className="text-xs text-slate-500">
               Real-time metrics query directly from Neon PostgreSQL.
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-amber-500">{selectedVersion.articles.length}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-amber-600">{selectedVersion.articles.length}</span>
               <span className="text-xs text-slate-500 block font-medium">Enacted Articles</span>
             </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-emerald-500">{stats.totalSections}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-emerald-700">{stats.totalSections}</span>
               <span className="text-xs text-slate-500 block font-medium">Sub-Sections</span>
             </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-blue-500">{stats.totalAmendments}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-blue-700">{stats.totalAmendments}</span>
               <span className="text-xs text-slate-500 block font-medium">Amendments</span>
             </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-purple-500">{allVersions.length}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-purple-700">{allVersions.length}</span>
               <span className="text-xs text-slate-500 block font-medium">Versions</span>
             </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-teal-500">{selectedVersion.viewsCount}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-teal-700">{selectedVersion.viewsCount}</span>
               <span className="text-xs text-slate-500 block font-medium">Page Views</span>
             </div>
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-              <span className="text-2xl font-extrabold font-serif text-rose-500">{localDownloadsCount}</span>
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1">
+              <span className="text-2xl font-extrabold font-serif text-rose-700">{localDownloadsCount}</span>
               <span className="text-xs text-slate-500 block font-medium">PDF Downloads</span>
             </div>
           </div>
