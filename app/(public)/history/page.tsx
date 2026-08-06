@@ -1,168 +1,438 @@
 import React from 'react';
-import Link from 'next/link';
 import { db } from '@/lib/db';
-import { BookOpen, ShieldCheck, CheckCircle2, History, Award, Calendar, Sparkles } from 'lucide-react';
-import { ScrollReveal } from '@/components/ui/scroll-reveal';
+import { HistoryArchiveClient, SerializedSession, HistoryStats } from '@/components/history/history-archive-client';
 
 export const revalidate = 60;
 
 export default async function HistoryPage() {
-  const sessions = await db.administrationSession.findMany({
-    include: {
-      achievements: { orderBy: { displayOrder: 'asc' } },
-      appointments: {
-        where: { status: 'ACTIVE' },
-        include: { person: true, office: true },
-        orderBy: { displayOrder: 'asc' },
+  // Execute all database queries in parallel for peak performance
+  const [
+    sessionsData,
+    totalAdministrations,
+    totalExecutives,
+    totalRepresentatives,
+    totalConstitutions,
+    totalProjectsCompleted,
+    achievementCount,
+    sessionAchievementCount,
+    totalPublishedNews,
+    totalGalleries,
+    allNewsArticles,
+    allEvents,
+    allDownloads,
+  ] = await Promise.all([
+    db.administrationSession.findMany({
+      orderBy: { startDate: 'desc' },
+      include: {
+        appointments: {
+          include: {
+            person: {
+              include: { avatarMedia: true },
+            },
+            office: true,
+          },
+          orderBy: { displayOrder: 'asc' },
+        },
+        houseRepresentatives: {
+          orderBy: [{ stateOfOrigin: 'asc' }, { displayOrder: 'asc' }],
+        },
+        achievements: {
+          orderBy: { displayOrder: 'asc' },
+        },
+        dynamicAchievements: {
+          orderBy: { createdAt: 'desc' },
+        },
+        projects: {
+          include: {
+            featuredMedia: true,
+            milestones: { orderBy: { order: 'asc' } },
+            updates: { orderBy: { publishedAt: 'desc' } },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        constitutions: {
+          include: {
+            pdfMedia: true,
+            articles: {
+              select: { id: true },
+            },
+          },
+          orderBy: { effectiveDate: 'desc' },
+        },
+        albums: {
+          include: {
+            coverMedia: true,
+            mediaItems: {
+              include: { media: true },
+              orderBy: { displayOrder: 'asc' },
+            },
+            event: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        presidentialWelcomes: {
+          where: { isActive: true },
+          take: 1,
+        },
       },
-    },
-    orderBy: { startDate: 'desc' },
+    }),
+    db.administrationSession.count(),
+    db.officeAppointment.count({
+      where: {
+        office: {
+          category: {
+            in: ['EXECUTIVE_COUNCIL', 'TRADITIONAL_TITLE'],
+          },
+        },
+      },
+    }),
+    db.houseRepresentative.count(),
+    db.constitutionVersion.count(),
+    db.project.count({
+      where: { status: 'COMPLETED' },
+    }),
+    db.achievement.count(),
+    db.sessionAchievement.count(),
+    db.newsArticle.count({
+      where: { status: 'PUBLISHED' },
+    }),
+    db.album.count(),
+    db.newsArticle.findMany({
+      where: { status: 'PUBLISHED' },
+      include: {
+        category: true,
+        author: {
+          include: { person: true },
+        },
+        featuredMedia: true,
+      },
+      orderBy: { publishedAt: 'desc' },
+    }),
+    db.event.findMany({
+      include: {
+        bannerMedia: true,
+      },
+      orderBy: { startDate: 'desc' },
+    }),
+    db.downloadResource.findMany({
+      where: { isPublic: true },
+      include: {
+        fileMedia: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+
+  const globalStats: HistoryStats = {
+    totalAdministrations,
+    totalExecutives,
+    totalRepresentatives,
+    totalConstitutions,
+    totalProjectsCompleted,
+    totalAchievements: achievementCount + sessionAchievementCount,
+    totalPublishedNews,
+    totalGalleries,
+  };
+
+  // Helper date formatter
+  const formatDate = (date?: Date | null) => {
+    if (!date) return null;
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // Map database sessions to fully serialized structures
+  const serializedSessions: SerializedSession[] = sessionsData.map((session) => {
+    const sStart = new Date(session.startDate);
+    const sEnd = session.endDate ? new Date(session.endDate) : new Date();
+
+    // 1. Identify President, VP, SecGen
+    const presidentApp = session.appointments.find(
+      (a) =>
+        a.office.category === 'EXECUTIVE_COUNCIL' &&
+        a.office.title.toLowerCase().includes('president') &&
+        !a.office.title.toLowerCase().includes('vice') &&
+        !a.office.title.toLowerCase().includes('assistant')
+    );
+
+    const vpApp = session.appointments.find(
+      (a) =>
+        a.office.category === 'EXECUTIVE_COUNCIL' &&
+        a.office.title.toLowerCase().includes('vice president')
+    );
+
+    const secGenApp = session.appointments.find(
+      (a) =>
+        a.office.category === 'EXECUTIVE_COUNCIL' &&
+        a.office.title.toLowerCase().includes('secretary general') &&
+        !a.office.title.toLowerCase().includes('assistant')
+    );
+
+    const presWelcome = session.presidentialWelcomes[0];
+
+    const president = presidentApp
+      ? {
+          id: presidentApp.person.id,
+          fullName: presidentApp.person.fullName,
+          email: presidentApp.person.email,
+          phoneNumber: presidentApp.person.phoneNumber,
+          stateOfOrigin: presidentApp.person.stateOfOrigin,
+          department: presidentApp.person.department,
+          level: presidentApp.person.level,
+          bio: presidentApp.person.bio || presWelcome?.welcomeSummary,
+          avatarUrl: presidentApp.person.avatarMedia?.url || presWelcome?.portraitUrl,
+          officeTitle: presidentApp.office.title,
+        }
+      : presWelcome
+      ? {
+          id: presWelcome.id,
+          fullName: presWelcome.presidentName,
+          stateOfOrigin: presWelcome.stateOfOrigin,
+          bio: presWelcome.welcomeSummary,
+          avatarUrl: presWelcome.portraitUrl,
+          officeTitle: presWelcome.officeTitle,
+        }
+      : null;
+
+    const vicePresident = vpApp
+      ? {
+          id: vpApp.person.id,
+          fullName: vpApp.person.fullName,
+          email: vpApp.person.email,
+          phoneNumber: vpApp.person.phoneNumber,
+          stateOfOrigin: vpApp.person.stateOfOrigin,
+          department: vpApp.person.department,
+          level: vpApp.person.level,
+          bio: vpApp.person.bio,
+          avatarUrl: vpApp.person.avatarMedia?.url,
+          officeTitle: vpApp.office.title,
+        }
+      : null;
+
+    const secretaryGeneral = secGenApp
+      ? {
+          id: secGenApp.person.id,
+          fullName: secGenApp.person.fullName,
+          email: secGenApp.person.email,
+          phoneNumber: secGenApp.person.phoneNumber,
+          stateOfOrigin: secGenApp.person.stateOfOrigin,
+          department: secGenApp.person.department,
+          level: secGenApp.person.level,
+          bio: secGenApp.person.bio,
+          avatarUrl: secGenApp.person.avatarMedia?.url,
+          officeTitle: secGenApp.office.title,
+        }
+      : null;
+
+    // 2. Executive Officers belonging ONLY to this session
+    const executives = session.appointments
+      .filter(
+        (a) =>
+          a.office.category === 'EXECUTIVE_COUNCIL' ||
+          a.office.category === 'TRADITIONAL_TITLE'
+      )
+      .map((a) => ({
+        id: a.id,
+        officeTitle: a.office.title,
+        officeCategory: a.office.category,
+        displayOrder: a.displayOrder,
+        person: {
+          id: a.person.id,
+          fullName: a.person.fullName,
+          email: a.person.email,
+          phoneNumber: a.person.phoneNumber,
+          stateOfOrigin: a.person.stateOfOrigin,
+          department: a.person.department,
+          level: a.person.level,
+          bio: a.person.bio,
+          avatarUrl: a.person.avatarMedia?.url,
+        },
+      }));
+
+    // 3. Representatives belonging ONLY to this session
+    const houseRepresentatives = session.houseRepresentatives.map((r) => ({
+      id: r.id,
+      fullName: r.fullName,
+      stateOfOrigin: r.stateOfOrigin,
+      positionTitle: r.positionTitle,
+      photoUrl: r.photoUrl,
+      displayOrder: r.displayOrder,
+    }));
+
+    // 4. Combined Session Achievements (dynamic + session achievements)
+    const combinedAchievements = [
+      ...session.dynamicAchievements.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        progressPercentage: a.progressPercentage,
+        status: a.status,
+        imageUrl: a.imageUrl,
+      })),
+      ...session.achievements.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        category: a.category,
+        displayOrder: a.displayOrder,
+      })),
+    ];
+
+    // 5. Projects belonging to this session
+    const projects = session.projects.map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      summary: p.summary,
+      description: p.description,
+      status: p.status,
+      progressPercentage: p.progressPercentage,
+      startDate: formatDate(p.startDate),
+      targetCompletionDate: formatDate(p.targetCompletionDate),
+      actualCompletionDate: formatDate(p.actualCompletionDate),
+      budgetAmount: p.budgetAmount,
+      spentAmount: p.spentAmount,
+      featuredMediaUrl: p.featuredMedia?.url,
+      milestones: p.milestones.map((m) => ({
+        id: m.id,
+        title: m.title,
+        description: m.description,
+        isCompleted: m.isCompleted,
+      })),
+    }));
+
+    // 6. Constitutions belonging to this session
+    const constitutions = session.constitutions.map((c) => ({
+      id: c.id,
+      versionName: c.versionName,
+      effectiveDate: formatDate(c.effectiveDate) || 'Ratified',
+      isCurrent: c.isCurrent,
+      pdfUrl: c.pdfMedia?.url,
+      articlesCount: c.articles.length,
+    }));
+
+    // 7. Extract Media Items from Albums belonging to this session
+    const albums = session.albums.map((alb) => ({
+      id: alb.id,
+      title: alb.title,
+      slug: alb.slug,
+      description: alb.description,
+      coverMediaUrl: alb.coverMedia?.url,
+      mediaItems: alb.mediaItems.map((item) => ({
+        id: item.media.id,
+        filename: item.media.filename,
+        url: item.media.url,
+        mimeType: item.media.mimeType,
+        caption: item.caption,
+        altText: item.media.altText,
+      })),
+    }));
+
+    const sessionMediaItems = albums.flatMap((a) => a.mediaItems);
+
+    // 8. News Articles published during this administration session
+    const newsArticles = allNewsArticles
+      .filter((n) => {
+        if (!n.publishedAt) return false;
+        const pDate = new Date(n.publishedAt);
+        return pDate >= sStart && pDate <= sEnd;
+      })
+      .map((n) => ({
+        id: n.id,
+        title: n.title,
+        slug: n.slug,
+        summary: n.summary,
+        publishedAt: formatDate(n.publishedAt),
+        featuredMediaUrl: n.featuredMedia?.url,
+        categoryName: n.category?.name,
+        authorName: n.author?.person?.fullName || 'Secretariat',
+      }));
+
+    // 9. Events occurring during this session
+    const events = allEvents
+      .filter((e) => {
+        const eDate = new Date(e.startDate);
+        return eDate >= sStart && eDate <= sEnd;
+      })
+      .map((e) => ({
+        id: e.id,
+        title: e.title,
+        slug: e.slug,
+        description: e.description,
+        location: e.location,
+        startDate: formatDate(e.startDate) || '',
+        endDate: formatDate(e.endDate),
+        bannerMediaUrl: e.bannerMedia?.url,
+      }));
+
+    // 10. Documents published during this session
+    const documents = allDownloads
+      .filter((d) => {
+        const dDate = new Date(d.createdAt);
+        return dDate >= sStart && dDate <= sEnd;
+      })
+      .map((d) => ({
+        id: d.id,
+        title: d.title,
+        description: d.description,
+        category: d.category,
+        fileUrl: d.fileMedia?.url || '#',
+        mimeType: d.fileMedia?.mimeType || 'application/pdf',
+        downloadsCount: d.downloadsCount,
+        createdAt: formatDate(d.createdAt) || '',
+      }));
+
+    const historicalSummary =
+      presWelcome?.welcomeSummary ||
+      session.theme ||
+      `Official administration session of the Yoruba Students' Union (YOSU), Federal University Dutse Chapter, serving from ${formatDate(
+        session.startDate
+      )}${session.endDate ? ` to ${formatDate(session.endDate)}` : ' to date'}.`;
+
+    return {
+      id: session.id,
+      title: session.title,
+      slug: session.slug,
+      theme: session.theme,
+      startDate: formatDate(session.startDate) || '',
+      endDate: formatDate(session.endDate),
+      isCurrent: session.isCurrent,
+      historicalSummary,
+      president,
+      vicePresident,
+      secretaryGeneral,
+      executives,
+      houseRepresentatives,
+      achievements: combinedAchievements,
+      projects,
+      constitutions,
+      albums,
+      mediaItems: sessionMediaItems,
+      newsArticles,
+      events,
+      documents,
+      stats: {
+        totalExecutives: executives.length,
+        totalRepresentatives: houseRepresentatives.length,
+        totalProjects: projects.length,
+        totalCompletedProjects: projects.filter(
+          (p) => p.status === 'COMPLETED' || p.progressPercentage === 100
+        ).length,
+        totalAchievements: combinedAchievements.length,
+        totalAlbums: albums.length,
+        totalMediaItems: sessionMediaItems.length,
+        totalConstitutions: constitutions.length,
+        totalNews: newsArticles.length,
+      },
+    };
   });
 
-  const timelineMilestones = [
-    {
-      year: '2025/2026',
-      badge: 'HISTORIC FOUNDING & NAME APPROVAL',
-      title: 'FUD Approval of Name Change from NAKOLES to YOSU',
-      description:
-        'The Federal University Dutse Students\' Affairs Division officially granted institutional approval for the change of name from NAKOLES (National Association of Kwara, Kogi, Oyo, Osun, Ondo, Ogun, Lagos, and Ekiti State Students) to the Yoruba Students\' Union (YOSU). Executed under President Asiwaju Abdulsalam Oluwagbenga.',
-      category: 'INSTITUTIONAL FOUNDING',
-    },
-    {
-      year: '2026',
-      badge: 'CONSTITUTIONAL HARMONIZATION',
-      title: 'Drafting of the 2026 Unification Constitution',
-      description:
-        'Comprehensive legislative review led by Speaker Rt. Hon. Ibrahim Sobur Bamidele and Clerk Hon. Alabi Oyeniyi. Codified the 8 Yoruba Constituent States representation framework and established independent CRC.',
-      category: 'LEGISLATION',
-    },
-    {
-      year: 'July 10, 2026',
-      badge: 'UNANIMOUS LEGISLATIVE RATIFICATION',
-      title: 'House of Representatives Ratification',
-      description:
-        'Motion for adoption moved by the Honourable Representative from Osun State, seconded by Ondo State, and unanimously passed by all state delegates in assembly at Federal University Dutse.',
-      category: 'RATIFICATION',
-    },
-    {
-      year: '2026/2027',
-      badge: 'THE PROGRESS ERA',
-      title: 'Inauguration of the Comdr Sobur-Led Administration',
-      description:
-        'Official swearing-in of Cmrd. Ibrahim Sobur Bamidele as Executive President alongside Vice President Latifat Usman Gidado, Executive Officers, and Traditional Title Holders.',
-      category: 'ADMINISTRATION',
-    },
-  ];
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 font-sans">
-      {/* Header Banner */}
-      <ScrollReveal animation="fade-up">
-        <div className="emerald-gradient-bg text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden border border-emerald-800">
-          <div className="relative z-10 max-w-3xl space-y-3">
-            <span className="bg-amber-400/20 text-amber-300 text-xs font-bold px-3.5 py-1.5 rounded-full border border-amber-400/30 uppercase tracking-wider inline-flex items-center gap-1.5">
-              <History className="w-3.5 h-3.5 text-amber-400" />
-              <span>OFFICIAL HISTORICAL GAZETTE & TIMELINE</span>
-            </span>
-            <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white">
-              Institutional Evolution & Heritage
-            </h1>
-            <p className="text-stone-200 text-sm sm:text-base font-light leading-relaxed">
-              The historical journey of the Yoruba Students' Union (YOSU), Federal University Dutse Chapter — from NAKOLES unification to the ratified 2026 Progress Era.
-            </p>
-          </div>
-        </div>
-      </ScrollReveal>
-
-      {/* Main Timeline Experience */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Interactive Database Timeline */}
-        <div className="lg:col-span-8 space-y-8">
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-8">
-            <div className="border-b border-stone-100 pb-4">
-              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">CHRONOLOGICAL MILESTONES</span>
-              <h2 className="text-2xl font-serif font-bold text-emerald-950">Major Union Milestones</h2>
-            </div>
-
-            {/* Vertical Timeline */}
-            <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-2.5 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-emerald-800/30">
-              {timelineMilestones.map((m, idx) => (
-                <ScrollReveal key={m.title} animation="fade-up" delayMs={idx * 80}>
-                  <div className="relative group">
-                    {/* Timeline Node */}
-                    <div className="absolute -left-[31px] sm:-left-[39px] top-1.5 w-6 h-6 rounded-full bg-emerald-950 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-md group-hover:scale-125 transition-transform">
-                      <Sparkles className="w-3 h-3" />
-                    </div>
-
-                    <div className="bg-stone-50 hover:bg-stone-100/80 p-5 sm:p-6 rounded-2xl border border-stone-200 hover:border-amber-400/50 transition-all space-y-2 hover-lift">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="bg-emerald-950 text-amber-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase border border-emerald-800">
-                          {m.badge}
-                        </span>
-                        <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-amber-600" />
-                          {m.year}
-                        </span>
-                      </div>
-
-                      <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900 leading-snug">
-                        {m.title}
-                      </h3>
-
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-light">
-                        {m.description}
-                      </p>
-                    </div>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Database Administrations & Achievements */}
-        <div className="lg:col-span-4 space-y-6">
-          <ScrollReveal animation="fade-up" delayMs={150}>
-            <div className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-md space-y-4">
-              <div className="border-b border-slate-800 pb-3">
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">DATABASE SESSIONS</span>
-                <h3 className="font-serif font-bold text-lg text-white">Administration Sessions</h3>
-              </div>
-
-              <div className="space-y-4">
-                {sessions.map((sess) => (
-                  <div key={sess.id} className="bg-slate-800/90 p-4 rounded-2xl border border-slate-700 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-serif font-bold text-sm text-white">{sess.title}</h4>
-                      {sess.isCurrent ? (
-                        <span className="bg-emerald-950 text-emerald-300 text-[9px] font-bold px-2 py-0.5 rounded uppercase border border-emerald-800">
-                          ACTIVE
-                        </span>
-                      ) : (
-                        <span className="bg-slate-700 text-slate-300 text-[9px] font-bold px-2 py-0.5 rounded uppercase">
-                          ARCHIVE
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-amber-300 font-semibold">{sess.theme || 'Administration'}</p>
-
-                    {sess.achievements.length > 0 && (
-                      <div className="pt-2 border-t border-slate-700 space-y-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Achievements ({sess.achievements.length})</span>
-                        <ul className="text-[11px] text-slate-300 space-y-1 list-disc pl-4">
-                          {sess.achievements.map((a) => (
-                            <li key={a.id}>{a.title}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <HistoryArchiveClient stats={globalStats} sessions={serializedSessions} />
     </div>
   );
 }
