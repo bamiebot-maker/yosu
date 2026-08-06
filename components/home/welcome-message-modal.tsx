@@ -12,6 +12,8 @@ interface WelcomeMessageModalProps {
   portraitUrl: string | null;
   welcomeSummary: string;
   fullMessage: string;
+  buttonClassName?: string;
+  buttonText?: string;
 }
 
 export function WelcomeMessageModal({
@@ -22,17 +24,22 @@ export function WelcomeMessageModal({
   portraitUrl,
   welcomeSummary,
   fullMessage,
+  buttonClassName,
+  buttonText = 'Read Presidential Address',
 }: WelcomeMessageModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const defaultBtnClass =
+    'px-5 py-3 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition-all hover:scale-105 flex items-center gap-2';
 
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-5 py-3 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition-all hover:scale-105 flex items-center gap-2"
+        className={buttonClassName || defaultBtnClass}
       >
-        <BookOpen className="w-4 h-4 text-slate-950" />
-        <span>Read Full Welcome Message</span>
+        <BookOpen className="w-4 h-4" />
+        <span>{buttonText}</span>
       </button>
 
       {isOpen && (

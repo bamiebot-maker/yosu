@@ -7,9 +7,7 @@ import {
   Users,
   Building2,
   ArrowRight,
-  ShieldCheck,
   Crown,
-  GraduationCap,
   Award,
   CheckCircle2,
   Clock,
@@ -24,13 +22,6 @@ import {
   MapPin,
   Globe,
   Sparkles,
-  Layers,
-  FileText,
-  Download,
-  FolderGit2,
-  History,
-  Target,
-  Compass,
 } from 'lucide-react';
 import { ExecutiveCarousel, ExecutiveOfficerItem } from '@/components/home/executive-carousel';
 import { HeroBackgroundSlider } from '@/components/home/hero-background-slider';
@@ -48,7 +39,7 @@ export default async function HomePage() {
 
   const activeSessionId = currentSession?.id;
 
-  // 2. Fetch Presidential Welcome Address (Hero Section - Requirement 1)
+  // 2. Fetch Presidential Welcome Address (Hero & Presidential Section - Requirement 1)
   let presidentialWelcome = await db.presidentialWelcome.findFirst({
     where: { isActive: true },
     orderBy: { createdAt: 'desc' },
@@ -70,11 +61,11 @@ export default async function HomePage() {
   const heroPresidentName = presidentialWelcome?.presidentName || presidentAppt?.person.fullName || 'Cmrd. Ibrahim Sobur Bamidele';
   const heroOfficeTitle = presidentialWelcome?.officeTitle || presidentAppt?.office.title || 'Executive President';
   const heroStateOfOrigin = presidentialWelcome?.stateOfOrigin || presidentAppt?.person.stateOfOrigin || 'Ekiti State';
-  const heroSessionTitle = presidentialWelcome?.sessionTitle || currentSession?.title || '2026/2027 Progress Era Session';
+  const heroSessionTitle = presidentialWelcome?.sessionTitle || currentSession?.title || '2026/2027 Session';
   const heroPortraitUrl = presidentialWelcome?.portraitUrl || presidentAppt?.person.avatarMedia?.url || '/images/gallery/sobur-certificate-presentation.jpg';
   const heroWelcomeSummary =
     presidentialWelcome?.welcomeSummary ||
-    "On behalf of the Executive Council and the entire Yoruba Students' Union (YOSU) at Federal University Dutse, I warmly welcome you to our official enterprise portal. We remain committed to academic excellence, cultural preservation, transparent governance, and student welfare.";
+    "Leading with dedication, integrity, and an unyielding commitment to every Yoruba student's success.";
   const heroFullMessage =
     presidentialWelcome?.fullMessage ||
     `Greetings Great Yoruba Students of Federal University Dutse!\n\nIt is with immense humility and gratitude that I address you as the President of our esteemed union for the 2026/2027 Progress Era.\n\nOur administration stands firmly on the pillars of Unity, Integrity, Academic Superiority, and Cultural Heritage. Through our interactive digital platforms, transparency initiatives, and legislative representation across all 8 Yoruba constituent states, we are transforming student governance at FUD.\n\nI encourage every member to engage with our supreme constitution, participate in union projects, and leverage our central media library. Together, we shall elevate YOSU to unprecedented heights.\n\nLong Live YOSU! Long Live Federal University Dutse! Long Live the Federal Republic of Nigeria!`;
@@ -259,30 +250,93 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFBF7] font-sans antialiased text-slate-900 selection:bg-amber-200 selection:text-emerald-950 overflow-x-hidden">
-      {/* 1. HERO SECTION WITH PRESIDENT WELCOME ADDRESS (REQUIREMENT 1) */}
-      <section className="relative w-full min-h-[640px] lg:min-h-[720px] flex items-center justify-center overflow-hidden bg-slate-950 py-16">
+      {/* 1. HERO SECTION WITH BACKGROUND SLIDER */}
+      <section className="relative w-full h-[85vh] min-h-[580px] max-h-[850px] flex items-center justify-center overflow-hidden bg-slate-950">
         <HeroBackgroundSlider images={heroBackgroundImages} intervalMs={6500} />
 
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left 7 Columns: Title & Tagline */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left text-white">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-amber-400/60 backdrop-blur-md shadow-lg animate-pulse-subtle">
-                <Crown className="w-4 h-4 text-amber-400" />
-                <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300">
-                  YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
-                </span>
+        <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-amber-400/60 backdrop-blur-md shadow-lg animate-pulse-subtle">
+            <Crown className="w-4 h-4 text-amber-400" />
+            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300">
+              YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
+            </span>
+          </div>
+
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-md">
+            Promoting Heritage, Unity & Academic Excellence
+          </h1>
+
+          <p className="text-sm sm:text-lg text-slate-200 font-light leading-relaxed drop-shadow max-w-2xl mx-auto">
+            Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting 8 constituent Yoruba state delegations under one supreme constitution.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <Link
+              href="/leadership"
+              className="px-6 py-3.5 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition-all hover:scale-105 flex items-center gap-2"
+            >
+              <span>Explore Executive Roster</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/constitution"
+              className="px-6 py-3.5 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-xl backdrop-blur-md transition-all hover:scale-105 flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4 text-amber-400" />
+              <span>Interactive Supreme Constitution</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* MARQUEE ANNOUNCEMENTS */}
+      <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
+
+      {/* 2. DEDICATED PRESIDENT SHOWCASE SECTION (MATCHING ATTACHED 3 REQUIREMENT) */}
+      <section className="w-full bg-[#080E1A] border-b border-emerald-900/40 text-white overflow-hidden shadow-2xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[480px]">
+            {/* Left Column (Attached 3 Style: Full President Portrait with Green Accent Edge) */}
+            <div className="lg:col-span-6 relative min-h-[380px] sm:min-h-[460px] bg-emerald-950 overflow-hidden flex items-center justify-center">
+              {/* Green Accent Stripe */}
+              <div className="absolute top-0 left-0 bottom-0 w-3 bg-[#00A86B] z-10" />
+
+              <Image
+                src={heroPortraitUrl}
+                alt={heroPresidentName}
+                fill
+                className="object-cover object-top"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080E1A] via-transparent to-transparent lg:hidden" />
+            </div>
+
+            {/* Right Column (Attached 3 Style: Dark Navy Background & Clean Typography) */}
+            <div className="lg:col-span-6 p-8 sm:p-12 lg:p-14 bg-[#0B132B] flex flex-col justify-center space-y-6">
+              {/* Green Pill Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-xs font-bold w-max uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>PRESIDENT</span>
               </div>
 
-              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-md">
-                Promoting Heritage, Unity & Academic Excellence
-              </h1>
+              {/* Giant Bold Name Header */}
+              <h2 className="font-serif text-3xl sm:text-5xl lg:text-5xl font-black text-white uppercase tracking-tight leading-[1.08]">
+                {heroPresidentName}
+              </h2>
 
-              <p className="text-sm sm:text-lg text-slate-200 font-light leading-relaxed drop-shadow max-w-2xl mx-auto lg:mx-0">
-                Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting 8 constituent Yoruba state delegations under one supreme constitution.
+              {/* Subtitle */}
+              <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest font-mono">
+                STUDENTS UNION GOVERNMENT • FEDERAL UNIVERSITY DUTSE
               </p>
 
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+              {/* Dynamic Address Quote */}
+              <p className="text-sm sm:text-base text-slate-200 font-light leading-relaxed italic border-l-2 border-[#00A86B] pl-4 py-1">
+                &quot;{heroWelcomeSummary}&quot;
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4 pt-4">
                 <WelcomeMessageModal
                   presidentName={heroPresidentName}
                   officeTitle={heroOfficeTitle}
@@ -291,72 +345,23 @@ export default async function HomePage() {
                   portraitUrl={heroPortraitUrl}
                   welcomeSummary={heroWelcomeSummary}
                   fullMessage={heroFullMessage}
+                  buttonText="READ PRESIDENTIAL ADDRESS →"
+                  buttonClassName="px-6 py-3.5 bg-[#00A86B] hover:bg-[#00905c] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-xl transition-all hover:scale-105 flex items-center gap-2"
                 />
 
                 <Link
                   href="/leadership"
-                  className="px-6 py-3 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-xl backdrop-blur-md transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-extrabold text-xs sm:text-sm rounded-full border border-emerald-800/80 shadow-xl transition-all hover:scale-105 flex items-center gap-2"
                 >
-                  <Users className="w-4 h-4 text-amber-400" />
-                  <span>View Leadership Roster</span>
+                  <span>MEET THE COUNCIL →</span>
                 </Link>
-              </div>
-            </div>
-
-            {/* Right 5 Columns: Executive President Welcome Card (Requirement 1) */}
-            <div className="lg:col-span-5">
-              <div className="bg-slate-900/95 border-2 border-amber-400/60 rounded-3xl p-6 sm:p-7 shadow-2xl backdrop-blur-xl space-y-4 hover-lift">
-                <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-amber-400 shrink-0 shadow-lg bg-slate-950">
-                    {heroPortraitUrl ? (
-                      <Image
-                        src={heroPortraitUrl}
-                        alt={heroPresidentName}
-                        fill
-                        className="object-cover object-top"
-                        priority
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-emerald-950 text-amber-400 flex items-center justify-center font-bold text-2xl">
-                        {heroPresidentName.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-1 min-w-0">
-                    <span className="bg-emerald-950 text-amber-300 text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-emerald-800 inline-block">
-                      {heroOfficeTitle}
-                    </span>
-                    <h3 className="font-serif font-bold text-lg text-white truncate">
-                      {heroPresidentName}
-                    </h3>
-                    <p className="text-xs text-slate-300 font-medium">
-                      {heroStateOfOrigin} Delegation
-                    </p>
-                    <span className="text-[10px] text-amber-400 font-mono block">
-                      {heroSessionTitle}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-2 border-t border-slate-800">
-                  <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">
-                    PRESIDENTIAL ADDRESS EXCERPT
-                  </span>
-                  <p className="text-xs text-slate-200 italic font-light leading-relaxed line-clamp-4">
-                    &quot;{heroWelcomeSummary}&quot;
-                  </p>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* MARQUEE ANNOUNCEMENTS */}
-      <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
-
-      {/* 2. EXPANDED ABOUT YOSU SECTION (REQUIREMENT 2) */}
+      {/* 3. EXPANDED ABOUT YOSU SECTION (REQUIREMENT 2) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16 space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -410,7 +415,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 3. 100% DYNAMIC HOMEPAGE STATISTICS (REQUIREMENT 3) */}
+      {/* 4. 100% DYNAMIC HOMEPAGE STATISTICS (REQUIREMENT 3) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
           <div className="text-center max-w-2xl mx-auto mb-8 space-y-1">
@@ -484,7 +489,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 4. MODERN NEWSROOM BROADCAST (REQUIREMENT 4) */}
+      {/* 5. MODERN NEWSROOM BROADCAST (REQUIREMENT 4) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-4">
@@ -621,7 +626,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 5. CURRENT ADMINISTRATION HIGHLIGHTS & ACHIEVEMENTS (REQUIREMENT 5) */}
+      {/* 6. CURRENT ADMINISTRATION HIGHLIGHTS & ACHIEVEMENTS (REQUIREMENT 5) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section className="bg-slate-950 text-white py-16 px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
           <div className="max-w-7xl mx-auto space-y-8">
@@ -694,7 +699,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 6. CURRENT ACTIVE SESSION REPRESENTATIVES (REQUIREMENT 6) */}
+      {/* 7. CURRENT ACTIVE SESSION REPRESENTATIVES (REQUIREMENT 6) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-4">
@@ -758,7 +763,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 7. EXECUTIVE COUNCIL CAROUSEL */}
+      {/* 8. EXECUTIVE COUNCIL CAROUSEL */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section id="executive-council-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
           <ExecutiveCarousel
@@ -768,7 +773,7 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 8. HOMEPAGE CONTACT PREVIEW & MAP (REQUIREMENT 7) */}
+      {/* 9. HOMEPAGE CONTACT PREVIEW & MAP (REQUIREMENT 7) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-4">
@@ -861,95 +866,6 @@ export default async function HomePage() {
           </div>
         </section>
       </ScrollReveal>
-
-      {/* 9. IMPROVED ENTERPRISE FOOTER (REQUIREMENT 8) */}
-      <footer className="bg-slate-950 text-white border-t border-slate-800 pt-16 pb-8 font-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-            {/* Column 1: Brand & Institutional Description */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/40">
-                  <Crown className="w-6 h-6 text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="font-serif font-bold text-lg text-white">Yoruba Students&apos; Union</h3>
-                  <span className="text-[10px] text-amber-400 font-extrabold uppercase tracking-widest block">
-                    Federal University Dutse Chapter
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-300 font-light leading-relaxed max-w-md">
-                Official enterprise platform for Yoruba scholars across Federal University Dutse. Governed under the ratified provisions of the Supreme Unification Constitution.
-              </p>
-
-              <div className="pt-2 text-xs font-bold text-emerald-400 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 inline-block">
-                Active Administration: <span className="text-amber-400">{currentSession?.title || '2026/2027 Session'}</span>
-              </div>
-            </div>
-
-            {/* Column 2: Quick Links */}
-            <div className="space-y-3">
-              <h4 className="font-serif font-bold text-sm text-amber-400 uppercase tracking-wider">Quick Navigation</h4>
-              <ul className="space-y-2 text-xs text-slate-300 font-medium">
-                <li><Link href="/" className="hover:text-amber-300 transition-colors">Home Portal</Link></li>
-                <li><Link href="/about" className="hover:text-amber-300 transition-colors">About YOSU</Link></li>
-                <li><Link href="/leadership" className="hover:text-amber-300 transition-colors">Leadership Roster</Link></li>
-                <li><Link href="/constitution" className="hover:text-amber-300 transition-colors">Supreme Constitution</Link></li>
-                <li><Link href="/news" className="hover:text-amber-300 transition-colors">Newsroom Gazettes</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 3: Resources & Governance */}
-            <div className="space-y-3">
-              <h4 className="font-serif font-bold text-sm text-amber-400 uppercase tracking-wider">Resources & Portal</h4>
-              <ul className="space-y-2 text-xs text-slate-300 font-medium">
-                <li><Link href="/projects" className="hover:text-amber-300 transition-colors">Transparency Projects</Link></li>
-                <li><Link href="/downloads" className="hover:text-amber-300 transition-colors">Public Downloads</Link></li>
-                <li><Link href="/gallery" className="hover:text-amber-300 transition-colors">Central Media Library</Link></li>
-                <li><Link href="/contact" className="hover:text-amber-300 transition-colors">Contact Secretariat</Link></li>
-                <li><Link href="/login" className="hover:text-amber-300 transition-colors">Executive Admin Login</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 4: Emergency Contacts & Socials */}
-            <div className="space-y-3">
-              <h4 className="font-serif font-bold text-sm text-amber-400 uppercase tracking-wider">Emergency Contacts</h4>
-              <div className="space-y-2 text-xs text-slate-300">
-                <p className="font-mono text-[11px]">{contactPhone}</p>
-                <p className="font-mono text-[11px]">{contactEmail}</p>
-                <p className="text-[11px] text-slate-400 font-light">Student Affairs Division, FUD Campus</p>
-              </div>
-
-              <div className="pt-2 flex items-center gap-2">
-                {settingsMap['social_facebook'] && (
-                  <a href={settingsMap['social_facebook']} target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-slate-300 hover:text-amber-400 transition-colors border border-slate-800">
-                    <Globe className="w-3.5 h-3.5" />
-                  </a>
-                )}
-                {settingsMap['social_twitter'] && (
-                  <a href={settingsMap['social_twitter']} target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-slate-300 hover:text-amber-400 transition-colors border border-slate-800">
-                    <Globe className="w-3.5 h-3.5" />
-                  </a>
-                )}
-                {settingsMap['social_instagram'] && (
-                  <a href={settingsMap['social_instagram']} target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-900 hover:bg-slate-800 rounded-xl text-slate-300 hover:text-amber-400 transition-colors border border-slate-800">
-                    <Globe className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400 font-medium">
-            <p>© {new Date().getFullYear()} Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter. All Rights Reserved.</p>
-            <p className="text-[11px] text-slate-300 font-mono">
-              Governed by the {currentSession?.title || 'Progress Era'} Administration
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
