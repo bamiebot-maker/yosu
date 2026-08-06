@@ -493,63 +493,8 @@ export async function deleteProjectAction(id: string) {
 }
 
 // ==========================================
-// 6. CONSTITUTION VERSIONS ACTIONS
+// 6. CONSTITUTION VERSIONS ACTIONS (DEFERRED TO SECTION 14)
 // ==========================================
-export async function createConstitutionVersionAction(formData: FormData) {
-  try {
-    const versionName = formData.get('versionName') as string || formData.get('title') as string;
-    const isCurrent = formData.get('isCurrent') === 'true';
-
-    const activeSession = await db.administrationSession.findFirst({ where: { isCurrent: true } })
-      || await db.administrationSession.findFirst();
-
-    if (!activeSession) throw new Error('No administration session found.');
-
-    if (isCurrent) {
-      await db.constitutionVersion.updateMany({ data: { isCurrent: false } });
-    }
-
-    await db.constitutionVersion.create({
-      data: {
-        versionName,
-        sessionId: activeSession.id,
-        effectiveDate: new Date(),
-        isCurrent,
-      },
-    });
-
-    revalidatePath('/admin/constitution');
-    revalidatePath('/constitution');
-    return { success: true, message: 'Constitution version created successfully!' };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to create constitution version' };
-  }
-}
-
-export async function deleteConstitutionVersionAction(id: string) {
-  try {
-    const session = await getSession();
-    const isSuperAdmin = session?.roleCodes.includes('SUPER_ADMIN');
-    if (!isSuperAdmin) {
-      return { success: false, error: '403 Forbidden: Only a Super Admin can delete Constitution versions permanently.' };
-    }
-
-    const version = await db.constitutionVersion.delete({ where: { id } });
-    await db.auditLog.create({
-      data: {
-        userId: session?.userId || null,
-        action: 'CONSTITUTION_DELETE',
-        details: `Super Admin permanently deleted Constitution version: ${version.versionName}`,
-      },
-    });
-
-    revalidatePath('/admin/constitution');
-    revalidatePath('/constitution');
-    return { success: true, message: 'Constitution version deleted successfully!' };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to delete version' };
-  }
-}
 
 // ==========================================
 // 7. USER & RBAC GOVERNANCE ACTIONS
@@ -1198,3 +1143,220 @@ export async function updateSiteSettingsAction(formData: FormData) {
     return { success: false, error: error.message || 'Failed to update site settings' };
   }
 }
+
+// ==========================================
+// 14. CONSTITUTION CMS ACTIONS
+// ==========================================
+export async function createConstitutionVersionAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const versionName = formData.get('versionName') as string;
+    const edition = (formData.get('edition') as string) || '1st Harmonized Edition';
+    const sessionId = formData.get('sessionId') as string;
+    const effectiveDateStr = formData.get('effectiveDate') as string;
+    const assentedBy = (formData.get('assentedBy') as string) || null;
+    const speakerCertBy = (formData.get('speakerCertBy') as string) || null;
+    const pdfMediaId = (formData.get('pdfMediaId') as string) || null;
+    const isCurrent = formData.get('isCurrent') === 'true';
+
+    if (isCurrent) {
+      await db.constitutionVersion.updateMany({
+        data: { isCurrent: false },
+      });
+    }
+
+    const version = await db.constitutionVersion.create({
+      data: {
+        versionName,
+        edition,
+        sessionId,
+        effectiveDate: new Date(effectiveDateStr),
+        assentedBy,
+        speakerCertBy,
+        pdfMediaId,
+        isCurrent,
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'CONSTITUTION_VERSION_CREATE',
+        details: `Created Constitution Version: ${versionName}`,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    revalidatePath('/history');
+    return { success: true, message: 'Constitution Version created successfully!', data: version };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to create constitution version' };
+  }
+}
+
+export async function updateConstitutionVersionAction(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const versionName = formData.get('versionName') as string;
+    const edition = (formData.get('edition') as string) || '1st Harmonized Edition';
+    const effectiveDateStr = formData.get('effectiveDate') as string;
+    const assentedBy = (formData.get('assentedBy') as string) || null;
+    const speakerCertBy = (formData.get('speakerCertBy') as string) || null;
+    const isCurrent = formData.get('isCurrent') === 'true';
+
+    if (isCurrent) {
+      await db.constitutionVersion.updateMany({
+        where: { id: { not: id } },
+        data: { isCurrent: false },
+      });
+    }
+
+    const version = await db.constitutionVersion.update({
+      where: { id },
+      data: {
+        versionName,
+        edition,
+        effectiveDate: new Date(effectiveDateStr),
+        assentedBy,
+        speakerCertBy,
+        isCurrent,
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'CONSTITUTION_VERSION_UPDATE',
+        details: `Updated Constitution Version: ${versionName}`,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    revalidatePath('/history');
+    return { success: true, message: 'Constitution Version updated successfully!', data: version };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update constitution version' };
+  }
+}
+
+export async function deleteConstitutionVersionAction(id: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const ver = await db.constitutionVersion.findUnique({ where: { id } });
+    if (ver?.isCurrent) {
+      throw new Error('Cannot delete the active ratified constitution version.');
+    }
+
+    await db.constitutionVersion.delete({ where: { id } });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'CONSTITUTION_VERSION_DELETE',
+        details: `Deleted Constitution Version ID: ${id}`,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    revalidatePath('/history');
+    return { success: true, message: 'Constitution Version deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete constitution version' };
+  }
+}
+
+export async function addConstitutionArticleAction(versionId: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const articleNumber = parseInt(formData.get('articleNumber') as string, 10);
+    const title = formData.get('title') as string;
+    const overview = (formData.get('overview') as string) || null;
+    const slug = (formData.get('slug') as string) || `article-${articleNumber}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+
+    const article = await db.constitutionArticle.create({
+      data: {
+        versionId,
+        articleNumber,
+        title,
+        overview,
+        slug,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    return { success: true, message: 'Constitution Article added successfully!', data: article };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to add article' };
+  }
+}
+
+export async function addConstitutionSectionAction(articleId: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const sectionNumber = formData.get('sectionNumber') as string;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const displayOrder = parseInt((formData.get('displayOrder') as string) || '0', 10);
+
+    const sectionRecord = await db.constitutionSection.create({
+      data: {
+        articleId,
+        sectionNumber,
+        title,
+        content,
+        displayOrder,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    return { success: true, message: 'Constitution Section added successfully!', data: sectionRecord };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to add section' };
+  }
+}
+
+export async function addConstitutionAmendmentAction(versionId: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const proposedBy = formData.get('proposedBy') as string;
+    const dateProposedStr = formData.get('dateProposed') as string;
+    const dateRatifiedStr = (formData.get('dateRatified') as string) || null;
+    const amendmentSummary = formData.get('amendmentSummary') as string;
+    const fullText = formData.get('fullText') as string;
+
+    const amendment = await db.constitutionAmendment.create({
+      data: {
+        versionId,
+        proposedBy,
+        dateProposed: new Date(dateProposedStr),
+        dateRatified: dateRatifiedStr ? new Date(dateRatifiedStr) : null,
+        amendmentSummary,
+        fullText,
+      },
+    });
+
+    revalidatePath('/constitution');
+    revalidatePath('/admin/constitution');
+    return { success: true, message: 'Constitution Amendment created successfully!', data: amendment };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to add amendment' };
+  }
+}
+

@@ -1,92 +1,121 @@
 import React from 'react';
 import { db } from '@/lib/db';
-import { BookOpen, Download, Shield, CheckCircle2 } from 'lucide-react';
-import { InteractiveConstitutionViewer } from '@/components/constitution/interactive-constitution-viewer';
+import {
+  InteractiveConstitutionPortal,
+  SerializedVersion,
+} from '@/components/constitution/interactive-constitution-portal';
 
 export const revalidate = 60;
 
 export default async function ConstitutionPage() {
-  const currentVersion = await db.constitutionVersion.findFirst({
-    where: { isCurrent: true },
-    include: {
-      articles: {
-        include: { sections: { orderBy: { displayOrder: 'asc' } } },
-        orderBy: { articleNumber: 'asc' },
+  const [
+    allVersionsData,
+    totalArticlesCount,
+    totalSectionsCount,
+    totalAmendmentsCount,
+  ] = await Promise.all([
+    db.constitutionVersion.findMany({
+      orderBy: { effectiveDate: 'desc' },
+      include: {
+        session: true,
+        pdfMedia: true,
+        amendments: {
+          orderBy: { dateProposed: 'desc' },
+        },
+        articles: {
+          orderBy: { articleNumber: 'asc' },
+          include: {
+            sections: {
+              orderBy: { displayOrder: 'asc' },
+            },
+          },
+        },
       },
-      pdfMedia: true,
-    },
-  }).catch(() => null);
+    }),
+    db.constitutionArticle.count(),
+    db.constitutionSection.count(),
+    db.constitutionAmendment.count(),
+  ]);
 
-  const articles = currentVersion?.articles || [];
+  if (!allVersionsData || allVersionsData.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4 font-sans">
+        <h1 className="text-2xl font-serif font-bold text-slate-900">Constitution Gazette Repository</h1>
+        <p className="text-slate-500 text-sm">No constitution versions found in the database.</p>
+      </div>
+    );
+  }
+
+  // Format Date Helper
+  const formatDate = (date?: Date | null) => {
+    if (!date) return null;
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // Serialize Versions
+  const serializedVersions: SerializedVersion[] = allVersionsData.map((ver) => ({
+    id: ver.id,
+    versionName: ver.versionName,
+    edition: ver.edition || '1st Harmonized Edition',
+    effectiveDate: formatDate(ver.effectiveDate) || 'Ratified',
+    adoptionDate: formatDate(ver.adoptionDate),
+    ratificationDate: formatDate(ver.ratificationDate),
+    isCurrent: ver.isCurrent,
+    assentedBy: ver.assentedBy || 'President Asiwaju Abdulsalam Oluwagbenga',
+    speakerCertBy: ver.speakerCertBy || 'Speaker Rt. Hon. Ibrahim Sobur Bamidele',
+    pdfUrl: ver.pdfMedia?.url || '/downloads/YOSU_Unification_Constitution_2026.pdf',
+    viewsCount: ver.viewsCount || 0,
+    downloadsCount: ver.downloadsCount || 0,
+    sessionTitle: ver.session?.title,
+    articles: ver.articles.map((art) => ({
+      id: art.id,
+      articleNumber: art.articleNumber,
+      title: art.title,
+      slug: art.slug,
+      overview: art.overview,
+      sections: art.sections.map((sec) => ({
+        id: sec.id,
+        sectionNumber: sec.sectionNumber,
+        title: sec.title,
+        content: sec.content,
+        displayOrder: sec.displayOrder,
+      })),
+    })),
+    amendments: ver.amendments.map((am) => ({
+      id: am.id,
+      proposedBy: am.proposedBy,
+      dateProposed: formatDate(am.dateProposed) || '',
+      dateRatified: formatDate(am.dateRatified),
+      amendmentSummary: am.amendmentSummary,
+      fullText: am.fullText,
+    })),
+  }));
+
+  const currentVersion =
+    serializedVersions.find((v) => v.isCurrent) || serializedVersions[0];
+
+  const totalViews = serializedVersions.reduce((acc, v) => acc + v.viewsCount, 0);
+  const totalDownloads = serializedVersions.reduce((acc, v) => acc + v.downloadsCount, 0);
+
+  const stats = {
+    totalChapters: 7,
+    totalArticles: totalArticlesCount,
+    totalSections: totalSectionsCount,
+    totalAmendments: totalAmendmentsCount,
+    totalViews,
+    totalDownloads,
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 font-sans">
-      {/* Header Banner */}
-      <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <BookOpen className="w-64 h-64 text-amber-300" />
-        </div>
-
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-amber-400/30">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Supreme Governing Document</span>
-          </div>
-
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            The Unification Constitution (2026)
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-light">
-            As amended and ratified by the House of Representatives on Friday, 10 July 2026 and assented by President Asiwaju Abdulsalam Abdulgafar Oluwagbenga on Saturday, 11 July 2026.
-          </p>
-
-          <div className="pt-4 flex flex-wrap gap-4 items-center">
-            <a
-              href={currentVersion?.pdfMedia?.url || '/downloads/YOSU_Unification_Constitution_2026.pdf'}
-              download
-              className="px-6 py-3 bg-[#E5A91A] hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Official PDF Gazette</span>
-            </a>
-            <div className="text-xs text-amber-300 flex items-center gap-1.5 font-medium bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Effective Date: July 11, 2026</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Official Signatories & Ratification Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-3xl border border-stone-200 shadow-sm text-xs text-slate-700">
-        <div className="space-y-2 border-l-4 border-emerald-900 pl-4">
-          <span className="font-bold text-emerald-950 uppercase tracking-wider block text-[10px]">PRESIDENTIAL ASSENT</span>
-          <p className="font-serif text-base font-bold text-slate-900">
-            Asiwaju Abdulsalam Abdulgafar Oluwagbenga
-          </p>
-          <p className="text-slate-500">President, Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter</p>
-          <span className="inline-block text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
-            Assented: 11 July 2026
-          </span>
-        </div>
-
-        <div className="space-y-2 border-l-4 border-[#E5A91A] pl-4">
-          <span className="font-bold text-amber-700 uppercase tracking-wider block text-[10px]">SPEAKER&apos;S CERTIFICATE</span>
-          <p className="font-serif text-base font-bold text-slate-900">
-            Rt. Hon. Ibrahim Sobur Bamidele
-          </p>
-          <p className="text-slate-500">Speaker, House of Representatives (2025/2026 Session)</p>
-          <span className="inline-block text-[11px] font-semibold text-amber-900 bg-amber-50 px-2 py-0.5 rounded">
-            Certified & Transmitted: 11 July 2026
-          </span>
-        </div>
-      </div>
-
-      {/* Interactive Constitution Viewer Component */}
-      <InteractiveConstitutionViewer
-        articles={articles}
-        pdfUrl={currentVersion?.pdfMedia?.url || '/downloads/YOSU_Unification_Constitution_2026.pdf'}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
+      <InteractiveConstitutionPortal
+        currentVersion={currentVersion}
+        allVersions={serializedVersions}
+        stats={stats}
       />
     </div>
   );

@@ -510,21 +510,26 @@ model AlbumMedia {
 // ==========================================
 
 model ConstitutionVersion {
-  id            String                  @id @default(cuid())
-  versionName   String
-  sessionId     String
-  session       AdministrationSession   @relation(fields: [sessionId], references: [id])
-  effectiveDate DateTime
-  isCurrent     Boolean                 @default(false)
-  assentDate    DateTime?
-  assentedBy    String?
-  speakerCertBy String?
-  pdfMediaId    String?
-  pdfMedia      Media?                  @relation("ConstitutionPdf", fields: [pdfMediaId], references: [id], onDelete: SetNull)
-  articles      ConstitutionArticle[]
-  amendments    ConstitutionAmendment[]
-  createdAt     DateTime                @default(now())
-  updatedAt     DateTime                @updatedAt
+  id               String                  @id @default(cuid())
+  versionName      String
+  edition          String?                 @default("1st Harmonized Edition")
+  sessionId        String
+  session          AdministrationSession   @relation(fields: [sessionId], references: [id])
+  effectiveDate    DateTime
+  adoptionDate     DateTime?
+  ratificationDate DateTime?
+  isCurrent        Boolean                 @default(false)
+  assentDate       DateTime?
+  assentedBy       String?
+  speakerCertBy    String?
+  pdfMediaId       String?
+  pdfMedia         Media?                  @relation("ConstitutionPdf", fields: [pdfMediaId], references: [id], onDelete: SetNull)
+  viewsCount       Int                     @default(0)
+  downloadsCount   Int                     @default(0)
+  articles         ConstitutionArticle[]
+  amendments       ConstitutionAmendment[]
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
 
   @@index([isCurrent])
 }
