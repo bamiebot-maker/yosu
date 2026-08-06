@@ -797,3 +797,50 @@ model AboutContent {
 
   @@index([sectionKey])
 }
+
+// ==========================================
+// 17. ENTERPRISE CONTACT & COMMUNICATION CENTRE
+// ==========================================
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model ContactMessage {
+  id           String        @id @default(cuid())
+  referenceNo  String        @unique
+  fullName     String
+  email        String
+  phone        String
+  institution  String
+  state        String
+  subject      String
+  category     String        @default("GENERAL")
+  message      String
+  status       MessageStatus @default(UNREAD)
+  replyMessage String?
+  ipAddress    String?
+  createdAt    DateTime      @default(now())
+  readAt       DateTime?
+  repliedAt    DateTime?
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model FaqItem {
+  id           String   @id @default(cuid())
+  question     String
+  answer       String
+  category     String   @default("GENERAL")
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isPublished, displayOrder])
+}
+

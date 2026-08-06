@@ -1360,3 +1360,216 @@ export async function addConstitutionAmendmentAction(versionId: string, formData
   }
 }
 
+// ==========================================
+// 15. CONTACT MESSAGES & INBOX ACTIONS
+// ==========================================
+export async function updateContactMessageStatusAction(id: string, status: 'UNREAD' | 'READ' | 'REPLIED' | 'ARCHIVED') {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const msg = await db.contactMessage.update({
+      where: { id },
+      data: {
+        status,
+        ...(status === 'READ' ? { readAt: new Date() } : {}),
+      },
+    });
+
+    revalidatePath('/admin/contact-messages');
+    return { success: true, message: `Message status updated to ${status}` };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update message status' };
+  }
+}
+
+export async function replyContactMessageAction(id: string, replyMessage: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const msg = await db.contactMessage.update({
+      where: { id },
+      data: {
+        status: 'REPLIED',
+        replyMessage,
+        repliedAt: new Date(),
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'CONTACT_MESSAGE_REPLY',
+        details: `Replied to contact enquiry Ref: ${msg.referenceNo} (${msg.email})`,
+      },
+    });
+
+    revalidatePath('/admin/contact-messages');
+    return { success: true, message: `Reply recorded for Ref: ${msg.referenceNo}` };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to record reply' };
+  }
+}
+
+export async function deleteContactMessageAction(id: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const msg = await db.contactMessage.delete({ where: { id } });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'CONTACT_MESSAGE_DELETE',
+        details: `Deleted contact enquiry Ref: ${msg.referenceNo}`,
+      },
+    });
+
+    revalidatePath('/admin/contact-messages');
+    return { success: true, message: 'Message deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete message' };
+  }
+}
+
+// ==========================================
+// 16. CONTACT SETTINGS & FAQ CMS ACTIONS
+// ==========================================
+export async function updateContactSettingsAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const keysToSave = [
+      { key: 'contact_address', label: 'Office Address', group: 'CONTACT' as const },
+      { key: 'contact_email', label: 'Official Email', group: 'CONTACT' as const },
+      { key: 'contact_support_email', label: 'Support Email', group: 'CONTACT' as const },
+      { key: 'contact_phone', label: 'Helpline Phone', group: 'CONTACT' as const },
+      { key: 'contact_phone_alt', label: 'Alternative Phone', group: 'CONTACT' as const },
+      { key: 'contact_whatsapp', label: 'Official WhatsApp', group: 'CONTACT' as const },
+      { key: 'social_facebook', label: 'Facebook URL', group: 'FOOTER' as const },
+      { key: 'social_instagram', label: 'Instagram URL', group: 'FOOTER' as const },
+      { key: 'social_twitter', label: 'X (Twitter) URL', group: 'FOOTER' as const },
+      { key: 'social_telegram', label: 'Telegram Channel', group: 'FOOTER' as const },
+      { key: 'social_linkedin', label: 'LinkedIn Page', group: 'FOOTER' as const },
+      { key: 'social_youtube', label: 'YouTube Channel', group: 'FOOTER' as const },
+      { key: 'social_website', label: 'Website URL', group: 'FOOTER' as const },
+      { key: 'contact_map_url', label: 'Google Maps Embed URL', group: 'CONTACT' as const },
+      { key: 'office_hours_weekday', label: 'Weekday Office Hours', group: 'CONTACT' as const },
+      { key: 'office_hours_saturday', label: 'Saturday Office Hours', group: 'CONTACT' as const },
+      { key: 'office_hours_sunday', label: 'Sunday Office Hours', group: 'CONTACT' as const },
+      { key: 'office_hours_holidays', label: 'Public Holiday Hours', group: 'CONTACT' as const },
+      { key: 'contact_intro_title', label: 'Contact Page Intro Title', group: 'CONTACT' as const },
+      { key: 'contact_intro_subtitle', label: 'Contact Page Intro Subtitle', group: 'CONTACT' as const },
+    ];
+
+    for (const item of keysToSave) {
+      const val = formData.get(item.key) as string | null;
+      if (val !== null) {
+        await db.siteSetting.upsert({
+          where: { key: item.key },
+          update: { value: val },
+          create: {
+            key: item.key,
+            value: val,
+            label: item.label,
+            group: item.group,
+          },
+        });
+      }
+    }
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'UPDATE_CONTACT_SETTINGS',
+        details: 'Updated Contact Settings & Social Media Hub configurations',
+      },
+    });
+
+    revalidatePath('/contact');
+    revalidatePath('/admin/contact-settings');
+    revalidatePath('/');
+    return { success: true, message: 'Contact settings saved successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update contact settings' };
+  }
+}
+
+export async function createFaqItemAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const question = formData.get('question') as string;
+    const answer = formData.get('answer') as string;
+    const category = (formData.get('category') as string) || 'GENERAL';
+    const displayOrder = parseInt((formData.get('displayOrder') as string) || '0', 10);
+    const isPublished = formData.get('isPublished') === 'true';
+
+    const faq = await db.faqItem.create({
+      data: {
+        question,
+        answer,
+        category,
+        displayOrder,
+        isPublished,
+      },
+    });
+
+    revalidatePath('/contact');
+    revalidatePath('/admin/contact-settings');
+    return { success: true, message: 'FAQ Item created successfully!', data: faq };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to create FAQ item' };
+  }
+}
+
+export async function updateFaqItemAction(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const question = formData.get('question') as string;
+    const answer = formData.get('answer') as string;
+    const category = (formData.get('category') as string) || 'GENERAL';
+    const displayOrder = parseInt((formData.get('displayOrder') as string) || '0', 10);
+    const isPublished = formData.get('isPublished') === 'true';
+
+    const faq = await db.faqItem.update({
+      where: { id },
+      data: {
+        question,
+        answer,
+        category,
+        displayOrder,
+        isPublished,
+      },
+    });
+
+    revalidatePath('/contact');
+    revalidatePath('/admin/contact-settings');
+    return { success: true, message: 'FAQ Item updated successfully!', data: faq };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update FAQ item' };
+  }
+}
+
+export async function deleteFaqItemAction(id: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    await db.faqItem.delete({ where: { id } });
+
+    revalidatePath('/contact');
+    revalidatePath('/admin/contact-settings');
+    return { success: true, message: 'FAQ Item deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete FAQ item' };
+  }
+}
+
+
