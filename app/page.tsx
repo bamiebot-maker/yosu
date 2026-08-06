@@ -28,6 +28,8 @@ import { HeroBackgroundSlider } from '@/components/home/hero-background-slider';
 import { ScrollingMarquee } from '@/components/home/scrolling-marquee';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
+import { PresidentShowcase } from '@/components/home/president-showcase';
+import { RepresentativeCarousel } from '@/components/home/representative-carousel';
 
 export const revalidate = 60; // ISR 60 seconds
 
@@ -293,73 +295,16 @@ export default async function HomePage() {
       {/* MARQUEE ANNOUNCEMENTS */}
       <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
 
-      {/* 2. DEDICATED PRESIDENT SHOWCASE SECTION (MATCHING ATTACHED 3 REQUIREMENT) */}
-      <section className="w-full bg-[#080E1A] border-b border-emerald-900/40 text-white overflow-hidden shadow-2xl">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[480px]">
-            {/* Left Column (Attached 3 Style: Full President Portrait with Green Accent Edge) */}
-            <div className="lg:col-span-6 relative min-h-[380px] sm:min-h-[460px] bg-emerald-950 overflow-hidden flex items-center justify-center">
-              {/* Green Accent Stripe */}
-              <div className="absolute top-0 left-0 bottom-0 w-3 bg-[#00A86B] z-10" />
-
-              <Image
-                src={heroPortraitUrl}
-                alt={heroPresidentName}
-                fill
-                className="object-cover object-top"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080E1A] via-transparent to-transparent lg:hidden" />
-            </div>
-
-            {/* Right Column (Attached 3 Style: Dark Navy Background & Clean Typography) */}
-            <div className="lg:col-span-6 p-8 sm:p-12 lg:p-14 bg-[#0B132B] flex flex-col justify-center space-y-6">
-              {/* Green Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 text-xs font-bold w-max uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>PRESIDENT</span>
-              </div>
-
-              {/* Giant Bold Name Header */}
-              <h2 className="font-serif text-3xl sm:text-5xl lg:text-5xl font-black text-white uppercase tracking-tight leading-[1.08]">
-                {heroPresidentName}
-              </h2>
-
-              {/* Subtitle */}
-              <p className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-widest font-mono">
-                STUDENTS UNION GOVERNMENT • FEDERAL UNIVERSITY DUTSE
-              </p>
-
-              {/* Dynamic Address Quote */}
-              <p className="text-sm sm:text-base text-slate-200 font-light leading-relaxed italic border-l-2 border-[#00A86B] pl-4 py-1">
-                &quot;{heroWelcomeSummary}&quot;
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-4">
-                <WelcomeMessageModal
-                  presidentName={heroPresidentName}
-                  officeTitle={heroOfficeTitle}
-                  stateOfOrigin={heroStateOfOrigin}
-                  sessionTitle={heroSessionTitle}
-                  portraitUrl={heroPortraitUrl}
-                  welcomeSummary={heroWelcomeSummary}
-                  fullMessage={heroFullMessage}
-                  buttonText="READ PRESIDENTIAL ADDRESS →"
-                  buttonClassName="px-6 py-3.5 bg-[#00A86B] hover:bg-[#00905c] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-xl transition-all hover:scale-105 flex items-center gap-2"
-                />
-
-                <Link
-                  href="/leadership"
-                  className="px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-extrabold text-xs sm:text-sm rounded-full border border-emerald-800/80 shadow-xl transition-all hover:scale-105 flex items-center gap-2"
-                >
-                  <span>MEET THE COUNCIL →</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 2. DEDICATED PRESIDENT SHOWCASE SECTION WITH SLIDING PICTURE ANIMATION */}
+      <PresidentShowcase
+        heroPresidentName={heroPresidentName}
+        heroOfficeTitle={heroOfficeTitle}
+        heroStateOfOrigin={heroStateOfOrigin}
+        heroSessionTitle={heroSessionTitle}
+        heroPortraitUrl={heroPortraitUrl}
+        heroWelcomeSummary={heroWelcomeSummary}
+        heroFullMessage={heroFullMessage}
+      />
 
       {/* 3. EXPANDED ABOUT YOSU SECTION (REQUIREMENT 2) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
@@ -699,75 +644,21 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 7. CURRENT ACTIVE SESSION REPRESENTATIVES (REQUIREMENT 6) */}
-      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12 space-y-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-4">
-            <div>
-              <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">
-                LEGISLATIVE LEGISLATURE
-              </span>
-              <h2 className="font-serif text-2xl sm:text-4xl font-bold text-slate-900">
-                House of Representatives ({currentSession?.title || 'Active Session'})
-              </h2>
-              <p className="text-xs text-slate-600 mt-1">
-                State assembly delegates representing Yoruba constituent states for the current active administration session.
-              </p>
-            </div>
-            <Link
-              href="/leadership#house-of-reps"
-              className="text-xs font-bold text-emerald-950 hover:text-amber-600 flex items-center gap-1"
-            >
-              <span>Full Assembly Roster</span>
-              <ArrowRight className="w-4 h-4 text-amber-500" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {activeConstituentStateList.length === 0 ? (
-              <div className="col-span-full bg-white p-6 rounded-3xl border border-stone-200 text-center text-xs text-slate-500">
-                No active session representatives enrolled.
-              </div>
-            ) : (
-              activeConstituentStateList.map((stateName) => {
-                const reps = stateRepresentativesMap[stateName];
-                return (
-                  <div key={stateName} className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm space-y-3 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-2 border-b border-stone-100 pb-2">
-                      <Building2 className="w-4 h-4 text-emerald-950" />
-                      <h3 className="font-serif font-bold text-sm text-slate-900">{stateName} Delegation</h3>
-                    </div>
-
-                    <div className="space-y-2">
-                      {reps.map((r) => (
-                        <div key={r.id} className="p-2.5 bg-stone-50 rounded-2xl border border-stone-200 flex items-center gap-3">
-                          {r.photoUrl ? (
-                            <img src={r.photoUrl} alt={r.fullName} className="w-8 h-8 rounded-full object-cover shrink-0 border border-amber-400" />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-emerald-950 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">
-                              {r.fullName.charAt(0)}
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <h4 className="font-serif font-bold text-xs text-slate-900 truncate">{r.fullName}</h4>
-                            <span className="text-[10px] text-amber-700 font-mono block">{r.positionTitle}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* 8. EXECUTIVE COUNCIL CAROUSEL */}
+      {/* 7. EXECUTIVE COUNCIL CAROUSEL */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
         <section id="executive-council-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
           <ExecutiveCarousel
             officers={carouselOfficers}
+            sessionTitle={currentSession?.title ? `${currentSession.title} (Progress Era)` : '2026/2027 Session'}
+          />
+        </section>
+      </ScrollReveal>
+
+      {/* 8. HOUSE OF REPRESENTATIVES CAROUSEL (SLIDER LIKE EXECUTIVE CARDS) */}
+      <ScrollReveal animation="fade-up" delayMs={100} durationMs={850}>
+        <section id="house-of-reps-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
+          <RepresentativeCarousel
+            representatives={dbRepresentatives}
             sessionTitle={currentSession?.title ? `${currentSession.title} (Progress Era)` : '2026/2027 Session'}
           />
         </section>
