@@ -18,6 +18,7 @@ import {
   Building2,
   ShieldCheck,
   Scale,
+  UserCheck,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -25,9 +26,35 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [governanceDropdownOpen, setGovernanceDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const govRef = useRef<HTMLDivElement>(null);
   const resRef = useRef<HTMLDivElement>(null);
+
+  // Track window scroll position for sticky header animation
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   // Close menus on path change
   useEffect(() => {
@@ -55,6 +82,7 @@ export function Navbar() {
     { name: 'About YOSU', href: '/about' },
     { name: 'History', href: '/history' },
     { name: 'Constitution', href: '/constitution', highlight: true },
+    { name: 'Student Registration', href: '/register', badge: 'NEW' },
     { name: 'Newsroom', href: '/news' },
     { name: 'Events', href: '/events' },
     { name: 'Projects', href: '/projects' },
@@ -77,9 +105,15 @@ export function Navbar() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <header className="sticky top-0 z-[9999] w-full max-w-full overflow-visible shadow-xl font-sans bg-white/95 backdrop-blur-md transition-all duration-300">
+    <header
+      className={`sticky top-0 z-[9999] w-full max-w-full font-sans transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-2xl border-b border-stone-300'
+          : 'bg-white shadow-lg border-b border-stone-200'
+      }`}
+    >
       {/* Top Banner - Motto & Institutional Identity */}
-      <div className="bg-emerald-950 text-white py-1 px-3 sm:px-6 text-[10px] sm:text-xs font-medium border-b border-emerald-800 w-full">
+      <div className="bg-emerald-950 text-white py-1 px-3 sm:px-6 text-[10px] sm:text-xs font-medium border-b border-emerald-800 w-full transition-all duration-300">
         <div className="max-w-7xl mx-auto flex flex-row justify-between items-center gap-2 w-full min-w-0">
           {/* Left: Motto Badge */}
           <div className="flex items-center gap-1.5 min-w-0 shrink">
@@ -87,7 +121,7 @@ export function Navbar() {
               MOTTO
             </span>
             <span className="italic font-serif tracking-wide text-amber-200 truncate text-[10px] sm:text-xs">
-              "Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ"
+              &quot;Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ&quot;
             </span>
           </div>
 
@@ -101,16 +135,16 @@ export function Navbar() {
       </div>
 
       {/* Main Header Bar */}
-      <div className="bg-white border-b border-stone-200 w-full relative overflow-visible z-[9999]">
+      <div className="bg-white/90 backdrop-blur-md border-b border-stone-200/80 w-full relative z-[9999]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full">
-          <div className="flex justify-between items-center h-16 sm:h-20 w-full gap-2">
+          <div className={`flex justify-between items-center transition-all duration-300 w-full gap-2 ${isScrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'}`}>
             {/* Brand Logo & Title */}
             <Link
               href="/"
               className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 shrink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-900 rounded-lg py-1 pr-1"
               aria-label="Yoruba Students' Union Homepage"
             >
-              <div className="relative w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14 transition-transform group-hover:scale-105 shrink-0">
+              <div className={`relative transition-all duration-300 shrink-0 ${isScrolled ? 'w-8 h-8 sm:w-10 sm:h-10' : 'w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14'}`}>
                 <Image
                   src="/images/logo.png"
                   alt="Official YOSU Seal"
@@ -120,8 +154,8 @@ export function Navbar() {
                 />
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <span className="font-serif text-sm sm:text-lg lg:text-2xl font-bold tracking-tight text-emerald-950 leading-tight truncate">
-                  YORUBA STUDENTS' UNION
+                <span className={`font-serif font-bold tracking-tight text-emerald-950 leading-tight truncate transition-all duration-300 ${isScrolled ? 'text-xs sm:text-base lg:text-xl' : 'text-sm sm:text-lg lg:text-2xl'}`}>
+                  YORUBA STUDENTS&apos; UNION
                 </span>
                 <span className="text-[9px] sm:text-[11px] font-semibold tracking-wider text-amber-700 uppercase leading-none truncate">
                   (YOSU) — Federal University Dutse
@@ -131,6 +165,13 @@ export function Navbar() {
 
             {/* Desktop Action Buttons */}
             <div className="hidden lg:flex items-center gap-3 shrink-0">
+              <Link
+                href="/register"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-900"
+              >
+                <UserCheck className="w-3.5 h-3.5 text-emerald-950" />
+                <span>Student Registration</span>
+              </Link>
               <Link
                 href="/search"
                 className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-900 bg-stone-100 hover:bg-amber-50 rounded-xl transition-colors border border-stone-200 focus-visible:ring-2 focus-visible:ring-emerald-900"
@@ -157,12 +198,11 @@ export function Navbar() {
                 <Search className="w-5 h-5 text-amber-700" />
               </Link>
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-slate-700 hover:text-emerald-900 rounded-lg focus:outline-none min-h-[40px] min-w-[40px] flex items-center justify-center"
-                aria-label="Toggle Navigation Menu"
-                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen(true)}
+                className="p-2 text-slate-700 hover:text-emerald-900 rounded-lg focus:outline-none min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
+                aria-label="Open Mobile Navigation Sidebar"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6 text-emerald-950" /> : <Menu className="w-6 h-6 text-slate-800" />}
+                <Menu className="w-6 h-6 text-emerald-950" />
               </button>
             </div>
           </div>
@@ -180,7 +220,7 @@ export function Navbar() {
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                    className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
                       isActive(link.href)
                         ? 'bg-emerald-900 text-white shadow-sm'
                         : link.highlight
@@ -188,7 +228,12 @@ export function Navbar() {
                         : 'text-slate-700 hover:bg-stone-200/80 hover:text-emerald-950'
                     }`}
                   >
-                    {link.name}
+                    <span>{link.name}</span>
+                    {link.badge && (
+                      <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-1.5 py-0.2 rounded-full uppercase">
+                        {link.badge}
+                      </span>
+                    )}
                   </Link>
                 ))}
 
@@ -199,7 +244,7 @@ export function Navbar() {
                       setGovernanceDropdownOpen(!governanceDropdownOpen);
                       setResourcesDropdownOpen(false);
                     }}
-                    className={`flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                    className={`flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                       governanceDropdownOpen
                         ? 'bg-emerald-950 text-amber-300'
                         : 'text-slate-700 hover:bg-stone-200/80 hover:text-emerald-950'
@@ -240,14 +285,14 @@ export function Navbar() {
                   )}
                 </div>
 
-                {/* Media & Resources Dropdown (Right Aligned) */}
+                {/* Media & Resources Dropdown */}
                 <div className="relative" ref={resRef}>
                   <button
                     onClick={() => {
                       setResourcesDropdownOpen(!resourcesDropdownOpen);
                       setGovernanceDropdownOpen(false);
                     }}
-                    className={`flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                    className={`flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                       resourcesDropdownOpen
                         ? 'bg-emerald-950 text-amber-300'
                         : 'text-slate-700 hover:bg-stone-200/80 hover:text-emerald-950'
@@ -293,80 +338,152 @@ export function Navbar() {
         </nav>
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* MOBILE LEFT SIDEBAR DRAWER (SLIDES IN FROM THE LEFT) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950 text-white border-b border-slate-800 px-4 py-5 space-y-5 shadow-2xl animate-in slide-in-from-top duration-200 max-w-full overflow-hidden">
-          <div className="pb-3 border-b border-slate-800">
-            <Link
-              href="/constitution"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 p-3 bg-amber-400 text-slate-950 text-xs font-bold rounded-xl w-full min-h-[44px] shadow-md"
-            >
-              <BookOpen className="w-4 h-4 text-slate-950" />
-              <span>Ratified 2026 Constitution</span>
-            </Link>
-          </div>
+        <div className="lg:hidden fixed inset-0 z-[100000] font-sans">
+          {/* Backdrop Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-          {/* Primary Navigation Links */}
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold tracking-widest text-amber-400 uppercase px-2 mb-1">
-              Primary Navigation
-            </p>
-            {primaryNav.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2.5 text-sm font-semibold rounded-xl transition-colors ${
-                  isActive(link.href) ? 'bg-emerald-900 text-amber-300 font-bold border border-emerald-700' : 'text-slate-200 hover:bg-slate-900'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-
-          {/* Governance Section */}
-          <div className="pt-3 border-t border-slate-800 space-y-1">
-            <p className="text-[10px] font-bold tracking-widest text-amber-400 uppercase px-2 mb-1">
-              Governance & Structure
-            </p>
-            {governanceLinks.map((item) => {
-              const Icon = item.icon;
-              return (
+          {/* Left Slide-In Drawer Sidebar Panel */}
+          <aside className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300">
+            {/* Top Drawer Header with Brand Logo & Close Button */}
+            <div>
+              <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                 <Link
-                  key={item.name}
-                  href={item.href}
+                  href="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                  className="flex items-center gap-2.5 overflow-hidden"
                 >
-                  <Icon className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>{item.name}</span>
+                  <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
+                    <Image
+                      src="/images/logo.png"
+                      alt="YOSU Seal"
+                      fill
+                      className="object-contain p-0.5"
+                    />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-serif text-sm font-bold text-white leading-tight truncate">
+                      YOSU FUD
+                    </span>
+                    <span className="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider truncate">
+                      Official Secretariat
+                    </span>
+                  </div>
                 </Link>
-              );
-            })}
-          </div>
 
-          {/* Additional Resources */}
-          <div className="pt-3 border-t border-slate-800 space-y-1">
-            <p className="text-[10px] font-bold tracking-widest text-amber-400 uppercase px-2 mb-1">
-              Media & Resources
-            </p>
-            {secondaryNav.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
+                <button
+                  type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-200 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                  aria-label="Close Mobile Sidebar"
                 >
-                  <Icon className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>{item.name}</span>
+                  <X className="w-6 h-6 text-amber-400" />
+                </button>
+              </div>
+
+              {/* Main Registration Callout */}
+              <div className="p-4 bg-emerald-950/80 border-b border-emerald-800 space-y-2">
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 p-3 bg-amber-400 text-slate-950 text-xs font-extrabold rounded-xl w-full shadow-md"
+                >
+                  <UserCheck className="w-4 h-4 text-slate-950" />
+                  <span>Student & Member Registration</span>
                 </Link>
-              );
-            })}
-          </div>
+                <Link
+                  href="/constitution"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 p-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl w-full border border-slate-700"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+                  <span>2026 Ratified Constitution</span>
+                </Link>
+              </div>
+
+              {/* Primary Navigation Links */}
+              <div className="p-4 space-y-1 border-b border-slate-800">
+                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+                  PRIMARY NAVIGATION
+                </p>
+                {primaryNav.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 text-xs font-bold rounded-xl transition-colors ${
+                      isActive(link.href)
+                        ? 'bg-emerald-900 text-amber-300 border border-emerald-700 shadow-sm'
+                        : 'text-slate-200 hover:bg-slate-900 hover:text-white'
+                    }`}
+                  >
+                    <span>{link.name}</span>
+                    {link.badge && (
+                      <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-1.5 py-0.2 rounded-full uppercase">
+                        {link.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Governance Section */}
+              <div className="p-4 space-y-1 border-b border-slate-800">
+                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+                  GOVERNANCE & ROSTER
+                </p>
+                {governanceLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                    >
+                      <Icon className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Additional Resources */}
+              <div className="p-4 space-y-1">
+                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+                  MEDIA & RESOURCES
+                </p>
+                {secondaryNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                    >
+                      <Icon className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom Footer Details */}
+            <div className="p-4 border-t border-slate-800 bg-slate-900/90 text-center space-y-1">
+              <span className="text-[10px] text-slate-400 font-serif block">
+                Yoruba Students&apos; Union (YOSU) FUD Chapter
+              </span>
+              <span className="text-[9px] text-amber-400 font-mono font-bold block">
+                Federal University Dutse • Jigawa State
+              </span>
+            </div>
+          </aside>
         </div>
       )}
     </header>
