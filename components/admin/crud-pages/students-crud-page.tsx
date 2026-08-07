@@ -38,7 +38,8 @@ export interface StudentItem {
   regNumber: string;
   fullName: string;
   gender: string;
-  dateOfBirth: string | null;
+  birthMonth: string | null;
+  birthDay: string | null;
   passportUrl: string | null;
   matricNumber: string;
   jambRegNumber: string | null;

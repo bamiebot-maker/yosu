@@ -860,6 +860,8 @@ model StudentRegistration {
   fullName                      String
   gender                        String             @default("MALE")
   dateOfBirth                   DateTime?
+  birthMonth                    String?
+  birthDay                      String?
   passportUrl                   String?
   matricNumber                  String             @unique
   jambRegNumber                 String?

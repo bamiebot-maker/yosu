@@ -22,13 +22,16 @@ import {
   Sparkles,
   Info,
   FileText,
+  Camera,
+  RefreshCw,
 } from 'lucide-react';
 
 export function InteractiveStudentRegistration() {
   const [formData, setFormData] = useState({
     fullName: '',
     gender: 'MALE',
-    dateOfBirth: '',
+    birthMonth: 'January',
+    birthDay: '1',
     passportUrl: '',
     matricNumber: '',
     jambRegNumber: '',
@@ -54,7 +57,10 @@ export function InteractiveStudentRegistration() {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingPassport, setUploadingPassport] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const [successResult, setSuccessResult] = useState<{
     regNumber: string;
     fullName: string;
@@ -91,10 +97,56 @@ export function InteractiveStudentRegistration() {
 
   const levels = ['100L', '200L', '300L', '400L', '500L', 'Postgraduate', 'Diploma'];
 
+  const monthsList = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const daysList = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handlePassportFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPassport(true);
+    setErrorMsg(null);
+
+    try {
+      const bodyData = new FormData();
+      bodyData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: bodyData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || 'Failed to upload passport photograph.');
+      }
+
+      setFormData((prev) => ({ ...prev, passportUrl: data.url }));
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error uploading passport file. Please try again.');
+    } finally {
+      setUploadingPassport(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -190,7 +242,7 @@ export function InteractiveStudentRegistration() {
 
       {/* REGISTRATION FORM OR SUCCESS SLIP */}
       {successResult ? (
-        /* SUCCESS REGISTRATION SLIP EXPERIENCE (TASK 5) */
+        /* SUCCESS REGISTRATION SLIP EXPERIENCE */
         <div className="bg-white p-8 sm:p-12 rounded-3xl border border-stone-200 shadow-xl space-y-8 max-w-3xl mx-auto font-sans print:p-0 print:border-none print:shadow-none">
           <div className="text-center space-y-3">
             <div className="w-16 h-16 bg-emerald-950 text-amber-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg border border-emerald-800">
@@ -247,7 +299,7 @@ export function InteractiveStudentRegistration() {
             <button
               type="button"
               onClick={() => copyRefToClipboard(successResult.regNumber)}
-              className="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl transition-all flex items-center gap-2 border border-stone-300"
+              className="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl transition-all flex items-center gap-2 border border-stone-300 cursor-pointer"
             >
               {copiedRef ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
               <span>{copiedRef ? 'Copied to Clipboard!' : 'Copy Reg Number'}</span>
@@ -265,14 +317,14 @@ export function InteractiveStudentRegistration() {
             <button
               type="button"
               onClick={() => setSuccessResult(null)}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-xl transition-all"
+              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
             >
               Register Another Student
             </button>
           </div>
         </div>
       ) : (
-        /* REGISTRATION FORM (TASK 2) */
+        /* REGISTRATION FORM */
         <main className="bg-white p-6 sm:p-12 rounded-3xl border border-stone-200 shadow-sm space-y-8 max-w-4xl mx-auto">
           <div className="border-b border-stone-100 pb-4">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
@@ -280,7 +332,7 @@ export function InteractiveStudentRegistration() {
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">Member Data Capture</h2>
             <p className="text-xs text-slate-500 mt-1">
-              Please complete all mandatory sections accurately. Duplicate registrations are automatically detected.
+              Please complete all mandatory sections accurately. Upload your passport photograph directly from your phone or device.
             </p>
           </div>
 
@@ -292,7 +344,7 @@ export function InteractiveStudentRegistration() {
               </div>
             )}
 
-            {/* SECTION 1: PERSONAL INFORMATION */}
+            {/* SECTION 1: PERSONAL INFORMATION & PASSPORT UPLOAD */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-b border-stone-100 pb-2">
                 <User className="w-4 h-4 text-amber-500" />
@@ -326,27 +378,120 @@ export function InteractiveStudentRegistration() {
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Date of Birth (Optional)</label>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-emerald-800 text-slate-900"
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Birth Month</label>
+                    <select
+                      name="birthMonth"
+                      value={formData.birthMonth}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-emerald-800 text-slate-900"
+                    >
+                      {monthsList.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Birth Day</label>
+                    <select
+                      name="birthDay"
+                      value={formData.birthDay}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-emerald-800 text-slate-900"
+                    >
+                      {daysList.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Passport Photograph URL (Cloudinary / Image Link)</label>
-                  <input
-                    type="url"
-                    name="passportUrl"
-                    value={formData.passportUrl}
-                    onChange={handleChange}
-                    placeholder="e.g. https://res.cloudinary.com/yosu/image/upload/v12345/passport.jpg"
-                    className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium text-slate-900"
-                  />
+                {/* PASSPORT PHOTOGRAPH DIRECT FILE UPLOAD ZONE */}
+                <div className="space-y-2 sm:col-span-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                      Passport Photograph *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                      className="text-[11px] font-bold text-emerald-800 hover:underline"
+                    >
+                      {showUrlInput ? 'Switch to File Upload' : 'Or enter Image URL manually'}
+                    </button>
+                  </div>
+
+                  {!showUrlInput ? (
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        id="passport-file-input"
+                        onChange={handlePassportFileUpload}
+                        className="hidden"
+                      />
+
+                      {formData.passportUrl ? (
+                        /* PREVIEW CARD IF UPLOADED */
+                        <div className="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-600 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-emerald-800 shadow shrink-0">
+                              <Image src={formData.passportUrl} alt="Passport Preview" fill className="object-cover" />
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-emerald-950 block flex items-center gap-1">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Passport Photograph Uploaded
+                              </span>
+                              <span className="text-[10px] text-slate-500 block truncate max-w-xs">{formData.passportUrl}</span>
+                            </div>
+                          </div>
+
+                          <label
+                            htmlFor="passport-file-input"
+                            className="px-3.5 py-2 bg-white hover:bg-stone-100 text-slate-900 text-xs font-bold rounded-xl border border-stone-300 shadow-sm cursor-pointer inline-flex items-center gap-1.5 shrink-0"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5 text-emerald-800" />
+                            <span>Change Photo</span>
+                          </label>
+                        </div>
+                      ) : (
+                        /* DROPZONE BUTTON */
+                        <label
+                          htmlFor="passport-file-input"
+                          className="w-full p-6 border-2 border-dashed border-stone-300 hover:border-emerald-800 rounded-2xl bg-stone-50 hover:bg-emerald-50/50 flex flex-col sm:flex-row items-center justify-center gap-4 cursor-pointer transition-all text-center sm:text-left select-none"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center shrink-0 border border-emerald-800 shadow-md">
+                            {uploadingPassport ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
+                          </div>
+
+                          <div>
+                            <span className="text-xs font-bold text-slate-900 block">
+                              {uploadingPassport ? 'Uploading Passport to Cloudinary...' : 'Click here to Upload Passport Photograph'}
+                            </span>
+                            <span className="text-[11px] text-slate-500 font-light block mt-0.5">
+                              Supports JPG, PNG, or WEBP images (Maximum file size: 10MB)
+                            </span>
+                          </div>
+                        </label>
+                      )}
+                    </div>
+                  ) : (
+                    /* MANUAL URL INPUT FALLBACK */
+                    <input
+                      type="url"
+                      name="passportUrl"
+                      value={formData.passportUrl}
+                      onChange={handleChange}
+                      placeholder="e.g. https://res.cloudinary.com/yosu/image/upload/v12345/passport.jpg"
+                      className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium text-slate-900"
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -585,7 +730,7 @@ export function InteractiveStudentRegistration() {
             <div className="pt-4 flex items-center justify-end border-t border-stone-100">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || uploadingPassport}
                 className="px-8 py-3.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer"
               >
                 {submitting ? (
