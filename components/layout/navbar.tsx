@@ -363,43 +363,44 @@ export function Navbar() {
           />
 
           {/* Left Slide-In Drawer Sidebar Panel */}
-          <aside className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300">
-            {/* Top Drawer Header with Brand Logo & Close Button */}
-            <div>
-              <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 overflow-hidden"
-                >
-                  <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
-                    <Image
-                      src="/images/logo.png"
-                      alt="YOSU Seal"
-                      fill
-                      className="object-contain p-0.5"
-                    />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-serif text-sm font-bold text-white leading-tight truncate">
-                      YOSU FUD
-                    </span>
-                    <span className="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider truncate">
-                      Official Secretariat
-                    </span>
-                  </div>
-                </Link>
+          <aside className="fixed top-0 left-0 bottom-0 h-full w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300">
+            {/* Top Drawer Header with Brand Logo & Close Button - PINNED STICKY AT TOP */}
+            <div className="shrink-0 p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-md">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 overflow-hidden"
+              >
+                <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
+                  <Image
+                    src="/images/logo.png"
+                    alt="YOSU Seal"
+                    fill
+                    className="object-contain p-0.5"
+                  />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-serif text-sm font-bold text-white leading-tight truncate">
+                    YOSU FUD
+                  </span>
+                  <span className="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider truncate">
+                    Official Secretariat
+                  </span>
+                </div>
+              </Link>
 
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-                  aria-label="Close Mobile Sidebar"
-                >
-                  <X className="w-6 h-6 text-amber-400" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close Mobile Sidebar"
+              >
+                <X className="w-6 h-6 text-amber-400" />
+              </button>
+            </div>
 
+            {/* Scrollable Navigation Body */}
+            <div className="flex-1 overflow-y-auto">
               {/* Main Registration Callout */}
               <div className="p-4 bg-emerald-950/80 border-b border-emerald-800 space-y-2">
                 {isRegistrationOpen && (
@@ -491,8 +492,8 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Bottom Footer Details */}
-            <div className="p-4 border-t border-slate-800 bg-slate-900/90 text-center space-y-1">
+            {/* Bottom Footer Details - PINNED AT BOTTOM */}
+            <div className="shrink-0 p-4 border-t border-slate-800 bg-slate-900 text-center space-y-1">
               <span className="text-[10px] text-slate-400 font-serif block">
                 Yoruba Students&apos; Union (YOSU) FUD Chapter
               </span>

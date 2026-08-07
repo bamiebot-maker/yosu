@@ -162,45 +162,46 @@ export function Header({ session }: HeaderProps) {
           />
 
           {/* Left Slide-in Sidebar Panel */}
-          <aside className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300">
-            <div>
-              {/* Header with Seal & Close Button */}
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
-                <Link
-                  href="/admin/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 overflow-hidden"
-                >
-                  <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
-                    <Image
-                      src="/images/logo.png"
-                      alt="YOSU Brand"
-                      fill
-                      className="object-contain p-0.5"
-                    />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-serif text-sm font-bold text-white tracking-tight truncate">
-                      YOSU PORTAL
-                    </span>
-                    <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider truncate">
-                      Admin Control Panel
-                    </span>
-                  </div>
-                </Link>
+          <aside className="fixed top-0 left-0 bottom-0 h-full w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300">
+            {/* Header with Seal & Close Button - PINNED STICKY AT TOP */}
+            <div className="shrink-0 p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-md">
+              <Link
+                href="/admin/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 overflow-hidden"
+              >
+                <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
+                  <Image
+                    src="/images/logo.png"
+                    alt="YOSU Brand"
+                    fill
+                    className="object-contain p-0.5"
+                  />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-serif text-sm font-bold text-white tracking-tight truncate">
+                    YOSU PORTAL
+                  </span>
+                  <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider truncate">
+                    Admin Control Panel
+                  </span>
+                </div>
+              </Link>
 
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-                  aria-label="Close Admin Sidebar Menu"
-                >
-                  <X className="w-6 h-6 text-amber-400" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close Admin Sidebar Menu"
+              >
+                <X className="w-6 h-6 text-amber-400" />
+              </button>
+            </div>
 
+            {/* Scrollable Content Body */}
+            <div className="flex-1 overflow-y-auto">
               {/* Breadcrumb info inside drawer */}
-              <div className="p-3 bg-slate-900 border-b border-slate-800">
+              <div className="p-3 bg-slate-900/60 border-b border-slate-800/80">
                 <Breadcrumbs />
               </div>
 
@@ -242,8 +243,8 @@ export function Header({ session }: HeaderProps) {
               </div>
             </div>
 
-            {/* Footer Live Website Link */}
-            <div className="p-4 border-t border-slate-800 bg-slate-900/90 space-y-2">
+            {/* Footer Live Website Link - PINNED AT BOTTOM */}
+            <div className="shrink-0 p-4 border-t border-slate-800 bg-slate-900 space-y-2">
               <Link
                 href="/"
                 target="_blank"
