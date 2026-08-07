@@ -1572,4 +1572,58 @@ export async function deleteFaqItemAction(id: string) {
   }
 }
 
+// ==========================================
+// 17. STUDENT REGISTRATION DATABASE ACTIONS
+// ==========================================
+export async function updateStudentStatusAction(id: string, status: 'PENDING' | 'VERIFIED' | 'REJECTED', notes?: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const student = await db.studentRegistration.update({
+      where: { id },
+      data: {
+        status,
+        ...(notes ? { notes } : {}),
+      },
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'STUDENT_STATUS_UPDATE',
+        details: `Updated student status for ${student.fullName} (${student.regNumber}) to ${status}`,
+      },
+    });
+
+    revalidatePath('/admin/students');
+    return { success: true, message: `Student status updated to ${status}` };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update student status' };
+  }
+}
+
+export async function deleteStudentRegistrationAction(id: string) {
+  try {
+    const session = await getSession();
+    if (!session) throw new Error('Unauthorized.');
+
+    const student = await db.studentRegistration.delete({ where: { id } });
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'STUDENT_DELETE',
+        details: `Deleted student registration record: ${student.fullName} (${student.regNumber})`,
+      },
+    });
+
+    revalidatePath('/admin/students');
+    return { success: true, message: 'Student registration record deleted successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to delete student record' };
+  }
+}
+
+
 

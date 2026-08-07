@@ -844,3 +844,53 @@ model FaqItem {
   @@index([isPublished, displayOrder])
 }
 
+// ==========================================
+// 18. ENTERPRISE STUDENT REGISTRATION & MEMBERSHIP DATABASE
+// ==========================================
+
+enum RegistrationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model StudentRegistration {
+  id                            String             @id @default(cuid())
+  regNumber                     String             @unique
+  fullName                      String
+  gender                        String             @default("MALE")
+  dateOfBirth                   DateTime?
+  passportUrl                   String?
+  matricNumber                  String             @unique
+  jambRegNumber                 String?
+  faculty                       String
+  department                    String
+  programme                     String             @default("B.Sc.")
+  level                         String             @default("100L")
+  phone                         String             @unique
+  whatsapp                      String?
+  email                         String             @unique
+  stateOfOrigin                 String
+  lga                           String
+  homeTown                      String
+  residenceType                 String             @default("On-Campus")
+  hallOfResidence               String?
+  roomNumber                    String?
+  residentialAddress            String?
+  areaCouncil                   String             @default("Federal University Dutse Main Campus")
+  membershipCategory            String             @default("Undergraduate")
+  emergencyContactName          String
+  emergencyContactRelationship  String
+  emergencyContactPhone         String
+  status                        RegistrationStatus @default(PENDING)
+  notes                         String?
+  ipAddress                     String?
+  createdAt                     DateTime           @default(now())
+  updatedAt                     DateTime           @updatedAt
+
+  @@index([status, createdAt])
+  @@index([stateOfOrigin, faculty, level])
+  @@index([matricNumber, email, phone])
+}
+
+

@@ -57,6 +57,7 @@ export function Sidebar({ session }: SidebarProps) {
     {
       group: 'GOVERNANCE & ROSTER',
       items: [
+        { name: 'Student Member Database', href: '/admin/students', icon: Users },
         { name: 'Executive Offices', href: '/admin/executives', icon: Users },
         { name: 'House Representatives', href: '/admin/representatives', icon: FolderGit2 },
         { name: 'Era Achievements', href: '/admin/achievements', icon: BarChart3 },
