@@ -148,6 +148,7 @@ export async function POST(req: NextRequest) {
         department: record.department,
         level: record.level,
         stateOfOrigin: record.stateOfOrigin,
+        passportUrl: record.passportUrl,
         createdAt: record.createdAt.toISOString(),
       },
     });

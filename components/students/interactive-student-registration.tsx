@@ -68,6 +68,7 @@ export function InteractiveStudentRegistration() {
     department: string;
     level: string;
     stateOfOrigin: string;
+    passportUrl: string | null;
     createdAt: string;
   } | null>(null);
 
@@ -254,45 +255,102 @@ export function InteractiveStudentRegistration() {
             </p>
           </div>
 
-          {/* PRINTABLE SLIP CONTAINER */}
-          <div id="printable-slip" className="p-8 bg-stone-50 rounded-3xl border-2 border-emerald-800 space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-300 pb-4">
-              <div>
-                <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">
-                  YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
-                </span>
-                <h3 className="font-serif font-bold text-xl text-slate-900">Official Membership Registration Slip</h3>
+          {/* PRINTABLE SLIP CONTAINER WITH PASSPORT PHOTOGRAPH & BRANDING */}
+          <div id="printable-slip" className="p-6 sm:p-8 bg-white rounded-3xl border-2 border-emerald-800 space-y-6 shadow-md">
+            {/* Card Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-emerald-950 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12 rounded-xl bg-white p-1 shadow border border-stone-200 shrink-0">
+                  <Image src="/images/logo.png" alt="YOSU Logo" fill className="object-contain p-0.5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">
+                    YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
+                  </span>
+                  <h3 className="font-serif font-bold text-xl text-slate-900">Official Membership Identification Slip</h3>
+                </div>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <span className="text-[10px] font-bold text-slate-400 uppercase block">REGISTRATION NO.</span>
                 <span className="font-mono text-lg font-extrabold text-emerald-950">{successResult.regNumber}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">FULL NAME</span>
-                <span className="font-bold text-slate-900 text-sm">{successResult.fullName}</span>
+            {/* Card Body: Passport Image + Details */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              {/* Passport Photograph */}
+              <div className="shrink-0">
+                {successResult.passportUrl ? (
+                  <div className="relative w-28 h-32 rounded-2xl overflow-hidden border-2 border-emerald-900 shadow-md bg-stone-100">
+                    <Image src={successResult.passportUrl} alt={successResult.fullName} fill className="object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-28 h-32 rounded-2xl bg-emerald-950 text-amber-400 flex flex-col items-center justify-center font-bold text-2xl border-2 border-emerald-900 shadow-md">
+                    <span>{successResult.fullName.charAt(0)}</span>
+                    <span className="text-[9px] text-emerald-300 font-normal uppercase tracking-wider mt-1">YOSU MEMBER</span>
+                  </div>
+                )}
               </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">MATRICULATION NUMBER</span>
-                <span className="font-mono font-bold text-slate-900 text-sm">{successResult.matricNumber}</span>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">DEPARTMENT & LEVEL</span>
-                <span className="font-semibold text-slate-800">{successResult.department} ({successResult.level})</span>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">STATE OF ORIGIN</span>
-                <span className="font-semibold text-slate-800">{successResult.stateOfOrigin}</span>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs flex-1 w-full">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">FULL NAME</span>
+                  <span className="font-bold text-slate-900 text-sm">{successResult.fullName}</span>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">MATRICULATION NUMBER</span>
+                  <span className="font-mono font-bold text-slate-900 text-sm">{successResult.matricNumber}</span>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">DEPARTMENT & LEVEL</span>
+                  <span className="font-semibold text-slate-800">{successResult.department} ({successResult.level})</span>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">STATE OF ORIGIN</span>
+                  <span className="font-semibold text-slate-800">{successResult.stateOfOrigin}</span>
+                </div>
               </div>
             </div>
 
+            {/* Footer Status */}
             <div className="pt-3 border-t border-stone-200 text-[11px] text-slate-500 font-light flex justify-between items-center">
               <span>Date Registered: {new Date(successResult.createdAt).toLocaleDateString()}</span>
-              <span className="font-bold text-emerald-800 uppercase">STATUS: VERIFIED MEMBER</span>
+              <span className="font-bold text-emerald-950 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+                STATUS: VERIFIED MEMBER
+              </span>
             </div>
           </div>
+
+          {/* PRINT-ONLY CSS TARGETING ONLY #printable-slip */}
+          <style jsx global>{`
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+              #printable-slip,
+              #printable-slip * {
+                visibility: visible !important;
+              }
+              #printable-slip {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 24px !important;
+                border: 3px solid #064e3b !important;
+                border-radius: 16px !important;
+                background-color: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              @page {
+                margin: 1cm;
+                size: auto;
+              }
+            }
+          `}</style>
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
