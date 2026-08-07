@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getRegistrationWindowStatus } from '@/lib/registration-window';
 
 export async function POST(req: NextRequest) {
   try {
+    // 0. Server-Side Registration Window Enforcement (HTTP 403 if closed)
+    const windowStatus = await getRegistrationWindowStatus();
+    if (!windowStatus.isOpen) {
+      return NextResponse.json(
+        { success: false, error: 'Registration is currently closed.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const {
       fullName,

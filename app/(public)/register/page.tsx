@@ -1,6 +1,9 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { getRegistrationWindowStatus } from '@/lib/registration-window';
 import { InteractiveStudentRegistration } from '@/components/students/interactive-student-registration';
+
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Official Student & Membership Registration | Yoruba Students\' Union (YOSU) FUD',
@@ -20,10 +23,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const windowStatus = await getRegistrationWindowStatus();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
-      <InteractiveStudentRegistration />
+      <InteractiveStudentRegistration windowStatus={windowStatus} />
     </div>
   );
 }

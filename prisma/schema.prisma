@@ -895,4 +895,20 @@ model StudentRegistration {
   @@index([matricNumber, email, phone])
 }
 
+// ==========================================
+// 19. CONTROLLED MEMBERSHIP REGISTRATION WINDOW
+// ==========================================
+
+model RegistrationSettings {
+  id               String    @id @default(cuid())
+  registrationOpen Boolean   @default(true)
+  opensAt          DateTime?
+  closesAt         DateTime?
+  notice           String?
+  closedMessage    String?
+  academicSession  String?   @default("2026/2027")
+  updatedAt        DateTime  @updatedAt
+}
+
+
 

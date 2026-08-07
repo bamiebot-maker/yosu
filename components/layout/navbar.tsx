@@ -27,9 +27,22 @@ export function Navbar() {
   const [governanceDropdownOpen, setGovernanceDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
 
   const govRef = useRef<HTMLDivElement>(null);
   const resRef = useRef<HTMLDivElement>(null);
+
+  // Fetch registration window status
+  useEffect(() => {
+    fetch('/api/students/register-status')
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.isOpen === 'boolean') {
+          setIsRegistrationOpen(data.isOpen);
+        }
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   // Track window scroll position for sticky header animation
   useEffect(() => {
@@ -82,7 +95,7 @@ export function Navbar() {
     { name: 'About YOSU', href: '/about' },
     { name: 'History', href: '/history' },
     { name: 'Constitution', href: '/constitution', highlight: true },
-    { name: 'Student Registration', href: '/register', badge: 'NEW' },
+    ...(isRegistrationOpen ? [{ name: 'Student Registration', href: '/register', badge: 'NEW' }] : []),
     { name: 'Newsroom', href: '/news' },
     { name: 'Events', href: '/events' },
     { name: 'Projects', href: '/projects' },
@@ -165,13 +178,15 @@ export function Navbar() {
 
             {/* Desktop Action Buttons */}
             <div className="hidden lg:flex items-center gap-3 shrink-0">
-              <Link
-                href="/register"
-                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-900"
-              >
-                <UserCheck className="w-3.5 h-3.5 text-emerald-950" />
-                <span>Student Registration</span>
-              </Link>
+              {isRegistrationOpen && (
+                <Link
+                  href="/register"
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-emerald-900"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-950" />
+                  <span>Student Registration</span>
+                </Link>
+              )}
               <Link
                 href="/search"
                 className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-900 bg-stone-100 hover:bg-amber-50 rounded-xl transition-colors border border-stone-200 focus-visible:ring-2 focus-visible:ring-emerald-900"
@@ -387,14 +402,16 @@ export function Navbar() {
 
               {/* Main Registration Callout */}
               <div className="p-4 bg-emerald-950/80 border-b border-emerald-800 space-y-2">
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 p-3 bg-amber-400 text-slate-950 text-xs font-extrabold rounded-xl w-full shadow-md"
-                >
-                  <UserCheck className="w-4 h-4 text-slate-950" />
-                  <span>Student & Member Registration</span>
-                </Link>
+                {isRegistrationOpen && (
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 p-3 bg-amber-400 text-slate-950 text-xs font-extrabold rounded-xl w-full shadow-md"
+                  >
+                    <UserCheck className="w-4 h-4 text-slate-950" />
+                    <span>Student & Member Registration</span>
+                  </Link>
+                )}
                 <Link
                   href="/constitution"
                   onClick={() => setMobileMenuOpen(false)}

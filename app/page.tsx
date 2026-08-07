@@ -30,10 +30,13 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
 import { PresidentShowcase } from '@/components/home/president-showcase';
 import { RepresentativeCarousel } from '@/components/home/representative-carousel';
+import { getRegistrationWindowStatus } from '@/lib/registration-window';
 
 export const revalidate = 60; // ISR 60 seconds
 
 export default async function HomePage() {
+  const regWindow = await getRegistrationWindowStatus();
+
   // 1. Current Administration Session & President Appointment
   const currentSession = (await db.administrationSession.findFirst({
     where: { isCurrent: true },
@@ -193,6 +196,7 @@ export default async function HomePage() {
     userCount,
     projectCount,
     sessionCount,
+    registeredStudentCount,
   ] = await Promise.all([
     db.officeAppointment.count({
       where: { status: 'ACTIVE', ...(activeSessionId ? { sessionId: activeSessionId } : {}) },
@@ -210,6 +214,7 @@ export default async function HomePage() {
     db.user.count({ where: { isActive: true } }).catch(() => 0),
     db.project.count().catch(() => 0),
     db.administrationSession.count().catch(() => 0),
+    db.studentRegistration.count().catch(() => 0),
   ]);
 
   // 9. Site Settings (Requirement 7 - Contact & Map CMS)
@@ -294,6 +299,64 @@ export default async function HomePage() {
 
       {/* MARQUEE ANNOUNCEMENTS */}
       <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
+
+      {/* DYNAMIC REGISTRATION WINDOW ANNOUNCEMENT CARD (TASK 5) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-8 relative z-30 font-sans">
+        {regWindow.isOpen ? (
+          <div className="bg-emerald-950 text-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-700 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  MEMBERSHIP REGISTRATION IS OPEN
+                </span>
+                <span className="text-emerald-300 text-xs font-mono font-bold">
+                  {regWindow.academicSession} Session
+                </span>
+              </div>
+              <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
+                Official YOSU Membership Data Capture
+              </h3>
+              <p className="text-xs text-stone-200 font-light max-w-xl">
+                {regWindow.closesAt
+                  ? `Registration is currently open for all bona fide students. Please complete your registration before ${regWindow.closesAt}.`
+                  : 'Registration is currently open for all bona fide Yoruba students at Federal University Dutse.'}
+              </p>
+            </div>
+
+            <Link
+              href="/register"
+              className="px-7 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 shrink-0 flex items-center gap-2"
+            >
+              <span>Register Now</span>
+              <ArrowRight className="w-4 h-4 text-slate-950" />
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <span className="bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  REGISTRATION CLOSED
+                </span>
+              </div>
+              <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
+                Membership Registration Window Closed
+              </h3>
+              <p className="text-xs text-slate-300 font-light max-w-xl">
+                {regWindow.closedMessage ||
+                  'Registration is currently closed. Follow our official channels for the next exercise.'}
+              </p>
+            </div>
+
+            <Link
+              href="/contact"
+              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl border border-slate-700 transition-all shrink-0"
+            >
+              Contact Secretariat
+            </Link>
+          </div>
+        )}
+      </section>
 
       {/* 2. DEDICATED PRESIDENT SHOWCASE SECTION WITH SLIDING PICTURE ANIMATION */}
       <PresidentShowcase
@@ -419,10 +482,10 @@ export default async function HomePage() {
               <div className="text-[9px] text-slate-400 font-medium">Resource Portal</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Active Users</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{userCount} Users</div>
-              <div className="text-[9px] text-slate-400 font-medium">Admin Accounts</div>
+            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow border-t-4 border-t-emerald-800">
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Registered Members</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{registeredStudentCount} Students</div>
+              <div className="text-[9px] text-emerald-800 font-bold">Bona Fide YOSU Members</div>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">

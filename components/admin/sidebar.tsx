@@ -72,6 +72,7 @@ export function Sidebar({ session }: SidebarProps) {
 
         ...(isSuperAdmin
           ? [
+              { name: 'Registration Window CMS', href: '/admin/registration-settings', icon: Sliders },
               { name: 'Audit Security Log', href: '/admin/audit', icon: ShieldAlert, highlight: true },
               { name: 'Site Settings', href: '/admin/settings', icon: Settings },
             ]

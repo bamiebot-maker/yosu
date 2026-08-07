@@ -1625,5 +1625,75 @@ export async function deleteStudentRegistrationAction(id: string) {
   }
 }
 
+// ==========================================
+// 18. CONTROLLED REGISTRATION WINDOW ACTIONS
+// ==========================================
+export async function updateRegistrationSettingsAction(formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session || !session.roleCodes.includes('SUPER_ADMIN')) {
+      throw new Error('Unauthorized. Super Admin access required.');
+    }
+
+    const registrationOpen = formData.get('registrationOpen') === 'true';
+    const opensAtStr = formData.get('opensAt') as string;
+    const closesAtStr = formData.get('closesAt') as string;
+    const academicSession = (formData.get('academicSession') as string) || '2026/2027';
+    const notice = formData.get('notice') as string;
+    const closedMessage = formData.get('closedMessage') as string;
+
+    const opensAt = opensAtStr ? new Date(opensAtStr) : null;
+    const closesAt = closesAtStr ? new Date(closesAtStr) : null;
+
+    const existing = await db.registrationSettings.findFirst({
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    if (existing) {
+      await db.registrationSettings.update({
+        where: { id: existing.id },
+        data: {
+          registrationOpen,
+          opensAt,
+          closesAt,
+          academicSession,
+          notice,
+          closedMessage,
+        },
+      });
+    } else {
+      await db.registrationSettings.create({
+        data: {
+          registrationOpen,
+          opensAt,
+          closesAt,
+          academicSession,
+          notice,
+          closedMessage,
+        },
+      });
+    }
+
+    await db.auditLog.create({
+      data: {
+        userId: session.userId,
+        action: 'REGISTRATION_WINDOW_UPDATE',
+        details: `Updated registration window settings: Open=${registrationOpen}, Opens=${opensAtStr}, Closes=${closesAtStr}`,
+      },
+    });
+
+    revalidatePath('/register');
+    revalidatePath('/admin/registration-settings');
+    revalidatePath('/admin/students');
+    revalidatePath('/admin/dashboard');
+    revalidatePath('/');
+
+    return { success: true, message: 'Registration window settings saved successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update registration settings' };
+  }
+}
+
+
 
 
