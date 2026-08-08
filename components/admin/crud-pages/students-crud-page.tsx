@@ -5,27 +5,18 @@ import Image from 'next/image';
 import {
   Users,
   Search,
-  Filter,
   CheckCircle2,
   XCircle,
   Trash2,
   FileSpreadsheet,
   Eye,
-  User,
-  GraduationCap,
-  MapPin,
-  Phone,
-  Mail,
-  ShieldCheck,
-  Building,
   Calendar,
   X,
   Loader2,
-  Check,
-  Copy,
-  Tag,
-  AlertCircle,
-  SlidersHorizontal,
+  Cake,
+  Sparkles,
+  Gift,
+  Download,
 } from 'lucide-react';
 import { DeleteConfirmModal } from '@/components/admin/crud-modals/delete-confirm-modal';
 import {
@@ -86,6 +77,7 @@ export function StudentsCrudPage({
   const [levelFilter, setLevelFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [genderFilter, setGenderFilter] = useState<string>('ALL');
+  const [monthFilter, setMonthFilter] = useState<string>('ALL');
 
   const [selectedStudent, setSelectedStudent] = useState<StudentItem | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
@@ -93,6 +85,10 @@ export function StudentsCrudPage({
   const [studentToDelete, setStudentToDelete] = useState<StudentItem | null>(null);
 
   const searchLower = search.trim().toLowerCase();
+
+  const currentCalendarMonth = useMemo(() => {
+    return new Date().toLocaleString('en-US', { month: 'long' });
+  }, []);
 
   const statesList = [
     'Ekiti State',
@@ -107,6 +103,30 @@ export function StudentsCrudPage({
 
   const levelsList = ['100L', '200L', '300L', '400L', '500L', 'Postgraduate', 'Diploma'];
 
+  const monthsList = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  // Birthday Distribution Counts per Month
+  const monthlyBirthdayCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    monthsList.forEach((m) => {
+      counts[m] = students.filter((s) => s.birthMonth === m).length;
+    });
+    return counts;
+  }, [students]);
+
   // Multi-Dimensional Filtering Logic
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
@@ -114,11 +134,13 @@ export function StudentsCrudPage({
       if (levelFilter !== 'ALL' && s.level !== levelFilter) return false;
       if (statusFilter !== 'ALL' && s.status !== statusFilter) return false;
       if (genderFilter !== 'ALL' && s.gender !== genderFilter) return false;
+      if (monthFilter !== 'ALL' && s.birthMonth !== monthFilter) return false;
       if (!searchLower) return true;
-      const text = `${s.regNumber} ${s.fullName} ${s.matricNumber} ${s.email} ${s.phone} ${s.department} ${s.faculty} ${s.lga} ${s.homeTown}`.toLowerCase();
+      const text =
+        `${s.regNumber} ${s.fullName} ${s.matricNumber} ${s.email} ${s.phone} ${s.department} ${s.faculty} ${s.lga} ${s.homeTown} ${s.birthMonth || ''} ${s.birthDay || ''}`.toLowerCase();
       return text.includes(searchLower);
     });
-  }, [students, stateFilter, levelFilter, statusFilter, genderFilter, searchLower]);
+  }, [students, stateFilter, levelFilter, statusFilter, genderFilter, monthFilter, searchLower]);
 
   const handleOpenStudent = (s: StudentItem) => {
     setSelectedStudent(s);
@@ -141,6 +163,8 @@ export function StudentsCrudPage({
       'Registration No',
       'Full Name',
       'Gender',
+      'Birth Month',
+      'Birth Day',
       'Matric Number',
       'Faculty',
       'Department',
@@ -158,6 +182,8 @@ export function StudentsCrudPage({
       `"${s.regNumber}"`,
       `"${s.fullName}"`,
       `"${s.gender}"`,
+      `"${s.birthMonth || 'N/A'}"`,
+      `"${s.birthDay || 'N/A'}"`,
       `"${s.matricNumber}"`,
       `"${s.faculty}"`,
       `"${s.department}"`,
@@ -175,7 +201,7 @@ export function StudentsCrudPage({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `YOSU_Students_Database_${stateFilter}_${levelFilter}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `YOSU_Students_${monthFilter === 'ALL' ? 'Database' : monthFilter + '_Birthdays'}_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -193,7 +219,7 @@ export function StudentsCrudPage({
             Central Student & Member Database ({filteredStudents.length})
           </h1>
           <p className="text-xs text-slate-600 mt-1">
-            Centralized searchable repository of registered YOSU members across all 8 constituent states and faculties.
+            Centralized searchable repository of registered YOSU members, including monthly birthday rosters and state demographics.
           </p>
         </div>
 
@@ -203,11 +229,11 @@ export function StudentsCrudPage({
           className="px-5 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-amber-300 font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
         >
           <FileSpreadsheet className="w-4 h-4" />
-          <span>Export Filtered CSV / Excel ({filteredStudents.length})</span>
+          <span>Export {monthFilter !== 'ALL' ? `${monthFilter} Birthdays` : 'Filtered CSV'} ({filteredStudents.length})</span>
         </button>
       </div>
 
-      {/* STATS ANALYTICS CARDS (TASK 8) */}
+      {/* STATS ANALYTICS CARDS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
           <span className="text-2xl font-extrabold font-serif text-slate-900">{stats.totalStudents}</span>
@@ -229,15 +255,104 @@ export function StudentsCrudPage({
           <span className="text-2xl font-extrabold font-serif text-pink-700">{stats.femaleCount}</span>
           <span className="text-xs text-slate-500 block font-medium">Female Students</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-purple-700">{stats.todayCount}</span>
-          <span className="text-xs text-slate-500 block font-medium">Registered Today</span>
+        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
+          <span className="text-2xl font-extrabold font-serif text-amber-700">
+            {monthlyBirthdayCounts[currentCalendarMonth] || 0}
+          </span>
+          <span className="text-xs text-amber-900 block font-bold flex items-center gap-1">
+            <Cake className="w-3.5 h-3.5 text-amber-600" /> {currentCalendarMonth} Birthdays
+          </span>
+        </div>
+      </div>
+
+      {/* DEDICATED MONTHLY BIRTHDAY ROSTER BOARD */}
+      <div className="bg-slate-950 text-white p-6 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+              <Gift className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">
+                BIRTHDAY ROSTER SYSTEM
+              </span>
+              <h2 className="font-serif font-bold text-lg text-white">
+                Monthly Student Birthday Celebrants
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMonthFilter(currentCalendarMonth)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                monthFilter === currentCalendarMonth
+                  ? 'bg-amber-400 text-slate-950 shadow-md'
+                  : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700'
+              }`}
+            >
+              <Cake className="w-3.5 h-3.5" />
+              <span>Current Month ({currentCalendarMonth}: {monthlyBirthdayCounts[currentCalendarMonth] || 0})</span>
+            </button>
+
+            {monthFilter !== 'ALL' && (
+              <button
+                type="button"
+                onClick={() => setMonthFilter('ALL')}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 cursor-pointer"
+              >
+                Clear Month Filter
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 12 Month Pills Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+          {monthsList.map((m) => {
+            const count = monthlyBirthdayCounts[m] || 0;
+            const isSelected = monthFilter === m;
+            const isCurrentMonth = m === currentCalendarMonth;
+
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMonthFilter(m)}
+                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'bg-emerald-900 border-amber-400 text-amber-300 shadow-lg ring-2 ring-amber-400/50'
+                    : isCurrentMonth
+                    ? 'bg-slate-900 border-amber-400/60 text-white hover:bg-slate-800'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-xs font-bold truncate">{m}</span>
+                  {isCurrentMonth && (
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  )}
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-800/80">
+                  <span className="text-[10px] text-slate-400 font-light">Celebrants</span>
+                  <span
+                    className={`text-xs font-mono font-extrabold px-2 py-0.5 rounded-full ${
+                      count > 0 ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-800 text-slate-500'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* MULTI-DIMENSIONAL SEARCH & FILTERING BAR */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4 font-sans">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Search */}
           <div className="relative sm:col-span-2">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -245,9 +360,25 @@ export function StudentsCrudPage({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by Name, Matric, Reg No, Email, Dept..."
+              placeholder="Search Name, Matric, Reg No, Month..."
               className="w-full pl-10 pr-4 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium focus:ring-2 focus:ring-emerald-800 text-slate-900"
             />
+          </div>
+
+          {/* Month Filter Dropdown */}
+          <div>
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              className="w-full p-2 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-slate-900"
+            >
+              <option value="ALL">All Birth Months</option>
+              {monthsList.map((m) => (
+                <option key={m} value={m}>
+                  🎂 {m} ({monthlyBirthdayCounts[m] || 0})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* State Filter */}
@@ -305,7 +436,7 @@ export function StudentsCrudPage({
             <Users className="w-12 h-12 text-slate-400 mx-auto" />
             <h3 className="font-serif font-bold text-base text-slate-900">No Student Records Found</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              No registered students match your active filters or search term.
+              No registered students match your active filters or selected birth month ({monthFilter}).
             </p>
           </div>
         ) : (
@@ -315,6 +446,7 @@ export function StudentsCrudPage({
                 <tr className="bg-stone-50 border-b border-stone-200 text-slate-700 font-bold uppercase tracking-wider">
                   <th className="py-3.5 px-4">Reg Number</th>
                   <th className="py-3.5 px-4">Student Name</th>
+                  <th className="py-3.5 px-4">🎂 Birthday</th>
                   <th className="py-3.5 px-4">Matric No</th>
                   <th className="py-3.5 px-4">State</th>
                   <th className="py-3.5 px-4">Department & Level</th>
@@ -340,6 +472,16 @@ export function StudentsCrudPage({
                         <span>{s.fullName}</span>
                       </div>
                     </td>
+                    <td className="py-3.5 px-4 font-medium">
+                      {s.birthMonth ? (
+                        <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold text-[11px] border border-amber-300">
+                          <Cake className="w-3 h-3 text-amber-700" />
+                          {s.birthMonth} {s.birthDay}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
+                    </td>
                     <td className="py-3.5 px-4 font-mono text-slate-700">{s.matricNumber}</td>
                     <td className="py-3.5 px-4 font-medium text-slate-800">{s.stateOfOrigin}</td>
                     <td className="py-3.5 px-4 text-slate-700">
@@ -362,7 +504,7 @@ export function StudentsCrudPage({
                       <button
                         type="button"
                         onClick={() => handleOpenStudent(s)}
-                        className="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-slate-900 font-bold rounded-lg transition-colors inline-flex items-center gap-1"
+                        className="px-3 py-1 bg-stone-100 hover:bg-stone-200 text-slate-900 font-bold rounded-lg transition-colors inline-flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5 text-emerald-800" /> View Profile
                       </button>
@@ -370,7 +512,7 @@ export function StudentsCrudPage({
                       <button
                         type="button"
                         onClick={() => setStudentToDelete(s)}
-                        className="p-1 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        className="p-1 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -383,14 +525,14 @@ export function StudentsCrudPage({
         )}
       </div>
 
-      {/* STUDENT DETAILED PROFILE MODAL (TASK 7) */}
+      {/* STUDENT DETAILED PROFILE MODAL */}
       {selectedStudent && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm font-sans">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-stone-200 space-y-6 relative max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setSelectedStudent(null)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-stone-100"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-stone-100 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -433,6 +575,12 @@ export function StudentsCrudPage({
 
             {/* Academic & Contact Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-200 text-xs">
+              <div className="bg-amber-100/60 p-2.5 rounded-xl border border-amber-300">
+                <span className="text-[10px] font-bold text-amber-900 uppercase block">🎂 BIRTHDAY</span>
+                <span className="font-bold text-amber-950 text-sm flex items-center gap-1 mt-0.5">
+                  {selectedStudent.birthMonth ? `${selectedStudent.birthMonth} ${selectedStudent.birthDay}` : 'Not Specified'}
+                </span>
+              </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase block">STATE OF ORIGIN</span>
                 <span className="font-bold text-slate-900">{selectedStudent.stateOfOrigin}</span>
@@ -456,10 +604,6 @@ export function StudentsCrudPage({
                 <a href={`mailto:${selectedStudent.email}`} className="font-bold text-emerald-800 hover:underline truncate block">
                   {selectedStudent.email}
                 </a>
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">RESIDENCE</span>
-                <span className="font-bold text-slate-900">{selectedStudent.residenceType} ({selectedStudent.hallOfResidence || 'Off-Campus'})</span>
               </div>
             </div>
 
@@ -493,7 +637,7 @@ export function StudentsCrudPage({
                     type="button"
                     disabled={updatingStatus}
                     onClick={() => handleUpdateStatus('REJECTED')}
-                    className="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1"
+                    className="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <XCircle className="w-3.5 h-3.5" /> Reject Record
                   </button>
@@ -501,7 +645,6 @@ export function StudentsCrudPage({
 
                 <button
                   type="button"
-                  disabled={updatingStatus}
                   onClick={() => handleUpdateStatus('VERIFIED')}
                   className="px-5 py-2 bg-emerald-950 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow cursor-pointer"
                 >
