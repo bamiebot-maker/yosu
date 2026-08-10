@@ -405,15 +405,15 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
 
               <div
                 onClick={() => setSelectedSessionId(activeAdministration.id)}
-                className={`group cursor-pointer bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 p-6 rounded-2xl border-2 transition-all duration-200 relative overflow-hidden ${
+                className={`group cursor-pointer bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-xl border transition-all duration-200 relative overflow-hidden ${
                   selectedSessionId === activeAdministration.id
-                    ? 'border-amber-400 shadow-xl shadow-amber-500/10'
+                    ? 'border-amber-400 shadow-md'
                     : 'border-emerald-800/80 hover:border-emerald-500'
                 }`}
               >
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                  <div className="flex items-start sm:items-center gap-4">
-                    <div className="w-16 h-16 rounded-full overflow-hidden relative border-2 border-amber-400 bg-slate-800 flex-shrink-0 shadow-lg">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-full overflow-hidden relative border border-amber-400 bg-slate-800 shrink-0 shadow-sm">
                       {activeAdministration.president?.avatarUrl ? (
                         <Image
                           src={activeAdministration.president.avatarUrl}
@@ -422,31 +422,31 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
                           className="object-cover"
                         />
                       ) : (
-                        <Crown className="w-8 h-8 text-amber-400 m-auto mt-3" />
+                        <Crown className="w-5 h-5 text-amber-400 m-auto mt-2.5" />
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="bg-emerald-900 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase border border-emerald-700">
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="bg-emerald-900 text-emerald-300 text-[9px] font-bold px-2 py-0.2 rounded uppercase border border-emerald-700">
                           CURRENT TENURE
                         </span>
-                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-amber-400" />
                           {activeAdministration.startDate} — Present
                         </span>
                       </div>
-                      <h4 className="font-serif font-bold text-xl text-white group-hover:text-amber-300 transition-colors">
+                      <h4 className="font-serif font-bold text-base text-white group-hover:text-amber-300 transition-colors">
                         {activeAdministration.title} — {activeAdministration.theme || 'Progress Era'}
                       </h4>
-                      <p className="text-xs text-slate-300 font-light line-clamp-1">
+                      <p className="text-[11px] text-slate-300 font-light line-clamp-1">
                         President: <strong className="text-white">{activeAdministration.president?.fullName || 'Cmrd. Ibrahim Sobur Bamidele'}</strong>
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 border-slate-800 pt-4 lg:pt-0">
-                    <div className="flex items-center gap-4 text-xs text-slate-300">
+                  <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-end border-t lg:border-t-0 border-slate-800 pt-2 lg:pt-0">
+                    <div className="flex items-center gap-3 text-[11px] text-slate-300">
                       <span><strong>{activeAdministration.stats.totalExecutives}</strong> Execs</span>
                       <span><strong>{activeAdministration.stats.totalRepresentatives}</strong> Reps</span>
                       <span><strong>{activeAdministration.stats.totalProjects}</strong> Projects</span>
@@ -454,10 +454,10 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
 
                     <button
                       type="button"
-                      className="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl transition-all inline-flex items-center gap-1.5"
+                      className="bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition-all inline-flex items-center gap-1"
                     >
-                      <span>View Full Administration</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>View Administration</span>
+                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
@@ -467,36 +467,36 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
 
           {/* Previous Archived Administrations */}
           {archivedAdministrations.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
                 PREVIOUS HISTORICAL ADMINISTRATIONS ({archivedAdministrations.length})
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {archivedAdministrations.map((session) => {
                   const isSelected = selectedSessionId === session.id;
                   return (
                     <div
                       key={session.id}
                       onClick={() => setSelectedSessionId(session.id)}
-                      className={`group cursor-pointer p-5 rounded-2xl border transition-all duration-200 space-y-3 ${
+                      className={`group cursor-pointer p-3.5 rounded-xl border transition-all duration-200 space-y-2 ${
                         isSelected
-                          ? 'bg-slate-800 border-amber-400 shadow-md'
+                          ? 'bg-slate-800 border-amber-400 shadow-sm'
                           : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700 hover:border-slate-600 text-slate-300'
                       }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                      <div className="flex justify-between items-start text-[11px]">
+                        <span className="font-bold text-amber-300 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-amber-400" />
                           {session.startDate} {session.endDate ? `— ${session.endDate}` : ''}
                         </span>
-                        <span className="bg-slate-700 text-slate-300 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">
+                        <span className="bg-slate-700 text-slate-300 text-[8px] font-bold px-1.5 py-0.2 rounded uppercase">
                           ARCHIVED
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full overflow-hidden relative bg-slate-700 border border-slate-600 flex-shrink-0">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-full overflow-hidden relative bg-slate-700 border border-slate-600 shrink-0">
                           {session.president?.avatarUrl ? (
                             <Image
                               src={session.president.avatarUrl}
@@ -505,20 +505,20 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
                               className="object-cover"
                             />
                           ) : (
-                            <Users className="w-6 h-6 text-slate-400 m-auto mt-3" />
+                            <Users className="w-4 h-4 text-slate-400 m-auto mt-2.5" />
                           )}
                         </div>
                         <div>
-                          <h4 className="font-serif font-bold text-base text-white group-hover:text-amber-300 transition-colors">
+                          <h4 className="font-serif font-bold text-sm text-white group-hover:text-amber-300 transition-colors">
                             {session.title}
                           </h4>
-                          <p className="text-xs text-slate-400 line-clamp-1 italic">
+                          <p className="text-[11px] text-slate-400 line-clamp-1 italic">
                             "{session.theme || 'Historical Administration'}"
                           </p>
                         </div>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+                      <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400">
                         <span>{session.stats.totalExecutives} Officers</span>
                         <span>{session.stats.totalProjects} Projects</span>
                         <span className="text-amber-300 font-semibold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">

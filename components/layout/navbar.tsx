@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -28,6 +29,11 @@ export function Navbar() {
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const govRef = useRef<HTMLDivElement>(null);
   const resRef = useRef<HTMLDivElement>(null);
@@ -353,8 +359,8 @@ export function Navbar() {
         </nav>
       </div>
 
-      {/* MOBILE LEFT SIDEBAR DRAWER (SLIDES IN FROM THE LEFT) */}
-      {mobileMenuOpen && (
+      {/* MOBILE LEFT SIDEBAR DRAWER (PORTALED TO DOCUMENT.BODY) */}
+      {mounted && mobileMenuOpen && createPortal(
         <div className="lg:hidden fixed inset-0 z-[100000] font-sans">
           {/* Backdrop Overlay */}
           <div
@@ -502,7 +508,8 @@ export function Navbar() {
               </span>
             </div>
           </aside>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

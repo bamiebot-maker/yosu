@@ -205,54 +205,53 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
         <span className="font-semibold text-slate-900">Student & Membership Registration</span>
       </nav>
 
-      {/* HERO BANNER (TASK 5 - COMPACT MOBILE HEADER CARD) */}
-      <header className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 max-w-4xl space-y-3 sm:space-y-4">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-              CENTRAL MEMBER DATABASE
-            </span>
-            {isOpen ? (
-              <span className="bg-emerald-950 text-emerald-300 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-amber-400" /> REGISTRATION OPEN
+      {/* HERO BANNER (ATTACHMENT 1 - SINGLE COMPACT HEADER CARD) */}
+      <header className="bg-slate-950 text-white rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
+        <div className="relative z-10 max-w-4xl space-y-2.5 sm:space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                CENTRAL MEMBER DATABASE
               </span>
-            ) : (
-              <span className="bg-rose-950 text-rose-300 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-rose-800 flex items-center gap-1">
-                <Lock className="w-3 h-3 text-rose-400" /> REGISTRATION CLOSED
+              {isOpen ? (
+                <span className="bg-emerald-950 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-amber-400" /> REGISTRATION OPEN
+                </span>
+              ) : (
+                <span className="bg-rose-950 text-rose-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-rose-800 flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-rose-400" /> REGISTRATION CLOSED
+                </span>
+              )}
+            </div>
+
+            {isOpen && windowStatus?.closesAt && (
+              <span className="text-[11px] text-amber-300 font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">
+                Closes: {windowStatus.closesAt}
               </span>
             )}
           </div>
 
-          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
-            YOSU Student & Membership Registration
+          <h1 className="font-serif text-xl sm:text-3xl font-extrabold tracking-tight text-white leading-snug">
+            YOSU Student &amp; Membership Registration
           </h1>
 
-          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+          <p className="text-slate-300 text-xs font-light leading-relaxed">
             Official digital registration portal of the Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter ({windowStatus?.academicSession || '2026/2027'} Academic Session).
           </p>
 
-          {/* Benefits Box */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-800/80 text-xs">
-            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-0.5">
-              <span className="text-amber-400 font-bold block text-xs">1. Official Union Record</span>
-              <p className="text-slate-400 text-[10px] sm:text-[11px] font-light">
-                Constitutional recognition across all 8 constituent states.
-              </p>
+          {/* Benefits Single-Line Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Official Constitutional Union Record</span>
             </div>
-            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-0.5">
-              <span className="text-amber-400 font-bold block text-xs">2. Welfare & Bursary Priority</span>
-              <p className="text-slate-400 text-[10px] sm:text-[11px] font-light">
-                Qualifies members for academic support and state bursaries.
-              </p>
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Welfare &amp; State Bursary Priority</span>
             </div>
-            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-0.5">
-              <span className="text-amber-400 font-bold block text-xs">3. Digital ID Slip</span>
-              <p className="text-slate-400 text-[10px] sm:text-[11px] font-light">
-                Generates printable registration slip with photo ID.
-              </p>
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Instant Digital ID Registration Slip</span>
             </div>
           </div>
         </div>
@@ -319,47 +318,7 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
         </div>
       ) : (
         /* CASE 1: REGISTRATION IS OPEN */
-        <div className="space-y-8">
-          {/* GREEN INFORMATION BANNER (TASK 3) */}
-          <div className="p-6 bg-emerald-950 text-white rounded-3xl border-2 border-emerald-800 shadow-lg space-y-3 relative overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold shrink-0 shadow">
-                  <BellRing className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-extrabold text-amber-300 uppercase tracking-widest block">
-                    ANNOUNCEMENT
-                  </span>
-                  <h3 className="font-serif font-bold text-lg text-white">
-                    MEMBERSHIP REGISTRATION IS CURRENTLY OPEN
-                  </h3>
-                </div>
-              </div>
-
-              {(windowStatus?.opensAt || windowStatus?.closesAt) && (
-                <div className="flex items-center gap-4 text-xs bg-slate-900/90 px-4 py-2 rounded-2xl border border-emerald-800/80 shrink-0">
-                  {windowStatus.opensAt && (
-                    <div>
-                      <span className="text-[9px] text-slate-400 uppercase block">OPENING DATE</span>
-                      <span className="font-bold text-amber-300">{windowStatus.opensAt}</span>
-                    </div>
-                  )}
-                  {windowStatus.closesAt && (
-                    <div className="pl-4 border-l border-slate-700">
-                      <span className="text-[9px] text-slate-400 uppercase block">CLOSING DATE</span>
-                      <span className="font-bold text-amber-300">{windowStatus.closesAt}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <p className="text-xs text-stone-200 font-light leading-relaxed pt-1 border-t border-emerald-900/80">
-              {windowStatus?.notice ||
-                'Registration for the 2026/2027 Academic Session is currently open. Eligible students are advised to complete their registration before the deadline.'}
-            </p>
-          </div>
+        <div className="space-y-6">
 
           {/* SUCCESS SLIP OR FORM */}
           {successResult ? (

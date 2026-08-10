@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -34,8 +35,13 @@ export function Header({ session }: HeaderProps) {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const isSuperAdmin = session.roleCodes.includes('SUPER_ADMIN');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lock body scroll when mobile drawer is open
   useEffect(() => {
@@ -152,8 +158,8 @@ export function Header({ session }: HeaderProps) {
         </div>
       </div>
 
-      {/* FULL MOBILE LEFT SIDEBAR DRAWER */}
-      {mobileMenuOpen && (
+      {/* FULL MOBILE LEFT SIDEBAR DRAWER (PORTALED TO DOCUMENT.BODY FOR VIEWPORT LOCK) */}
+      {mounted && mobileMenuOpen && createPortal(
         <div className="lg:hidden fixed inset-0 z-[100000] font-sans">
           {/* Dark Backdrop Overlay */}
           <div
@@ -161,28 +167,28 @@ export function Header({ session }: HeaderProps) {
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Left Slide-in Sidebar Panel */}
-          <aside className="fixed top-0 left-0 bottom-0 h-full w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300">
-            {/* Header with Seal & Close Button - PINNED STICKY AT TOP */}
-            <div className="shrink-0 p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-md">
+          {/* Left Slide-in Sidebar Panel (THIN & SPACE SAVING) */}
+          <aside className="fixed top-0 left-0 bottom-0 h-full w-[72vw] max-w-[260px] bg-slate-950 text-white border-r border-slate-800/80 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300">
+            {/* Header with Seal & Close Button - PINNED */}
+            <div className="shrink-0 p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-sm">
               <Link
                 href="/admin/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 overflow-hidden"
+                className="flex items-center gap-2 overflow-hidden"
               >
-                <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
+                <div className="relative w-7 h-7 shrink-0 bg-white p-0.5 rounded-lg shadow">
                   <Image
                     src="/images/logo.png"
                     alt="YOSU Brand"
                     fill
-                    className="object-contain p-0.5"
+                    className="object-contain"
                   />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-serif text-sm font-bold text-white tracking-tight truncate">
+                  <span className="font-serif text-xs font-bold text-white leading-tight truncate">
                     YOSU PORTAL
                   </span>
-                  <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider truncate">
+                  <span className="text-[8px] font-bold text-amber-400 uppercase tracking-wider truncate">
                     Admin Control Panel
                   </span>
                 </div>
@@ -191,25 +197,25 @@ export function Header({ session }: HeaderProps) {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                 aria-label="Close Admin Sidebar Menu"
               >
-                <X className="w-6 h-6 text-amber-400" />
+                <X className="w-4 h-4 text-amber-400" />
               </button>
             </div>
 
             {/* Scrollable Content Body */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto space-y-1">
               {/* Breadcrumb info inside drawer */}
-              <div className="p-3 bg-slate-900/60 border-b border-slate-800/80">
+              <div className="p-2.5 bg-slate-900/60 border-b border-slate-800/80">
                 <Breadcrumbs />
               </div>
 
               {/* Full Admin Navigation Sections */}
-              <div className="p-3 space-y-5">
+              <div className="p-3 space-y-4">
                 {navigation.map((group) => (
-                  <div key={group.group} className="space-y-1">
-                    <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase px-2 mb-1.5">
+                  <div key={group.group} className="space-y-0.5">
+                    <p className="text-[9px] font-extrabold tracking-wider text-amber-400/90 uppercase px-2 mb-1">
                       {group.group}
                     </p>
                     {group.items.map((item) => {
@@ -221,16 +227,16 @@ export function Header({ session }: HeaderProps) {
                           key={item.name}
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-xs transition-all ${
+                          className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg font-medium text-[11px] transition-all ${
                             active
-                              ? 'bg-emerald-900 text-amber-300 font-bold shadow border border-emerald-700/50'
+                              ? 'bg-emerald-950 text-amber-300 font-bold border border-emerald-800/90 shadow-sm'
                               : item.highlight
                               ? 'text-amber-400 hover:bg-slate-900 hover:text-amber-300'
                               : 'text-slate-300 hover:bg-slate-900 hover:text-white'
                           }`}
                         >
                           <Icon
-                            className={`w-4 h-4 shrink-0 ${
+                            className={`w-3.5 h-3.5 shrink-0 ${
                               active ? 'text-amber-400' : 'text-slate-400'
                             }`}
                           />
@@ -244,19 +250,20 @@ export function Header({ session }: HeaderProps) {
             </div>
 
             {/* Footer Live Website Link - PINNED AT BOTTOM */}
-            <div className="shrink-0 p-4 border-t border-slate-800 bg-slate-900 space-y-2">
+            <div className="shrink-0 p-3 border-t border-slate-800 bg-slate-900">
               <Link
                 href="/"
                 target="_blank"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold rounded-xl transition-colors w-full border border-slate-700"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-bold rounded-lg transition-colors w-full border border-slate-700/80"
               >
-                <ExternalLink className="w-4 h-4 text-amber-400 shrink-0" />
+                <ExternalLink className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>View Live Website</span>
               </Link>
             </div>
           </aside>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

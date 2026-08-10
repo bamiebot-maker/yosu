@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
+import { HeroInteractiveCardSlider } from '@/components/home/hero-interactive-card-slider';
 
 export const revalidate = 60; // ISR 60 seconds
 
@@ -126,31 +127,78 @@ export default async function AboutPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFBF7] font-sans antialiased text-slate-900 overflow-x-hidden">
-      {/* 1. HERO HEADER BANNER */}
-      <section className="bg-slate-950 text-white py-16 px-4 sm:px-6 lg:px-8 border-b-4 border-amber-400 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto space-y-6 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950 border border-amber-400/60 shadow-md">
-            <Crown className="w-4 h-4 text-amber-400" />
-            <span className="text-xs font-extrabold uppercase tracking-widest text-amber-300">
-              INSTITUTIONAL CHARTER & HERITAGE
-            </span>
-          </div>
+      {/* 1. HERO SECTION (MATCHING HOMEPAGE HERO STYLE) */}
+      <section className="relative w-full bg-[#FAF8F5] pt-6 sm:pt-10 pb-8 sm:pb-12 border-b border-stone-200/70 font-sans overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left Content Column */}
+            <div className="lg:col-span-6 space-y-4 sm:space-y-6">
+              <div className="space-y-1">
+                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#B8860B] block">
+                  INSTITUTIONAL CHARTER &amp; HERITAGE
+                </span>
+                <div className="w-10 h-0.5 bg-[#D4A311] rounded-full" />
+              </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
-            About Yoruba Students&apos; Union (YOSU)
-          </h1>
+              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0D2818] tracking-tight leading-[1.15]">
+                About Yoruba <br className="hidden sm:inline" />
+                Students&apos; <span className="text-[#D4A311]">Union</span> (YOSU)
+              </h1>
 
-          <p className="text-sm sm:text-lg text-slate-300 font-light leading-relaxed max-w-3xl">
-            Official Enterprise Headquarters of Yoruba scholars at Federal University Dutse, Jigawa State — Uniting 8 constituent state delegations under the Supreme Unification Constitution.
-          </p>
+              <p className="text-slate-700 text-xs sm:text-sm font-normal leading-relaxed max-w-lg">
+                Official Enterprise Headquarters of Yoruba scholars at Federal University Dutse, Jigawa State — Uniting 8 constituent state delegations under the Supreme Unification Constitution.
+              </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3 text-xs font-bold">
-            <span className="bg-emerald-900/90 text-emerald-300 px-3.5 py-1.5 rounded-xl border border-emerald-700">
-              Active Session: {currentSession?.title || '2026/2027 Session'}
-            </span>
-            <span className="bg-slate-900 text-amber-400 px-3.5 py-1.5 rounded-xl border border-slate-800">
-              Motto: Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ
-            </span>
+              <div className="space-y-3.5 pt-1">
+                <Link
+                  href="/leadership"
+                  className="w-max px-5 py-3 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-lg shadow-md transition-all flex items-center justify-between gap-3 group"
+                >
+                  <span>Explore Executive Governance</span>
+                  <ArrowRight className="w-4 h-4 text-[#D4A311] group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <div className="flex items-center gap-2 pt-0.5">
+                  <BookOpen className="w-4 h-4 text-[#D4A311] shrink-0" />
+                  <Link
+                    href="/constitution"
+                    className="text-xs font-bold text-[#B8860B] hover:text-[#0D2818] transition-colors underline underline-offset-4 decoration-[#D4A311]/60"
+                  >
+                    Read Supreme Unification Constitution
+                  </Link>
+                </div>
+              </div>
+
+              <p className="italic font-serif text-[#0D2818] text-xs sm:text-sm tracking-wide pt-1">
+                &apos;Ìpínlẹ̀ Ọmọ Odùdú: &apos;Ìfé Sókàpò&apos;
+              </p>
+            </div>
+
+            {/* Right Interactive Image Slider Card Column */}
+            <div className="lg:col-span-6 w-full">
+              <HeroInteractiveCardSlider
+                images={[
+                  {
+                    url: '/images/hero/hero-bg-1.jpg',
+                    alt: 'Yoruba Students Union FUD Member Delegation in Traditional Attire',
+                    badgeText: 'YORUBA STUDENTS\' UNION',
+                  },
+                  {
+                    url: '/images/gallery/inauguration-stage-group.jpg',
+                    alt: 'Executive Officers Assembly on Auditorium Stage',
+                    badgeText: 'EXECUTIVE GOVERNANCE',
+                  },
+                  {
+                    url: '/images/leadership/oba-fouad.jpg',
+                    alt: 'Royal Court: OBA Fouad Adegoke Adedotun & Oloris Seated in Dignity',
+                    badgeText: 'ROYAL CULTURAL HERITAGE',
+                  },
+                ]}
+                autoSlideIntervalMs={4500}
+              />
+            </div>
+
           </div>
         </div>
       </section>

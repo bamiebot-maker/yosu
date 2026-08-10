@@ -12,18 +12,17 @@ export default async function ProjectsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-10 font-sans">
-      {/* Header Banner (TASK 5 - COMPACT MOBILE HEADER CARD) */}
-      <div className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl border border-slate-800 relative overflow-hidden">
-        <div className="max-w-3xl space-y-2.5 sm:space-y-4 relative z-10">
-          <span className="bg-amber-400/20 text-amber-300 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-400/30 uppercase tracking-wider inline-flex items-center gap-1.5">
-            <FolderKanban className="w-3.5 h-3.5 text-amber-400" />
-            PUBLIC TRANSPARENCY DASHBOARD
-          </span>
-          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold text-white">YOSU Developmental Projects</h1>
-          <p className="text-stone-200 text-xs sm:text-sm font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
-            Tracking execution milestones, progress percentages, and budget utilization across all executive projects.
-          </p>
-        </div>
+      {/* Minimalist Header */}
+      <div className="space-y-1.5 border-b border-stone-200/80 pb-4 font-sans">
+        <span className="text-[10px] sm:text-xs font-bold text-amber-700 uppercase tracking-widest block">
+          PUBLIC TRANSPARENCY DASHBOARD
+        </span>
+        <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-slate-900">
+          YOSU Developmental Projects
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed max-w-2xl">
+          Tracking execution milestones, progress percentages, and budget utilization across all executive projects.
+        </p>
       </div>
 
       <div className="space-y-8">
