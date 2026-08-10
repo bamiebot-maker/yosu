@@ -190,7 +190,7 @@ export default async function AboutPage() {
                     badgeText: 'EXECUTIVE GOVERNANCE',
                   },
                   {
-                    url: '/images/leadership/oba-fouad.jpg',
+                    url: '/images/leadership/oba-procession.jpg',
                     alt: 'Royal Court: OBA Fouad Adegoke Adedotun & Oloris Seated in Dignity',
                     badgeText: 'ROYAL CULTURAL HERITAGE',
                   },

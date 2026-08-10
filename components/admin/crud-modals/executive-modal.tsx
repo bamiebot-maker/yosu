@@ -190,7 +190,7 @@ export function ExecutiveModal({ isOpen, onClose, appointmentToEdit }: Executive
               { label: 'FinSec Arike', url: '/images/leadership/finsec-arike.jpg' },
               { label: 'Treasurer Trimiz', url: '/images/leadership/treasurer-trimiz.jpg' },
               { label: 'Auditor Hameedat', url: '/images/leadership/auditor-hameedat.jpg' },
-              { label: 'OBA Fouad', url: '/images/leadership/oba-fouad.jpg' },
+              { label: 'OBA Fouad', url: '/images/leadership/oba-procession.jpg' },
             ]}
           />
 

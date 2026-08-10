@@ -80,7 +80,7 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
           twitterUrl: null,
           linkedinUrl: null,
           bio: 'His Royal Majesty, The Oba of Yoruba Students\' Union (YOSU), Federal University Dutse Chapter. Custodian of Omoluabi heritage and traditional court.',
-          avatarMedia: { url: '/images/leadership/oba-fouad.jpg' },
+          avatarMedia: { url: '/images/leadership/oba-procession.jpg' },
         },
         office: {
           title: 'OBA of YOSU FUD',
