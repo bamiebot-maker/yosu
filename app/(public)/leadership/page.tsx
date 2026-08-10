@@ -224,91 +224,6 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
         </details>
       )}
 
-      {/* TRADITIONAL & CULTURAL ROYAL COURT SECTION (OBA & OLORIS) */}
-      {traditionalOfficers.length > 0 && (
-        <section className="space-y-6">
-          <div className="border-b border-amber-300/80 pb-3 flex justify-between items-end">
-            <div>
-              <span className="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full border border-amber-500 tracking-wider inline-flex items-center gap-1">
-                <Crown className="w-3.5 h-3.5 text-slate-950 shrink-0" /> CULTURAL TITLE
-              </span>
-              <h2 className="text-2xl font-serif font-bold text-slate-900 mt-1.5">
-                The Royal Court (OBA &amp; Royal Oloris)
-              </h2>
-            </div>
-            <span className="text-xs font-semibold text-slate-500">{traditionalOfficers.length} Royal Dignitaries</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {traditionalOfficers.map((appt) => (
-              <div
-                key={appt.id}
-                className="bg-white rounded-3xl border-2 border-amber-300/80 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="relative h-64 sm:h-72 bg-slate-950 border-b border-stone-100 overflow-hidden flex items-center justify-center">
-                    {appt.person.avatarMedia?.url ? (
-                      <Image
-                        src={appt.person.avatarMedia.url}
-                        alt={appt.person.fullName}
-                        fill
-                        className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 rounded-full bg-emerald-950 text-amber-400 font-bold text-2xl flex items-center justify-center border border-amber-400/40">
-                        {appt.person.fullName.charAt(0)}
-                      </div>
-                    )}
-
-                    {/* CULTURAL TITLE BADGE TAG */}
-                    <div className="absolute top-4 left-4 bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-500 shadow-md tracking-wider flex items-center gap-1">
-                      <Crown className="w-3 h-3 text-slate-950 shrink-0" />
-                      <span>CULTURAL TITLE • {appt.office.title}</span>
-                    </div>
-
-                    <div className="absolute top-4 right-4 bg-emerald-950 text-amber-300 font-bold text-[10px] uppercase px-2.5 py-1 rounded-md shadow border border-emerald-800">
-                      {appt.person.stateOfOrigin} State
-                    </div>
-                  </div>
-
-                  <div className="p-6 space-y-3">
-                    <div>
-                      <h3 className="font-serif font-bold text-xl text-slate-900 leading-snug">
-                        {appt.person.fullName}
-                      </h3>
-                      {appt.person.department && (
-                        <p className="text-xs text-slate-500 font-medium">
-                          {appt.person.department}
-                        </p>
-                      )}
-                    </div>
-
-                    {appt.person.bio && (
-                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-light">{appt.person.bio}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-6 pt-0 space-y-3">
-                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-100 text-xs text-slate-500">
-                    {appt.person.email && (
-                      <a href={`mailto:${appt.person.email}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Email Officer">
-                        <Mail className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    {appt.person.phoneNumber && (
-                      <a href={`tel:${appt.person.phoneNumber}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Call Officer">
-                        <Phone className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* EXECUTIVE COUNCIL GRID (TASK 13) */}
       <section className="space-y-6">
         <div className="border-b border-stone-200 pb-3 flex justify-between items-end">
@@ -411,6 +326,91 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
           ))}
         </div>
       </section>
+
+      {/* TRADITIONAL & CULTURAL ROYAL COURT SECTION (AFTER EXECUTIVE, BEFORE LEGISLATIVE) */}
+      {traditionalOfficers.length > 0 && (
+        <section className="space-y-6">
+          <div className="border-b border-amber-300/80 pb-3 flex justify-between items-end">
+            <div>
+              <span className="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-full border border-amber-500 tracking-wider inline-flex items-center gap-1">
+                <Crown className="w-3.5 h-3.5 text-slate-950 shrink-0" /> CULTURAL TITLE
+              </span>
+              <h2 className="text-2xl font-serif font-bold text-slate-900 mt-1.5">
+                The Royal Court (OBA &amp; Royal Oloris)
+              </h2>
+            </div>
+            <span className="text-xs font-semibold text-slate-500">{traditionalOfficers.length} Royal Dignitaries</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {traditionalOfficers.map((appt) => (
+              <div
+                key={appt.id}
+                className="bg-white rounded-3xl border-2 border-amber-300/80 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="relative h-64 sm:h-72 bg-slate-950 border-b border-stone-100 overflow-hidden flex items-center justify-center">
+                    {appt.person.avatarMedia?.url ? (
+                      <Image
+                        src={appt.person.avatarMedia.url}
+                        alt={appt.person.fullName}
+                        fill
+                        className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-emerald-950 text-amber-400 font-bold text-2xl flex items-center justify-center border border-amber-400/40">
+                        {appt.person.fullName.charAt(0)}
+                      </div>
+                    )}
+
+                    {/* CULTURAL TITLE BADGE TAG */}
+                    <div className="absolute top-4 left-4 bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-500 shadow-md tracking-wider flex items-center gap-1">
+                      <Crown className="w-3 h-3 text-slate-950 shrink-0" />
+                      <span>CULTURAL TITLE • {appt.office.title}</span>
+                    </div>
+
+                    <div className="absolute top-4 right-4 bg-emerald-950 text-amber-300 font-bold text-[10px] uppercase px-2.5 py-1 rounded-md shadow border border-emerald-800">
+                      {appt.person.stateOfOrigin} State
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-3">
+                    <div>
+                      <h3 className="font-serif font-bold text-xl text-slate-900 leading-snug">
+                        {appt.person.fullName}
+                      </h3>
+                      {appt.person.department && (
+                        <p className="text-xs text-slate-500 font-medium">
+                          {appt.person.department}
+                        </p>
+                      )}
+                    </div>
+
+                    {appt.person.bio && (
+                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-light">{appt.person.bio}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6 pt-0 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-100 text-xs text-slate-500">
+                    {appt.person.email && (
+                      <a href={`mailto:${appt.person.email}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Email Officer">
+                        <Mail className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {appt.person.phoneNumber && (
+                      <a href={`tel:${appt.person.phoneNumber}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Call Officer">
+                        <Phone className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* DYNAMIC HOUSE OF REPRESENTATIVES (TASK 2) */}
       <section id="house-of-reps" className="space-y-6">
