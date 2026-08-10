@@ -218,6 +218,7 @@ export async function createExecutiveAppointmentAction(formData: FormData) {
     const stateOfOrigin = formData.get('stateOfOrigin') as string;
     const department = formData.get('department') as string;
     const level = formData.get('level') as string;
+    const phoneNumber = (formData.get('phoneNumber') as string) || (formData.get('phone') as string) || null;
     const bio = formData.get('bio') as string;
     const imageUrl = (formData.get('imageUrl') as string) || null;
 
@@ -256,6 +257,7 @@ export async function createExecutiveAppointmentAction(formData: FormData) {
         stateOfOrigin,
         department,
         level,
+        phoneNumber,
         bio,
         avatarMediaId,
       },
@@ -283,14 +285,16 @@ export async function createExecutiveAppointmentAction(formData: FormData) {
 export async function updateExecutiveAppointmentAction(appointmentId: string, formData: FormData) {
   try {
     const fullName = formData.get('fullName') as string;
+    const officeTitle = (formData.get('officeTitle') as string) || null;
     const stateOfOrigin = formData.get('stateOfOrigin') as string;
     const department = formData.get('department') as string;
+    const phoneNumber = (formData.get('phoneNumber') as string) || (formData.get('phone') as string) || null;
     const bio = formData.get('bio') as string;
     const imageUrl = (formData.get('imageUrl') as string) || null;
 
     const appointment = await db.officeAppointment.findUnique({
       where: { id: appointmentId },
-      include: { person: true },
+      include: { person: true, office: true },
     });
 
     if (!appointment) throw new Error('Appointment not found');
@@ -308,16 +312,37 @@ export async function updateExecutiveAppointmentAction(appointmentId: string, fo
       avatarMediaId = media.id;
     }
 
+    // Update Person details including phone number
     await db.person.update({
       where: { id: appointment.personId },
       data: {
         fullName,
         stateOfOrigin,
         department,
+        phoneNumber,
         bio,
         ...(avatarMediaId ? { avatarMediaId } : {}),
       },
     });
+
+    // Update Office Title / Executive Position if provided
+    if (officeTitle && officeTitle !== appointment.office.title) {
+      let office = await db.office.findFirst({ where: { title: officeTitle } });
+      if (!office) {
+        office = await db.office.create({
+          data: {
+            title: officeTitle,
+            category: OfficeCategory.EXECUTIVE_COUNCIL,
+            defaultOrder: 10,
+          },
+        });
+      }
+
+      await db.officeAppointment.update({
+        where: { id: appointmentId },
+        data: { officeId: office.id },
+      });
+    }
 
     revalidatePath('/admin/executives');
     revalidatePath('/leadership');

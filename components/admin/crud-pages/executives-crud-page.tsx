@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Users, Plus, Edit3, Trash2, CheckCircle2 } from 'lucide-react';
+import { Users, Plus, Edit3, Trash2, CheckCircle2, Phone } from 'lucide-react';
 import { ExecutiveModal } from '@/components/admin/crud-modals/executive-modal';
 import { DeleteConfirmModal } from '@/components/admin/crud-modals/delete-confirm-modal';
 import { deleteExecutiveAppointmentAction } from '@/app/admin/actions';
@@ -14,6 +14,7 @@ interface ExecutiveAppointmentItem {
     stateOfOrigin: string | null;
     department: string | null;
     level: string | null;
+    phoneNumber?: string | null;
     bio: string | null;
     avatarMedia: { url: string } | null;
   };
@@ -90,6 +91,13 @@ export function ExecutivesCrudPage({ appointments }: { appointments: ExecutiveAp
               {appt.person.department && (
                 <p className="text-xs text-slate-600 font-medium">
                   Department: <span className="text-slate-900 font-bold">{appt.person.department}</span>
+                </p>
+              )}
+
+              {appt.person.phoneNumber && (
+                <p className="text-xs text-slate-600 font-medium flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-emerald-800" />
+                  <span className="text-slate-900 font-bold">{appt.person.phoneNumber}</span>
                 </p>
               )}
 

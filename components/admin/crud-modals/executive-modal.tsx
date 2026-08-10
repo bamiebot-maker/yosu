@@ -14,6 +14,7 @@ interface ExecutiveModalProps {
       fullName: string;
       stateOfOrigin: string | null;
       department: string | null;
+      phoneNumber?: string | null;
       bio: string | null;
       avatarMedia?: { url: string } | null;
     };
@@ -103,18 +104,35 @@ export function ExecutiveModal({ isOpen, onClose, appointmentToEdit }: Executive
             />
           </div>
 
-          {!isEditing && (
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Office Title *</label>
-              <input
-                type="text"
-                name="officeTitle"
-                required
-                placeholder="e.g., President, Vice President, General Secretary"
-                className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-800"
-              />
-            </div>
-          )}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              Executive Position / Office Title *
+            </label>
+            <input
+              type="text"
+              name="officeTitle"
+              defaultValue={appointmentToEdit?.office.title || ''}
+              required
+              list="executive-positions-list"
+              placeholder="e.g., Executive President, Vice President, General Secretary"
+              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-800 text-slate-900"
+            />
+            <datalist id="executive-positions-list">
+              <option value="Executive President" />
+              <option value="Vice President" />
+              <option value="General Secretary" />
+              <option value="Assistant General Secretary" />
+              <option value="Financial Secretary" />
+              <option value="Treasurer" />
+              <option value="Public Relations Officer (PRO)" />
+              <option value="Social Director" />
+              <option value="Sports Director" />
+              <option value="Welfare Director" />
+              <option value="Auditor General" />
+              <option value="Speaker (House of Reps)" />
+              <option value="Deputy Speaker" />
+            </datalist>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -145,6 +163,19 @@ export function ExecutiveModal({ isOpen, onClose, appointmentToEdit }: Executive
                 className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium focus:outline-none"
               />
             </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              Phone Number / WhatsApp Contact
+            </label>
+            <input
+              type="text"
+              name="phoneNumber"
+              defaultValue={(appointmentToEdit?.person as any)?.phoneNumber || (appointmentToEdit?.person as any)?.phone || ''}
+              placeholder="e.g., +234 801 234 5678"
+              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-800 text-slate-900"
+            />
           </div>
 
           <ImageUploader
