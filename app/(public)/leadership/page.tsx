@@ -186,7 +186,7 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
                     </h3>
                     {appt.person.department && (
                       <p className="text-xs text-slate-500 font-medium">
-                        {appt.person.department} {appt.person.level ? `(${appt.person.level})` : ''}
+                        {appt.person.department}
                       </p>
                     )}
                   </div>
