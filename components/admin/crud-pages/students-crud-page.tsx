@@ -17,6 +17,7 @@ import {
   Sparkles,
   Gift,
   Download,
+  ChevronDown,
 } from 'lucide-react';
 import { DeleteConfirmModal } from '@/components/admin/crud-modals/delete-confirm-modal';
 import {
@@ -265,90 +266,106 @@ export function StudentsCrudPage({
         </div>
       </div>
 
-      {/* DEDICATED MONTHLY BIRTHDAY ROSTER BOARD */}
-      <div className="bg-slate-950 text-white p-6 rounded-3xl border border-slate-800 shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+      {/* COMPACT COLLAPSIBLE BIRTHDAY ROSTER ACCORDION (ATTACHMENT 1 - MINIMALIST MONTHLY DROPDOWN) */}
+      <details className="bg-slate-950 text-white rounded-2xl border border-slate-800 shadow-md group transition-all">
+        <summary className="p-4 flex items-center justify-between cursor-pointer select-none font-sans">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold shrink-0">
               <Gift className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">
-                BIRTHDAY ROSTER SYSTEM
-              </span>
-              <h2 className="font-serif font-bold text-lg text-white">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">
+                  BIRTHDAY ROSTER SYSTEM
+                </span>
+                {monthFilter !== 'ALL' && (
+                  <span className="bg-emerald-900 text-amber-300 text-[10px] font-bold px-2 py-0.2 rounded-full uppercase border border-emerald-700">
+                    Filtered: {monthFilter} ({monthlyBirthdayCounts[monthFilter] || 0})
+                  </span>
+                )}
+              </div>
+              <h2 className="font-serif font-bold text-sm sm:text-base text-white">
                 Monthly Student Birthday Celebrants
               </h2>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setMonthFilter(currentCalendarMonth)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                monthFilter === currentCalendarMonth
-                  ? 'bg-amber-400 text-slate-950 shadow-md'
-                  : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700'
-              }`}
-            >
-              <Cake className="w-3.5 h-3.5" />
-              <span>Current Month ({currentCalendarMonth}: {monthlyBirthdayCounts[currentCalendarMonth] || 0})</span>
-            </button>
-
-            {monthFilter !== 'ALL' && (
-              <button
-                type="button"
-                onClick={() => setMonthFilter('ALL')}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 cursor-pointer"
-              >
-                Clear Month Filter
-              </button>
-            )}
+            <span className="text-xs text-amber-300 font-bold hidden sm:inline-block">
+              {currentCalendarMonth}: {monthlyBirthdayCounts[currentCalendarMonth] || 0} Celebrants
+            </span>
+            <ChevronDown className="w-4 h-4 text-amber-400 group-open:rotate-180 transition-transform" />
           </div>
-        </div>
+        </summary>
 
-        {/* 12 Month Pills Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-          {monthsList.map((m) => {
-            const count = monthlyBirthdayCounts[m] || 0;
-            const isSelected = monthFilter === m;
-            const isCurrentMonth = m === currentCalendarMonth;
+        <div className="p-4 border-t border-slate-800 space-y-3 bg-slate-900/50 rounded-b-2xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <p className="text-xs text-slate-300 font-light">
+              Select a month below or from the dropdown to filter the student list by birth month:
+            </p>
 
-            return (
+            <div className="flex items-center gap-2">
               <button
-                key={m}
                 type="button"
-                onClick={() => setMonthFilter(m)}
-                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-emerald-900 border-amber-400 text-amber-300 shadow-lg ring-2 ring-amber-400/50'
-                    : isCurrentMonth
-                    ? 'bg-slate-900 border-amber-400/60 text-white hover:bg-slate-800'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white'
+                onClick={() => setMonthFilter(currentCalendarMonth)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  monthFilter === currentCalendarMonth
+                    ? 'bg-amber-400 text-slate-950 shadow-md'
+                    : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700'
                 }`}
               >
-                <div className="flex justify-between items-center w-full">
-                  <span className="text-xs font-bold truncate">{m}</span>
-                  {isCurrentMonth && (
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                  )}
-                </div>
-                <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-800/80">
-                  <span className="text-[10px] text-slate-400 font-light">Celebrants</span>
-                  <span
-                    className={`text-xs font-mono font-extrabold px-2 py-0.5 rounded-full ${
-                      count > 0 ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-800 text-slate-500'
-                    }`}
-                  >
-                    {count}
-                  </span>
-                </div>
+                <Cake className="w-3.5 h-3.5" />
+                <span>Current Month ({currentCalendarMonth}: {monthlyBirthdayCounts[currentCalendarMonth] || 0})</span>
               </button>
-            );
-          })}
+
+              {monthFilter !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={() => setMonthFilter('ALL')}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 cursor-pointer"
+                >
+                  Clear Filter
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 12 Month Compact Selectable Badges */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+            {monthsList.map((m) => {
+              const count = monthlyBirthdayCounts[m] || 0;
+              const isSelected = monthFilter === m;
+              const isCurrentMonth = m === currentCalendarMonth;
+
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMonthFilter(m)}
+                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    isSelected
+                      ? 'bg-emerald-900 border-amber-400 text-amber-300 shadow-md ring-1 ring-amber-400/50'
+                      : isCurrentMonth
+                      ? 'bg-slate-900 border-amber-400/60 text-white hover:bg-slate-800'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:text-white'
+                  }`}
+                >
+                  <div className="flex justify-between items-center w-full">
+                    <span className="text-[11px] font-bold truncate">{m}</span>
+                    <span
+                      className={`text-[10px] font-mono font-extrabold px-1.5 py-0.2 rounded-full ${
+                        count > 0 ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </details>
 
       {/* MULTI-DIMENSIONAL SEARCH & FILTERING BAR */}
       <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4 font-sans">

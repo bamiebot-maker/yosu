@@ -131,27 +131,7 @@ export function Navbar() {
           : 'bg-white shadow-lg border-b border-stone-200'
       }`}
     >
-      {/* Top Banner - Motto & Institutional Identity */}
-      <div className="bg-emerald-950 text-white py-1 px-3 sm:px-6 text-[10px] sm:text-xs font-medium border-b border-emerald-800 w-full transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex flex-row justify-between items-center gap-2 w-full min-w-0">
-          {/* Left: Motto Badge */}
-          <div className="flex items-center gap-1.5 min-w-0 shrink">
-            <span className="bg-[#E5A91A] text-slate-900 font-bold px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] tracking-wider uppercase shrink-0">
-              MOTTO
-            </span>
-            <span className="italic font-serif tracking-wide text-amber-200 truncate text-[10px] sm:text-xs">
-              &quot;Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ&quot;
-            </span>
-          </div>
 
-          {/* Right: Institutional Designation */}
-          <div className="flex items-center gap-1.5 sm:gap-3 text-emerald-200 text-[10px] sm:text-[11px] shrink-0">
-            <span className="truncate">FUD Chapter</span>
-            <span className="hidden sm:inline text-amber-400">•</span>
-            <span className="hidden sm:inline text-slate-300">PMB 7156, Dutse</span>
-          </div>
-        </div>
-      </div>
 
       {/* Main Header Bar */}
       <div className="bg-white/90 backdrop-blur-md border-b border-stone-200/80 w-full relative z-[9999]">
