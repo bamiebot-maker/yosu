@@ -61,20 +61,20 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
   const constituentStateList = Object.keys(stateRepresentativesMap);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 font-sans">
-      {/* Header Banner */}
-      <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-amber-400/30">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-12 font-sans">
+      {/* Header Banner (TASK 5 - COMPACT MOBILE HEADER CARD) */}
+      <div className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800">
+        <div className="relative z-10 max-w-3xl space-y-2.5 sm:space-y-4">
+          <div className="inline-flex items-center gap-1.5 bg-amber-400/15 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider border border-amber-400/30">
             <Users className="w-3.5 h-3.5 text-amber-400" />
             <span>OFFICIAL GOVERNANCE & LEADERSHIP ROSTER</span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
             Executive Council & Legislative Arms
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
             Currently viewing: <span className="font-bold text-amber-400">{currentSession.title}</span> — {currentSession.theme || 'Administration'}. Governed under the ratified provisions of the Supreme Constitution.
           </p>
         </div>

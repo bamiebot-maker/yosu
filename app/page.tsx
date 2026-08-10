@@ -257,30 +257,30 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFBF7] font-sans antialiased text-slate-900 selection:bg-amber-200 selection:text-emerald-950 overflow-x-hidden">
-      {/* 1. HERO SECTION WITH BACKGROUND SLIDER */}
-      <section className="relative w-full h-[85vh] min-h-[580px] max-h-[850px] flex items-center justify-center overflow-hidden bg-slate-950">
+      {/* 1. HERO SECTION WITH BACKGROUND SLIDER (TASK 1 - REDESIGNED HERO FOR MOBILE) */}
+      <section className="relative w-full h-[480px] sm:h-[600px] lg:h-[720px] flex items-center justify-center overflow-hidden bg-slate-950">
         <HeroBackgroundSlider images={heroBackgroundImages} intervalMs={6500} />
 
-        <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-amber-400/60 backdrop-blur-md shadow-lg animate-pulse-subtle">
-            <Crown className="w-4 h-4 text-amber-400" />
-            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300">
+        <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white space-y-3 sm:space-y-5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-amber-400/50 backdrop-blur-md shadow-md">
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
               YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
             </span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-md">
+          <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-snug drop-shadow-md">
             Promoting Heritage, Unity & Academic Excellence
           </h1>
 
-          <p className="text-sm sm:text-lg text-slate-200 font-light leading-relaxed drop-shadow max-w-2xl mx-auto">
+          <p className="text-xs sm:text-base text-slate-200 font-light leading-relaxed drop-shadow max-w-xl mx-auto line-clamp-3 sm:line-clamp-none">
             Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting 8 constituent Yoruba state delegations under one supreme constitution.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 pt-1">
             <Link
               href="/leadership"
-              className="px-6 py-3.5 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition-all hover:scale-105 flex items-center gap-2"
+              className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center gap-1.5"
             >
               <span>Explore Executive Roster</span>
               <ArrowRight className="w-4 h-4" />
@@ -288,10 +288,10 @@ export default async function HomePage() {
 
             <Link
               href="/constitution"
-              className="px-6 py-3.5 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-xl backdrop-blur-md transition-all hover:scale-105 flex items-center gap-2"
+              className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-lg backdrop-blur-md transition-all flex items-center gap-1.5"
             >
-              <BookOpen className="w-4 h-4 text-amber-400" />
-              <span>Interactive Supreme Constitution</span>
+              <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+              <span>Supreme Constitution</span>
             </Link>
           </div>
         </div>
@@ -300,57 +300,53 @@ export default async function HomePage() {
       {/* MARQUEE ANNOUNCEMENTS */}
       <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
 
-      {/* DYNAMIC REGISTRATION WINDOW ANNOUNCEMENT CARD (TASK 5) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-8 relative z-30 font-sans">
+      {/* DYNAMIC REGISTRATION WINDOW ANNOUNCEMENT STRIP (TASK 2 - SLIM COMPACT ANNOUNCEMENT STRIP) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-4 sm:my-6 relative z-30 font-sans">
         {regWindow.isOpen ? (
-          <div className="bg-emerald-950 text-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-700 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 text-center sm:text-left">
+          <div className="bg-emerald-950 text-white rounded-2xl p-3.5 sm:p-5 border border-emerald-700/70 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="space-y-0.5 text-center sm:text-left flex-1 min-w-0">
               <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  MEMBERSHIP REGISTRATION IS OPEN
+                <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  REGISTRATION OPEN
                 </span>
-                <span className="text-emerald-300 text-xs font-mono font-bold">
+                <span className="text-emerald-300 text-[11px] font-mono font-bold truncate">
                   {regWindow.academicSession} Session
                 </span>
               </div>
-              <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
+              <h3 className="font-serif font-bold text-sm sm:text-lg text-white truncate">
                 Official YOSU Membership Data Capture
               </h3>
-              <p className="text-xs text-stone-200 font-light max-w-xl">
+              <p className="text-[11px] sm:text-xs text-stone-200 font-light truncate max-w-xl">
                 {regWindow.closesAt
-                  ? `Registration is currently open for all bona fide students. Please complete your registration before ${regWindow.closesAt}.`
-                  : 'Registration is currently open for all bona fide Yoruba students at Federal University Dutse.'}
+                  ? `Registration is currently open for all bona fide students before ${regWindow.closesAt}.`
+                  : 'Registration is open for all bona fide Yoruba students at Federal University Dutse.'}
               </p>
             </div>
 
             <Link
               href="/register"
-              className="px-7 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 shrink-0 flex items-center gap-2"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow transition-all shrink-0 flex items-center gap-1.5"
             >
               <span>Register Now</span>
-              <ArrowRight className="w-4 h-4 text-slate-950" />
+              <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
             </Link>
           </div>
         ) : (
-          <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 text-center sm:text-left">
+          <div className="bg-slate-900 text-white rounded-2xl p-3.5 sm:p-5 border border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="space-y-0.5 text-center sm:text-left flex-1 min-w-0">
               <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="bg-rose-950 text-rose-300 border border-rose-800 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                   REGISTRATION CLOSED
                 </span>
               </div>
-              <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
+              <h3 className="font-serif font-bold text-sm sm:text-lg text-white">
                 Membership Registration Window Closed
               </h3>
-              <p className="text-xs text-slate-300 font-light max-w-xl">
-                {regWindow.closedMessage ||
-                  'Registration is currently closed. Follow our official channels for the next exercise.'}
-              </p>
             </div>
 
             <Link
               href="/contact"
-              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl border border-slate-700 transition-all shrink-0"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl border border-slate-700 transition-all shrink-0"
             >
               Contact Secretariat
             </Link>
@@ -369,37 +365,37 @@ export default async function HomePage() {
         heroFullMessage={heroFullMessage}
       />
 
-      {/* 3. EXPANDED ABOUT YOSU SECTION (REQUIREMENT 2) */}
+      {/* 3. EXPANDED ABOUT YOSU SECTION (TASK 4 - COMPACT PREMIUM MISSION & VISION CARDS) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-16 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-8 sm:my-12 space-y-6 sm:space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <span className="text-[9px] font-extrabold text-amber-700 uppercase tracking-widest bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
               INSTITUTIONAL CHARTER & HERITAGE
             </span>
-            <h2 className="text-3xl sm:text-5xl font-serif font-extrabold text-slate-900">
+            <h2 className="text-2xl sm:text-4xl font-serif font-extrabold text-slate-900">
               About Yoruba Students&apos; Union (YOSU)
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 font-light leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 font-light leading-relaxed max-w-2xl mx-auto">
               The supreme umbrella body uniting, representing, and empowering all bona fide Yoruba scholars at Federal University Dutse, Jigawa State.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {dbAboutSections.length > 0
               ? dbAboutSections.map((sec) => (
                   <div
                     key={sec.id}
-                    className="bg-white p-7 rounded-3xl border border-stone-200 shadow-sm hover:shadow-md transition-all space-y-3 flex flex-col justify-between"
+                    className="bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-all space-y-2.5 flex flex-col justify-between"
                   >
-                    <div className="space-y-3">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/30">
-                        <BookOpen className="w-6 h-6" />
+                    <div className="space-y-2">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/30">
+                        <BookOpen className="w-4 h-4" />
                       </div>
-                      <h3 className="font-serif font-bold text-xl text-slate-900">{sec.title}</h3>
+                      <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900">{sec.title}</h3>
                       {sec.subtitle && (
-                        <p className="text-xs text-amber-700 font-semibold italic">{sec.subtitle}</p>
+                        <p className="text-[11px] text-amber-700 font-semibold italic">{sec.subtitle}</p>
                       )}
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-light whitespace-pre-line">
+                      <p className="text-xs text-slate-600 leading-relaxed font-light whitespace-pre-line">
                         {sec.content}
                       </p>
                     </div>
@@ -408,13 +404,13 @@ export default async function HomePage() {
               : defaultAboutList.map((item) => (
                   <div
                     key={item.key}
-                    className="bg-white p-7 rounded-3xl border border-stone-200 shadow-sm hover:shadow-md transition-all space-y-3"
+                    className="bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-all space-y-2.5"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/30">
-                      <BookOpen className="w-6 h-6" />
+                    <div className="w-9 h-9 rounded-xl bg-emerald-950 text-amber-400 flex items-center justify-center border border-amber-400/30">
+                      <BookOpen className="w-4 h-4" />
                     </div>
-                    <h3 className="font-serif font-bold text-xl text-slate-900">{item.title}</h3>
-                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-light">
+                    <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900">{item.title}</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed font-light">
                       {item.content}
                     </p>
                   </div>
@@ -423,75 +419,79 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 4. 100% DYNAMIC HOMEPAGE STATISTICS (REQUIREMENT 3) */}
+      {/* 4. 100% DYNAMIC HOMEPAGE STATISTICS (TASK 3 - COMPACT SWIPEABLE RESPONSIVE METRICS) */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-12">
-          <div className="text-center max-w-2xl mx-auto mb-8 space-y-1">
-            <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest">
-              LIVE DATABASE METRICS
-            </span>
-            <h3 className="font-serif text-2xl font-bold text-slate-900">Institutional Statistics & Data</h3>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-8 sm:my-12 space-y-4">
+          <div className="flex justify-between items-end border-b border-stone-200 pb-2">
+            <div>
+              <span className="text-[9px] font-extrabold text-amber-700 uppercase tracking-widest block">
+                LIVE DATABASE TELEMETRY
+              </span>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">Institutional Metrics</h3>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium sm:hidden">Swipe ← →</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Yoruba States</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">8 States</div>
-              <div className="text-[9px] text-slate-400 font-medium">100% Representation</div>
+          {/* Swipeable Metrics Row on Mobile, Grid on Tablet/Desktop */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-2 scrollbar-none sm:grid sm:grid-cols-5 lg:grid-cols-10">
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Yoruba States</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">8 States</div>
+              <div className="text-[8px] text-slate-400 font-medium">Representation</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Active Excos</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-600">{excoCount} Officers</div>
-              <div className="text-[9px] text-slate-400 font-medium">Executive Portfolios</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Active Excos</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{excoCount} Officers</div>
+              <div className="text-[8px] text-slate-400 font-medium">Cabinet</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">House Delegates</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{repCount} Reps</div>
-              <div className="text-[9px] text-slate-400 font-medium">State Assembly</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">House Delegates</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{repCount} Reps</div>
+              <div className="text-[8px] text-slate-400 font-medium">Assembly</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Achievements</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-600">{achieveCount} Goals</div>
-              <div className="text-[9px] text-slate-400 font-medium">Progress Era</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Achievements</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{achieveCount} Goals</div>
+              <div className="text-[8px] text-slate-400 font-medium">Progress Era</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Projects</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{projectCount} Projects</div>
-              <div className="text-[9px] text-slate-400 font-medium">Transparency Tracker</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Projects</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{projectCount} Projects</div>
+              <div className="text-[8px] text-slate-400 font-medium">Tracker</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">News Gazettes</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-600">{newsCount} Articles</div>
-              <div className="text-[9px] text-slate-400 font-medium">Published Statements</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">News Gazettes</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{newsCount} Articles</div>
+              <div className="text-[8px] text-slate-400 font-medium">Press</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Media Assets</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{mediaCount} Media</div>
-              <div className="text-[9px] text-slate-400 font-medium">Cloudinary CDN</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Media Assets</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{mediaCount} Media</div>
+              <div className="text-[8px] text-slate-400 font-medium">CDN Gallery</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Public Downloads</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-600">{downloadCount} PDFs</div>
-              <div className="text-[9px] text-slate-400 font-medium">Resource Portal</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Downloads</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{downloadCount} PDFs</div>
+              <div className="text-[8px] text-slate-400 font-medium">Resources</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow border-t-4 border-t-emerald-800">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Registered Members</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">{registeredStudentCount} Students</div>
-              <div className="text-[9px] text-emerald-800 font-bold">Bona Fide YOSU Members</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow border-t-2 border-t-emerald-800">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Members</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{registeredStudentCount}</div>
+              <div className="text-[8px] text-emerald-800 font-bold">Registered</div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm text-center space-y-1 hover:shadow-md transition-shadow">
-              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">Sessions</span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-600">{sessionCount} Sessions</div>
-              <div className="text-[9px] text-slate-400 font-medium">Historical Timeline</div>
+            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
+              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Sessions</span>
+              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{sessionCount}</div>
+              <div className="text-[8px] text-slate-400 font-medium">Timeline</div>
             </div>
           </div>
         </section>

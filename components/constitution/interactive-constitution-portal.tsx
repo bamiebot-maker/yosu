@@ -305,78 +305,78 @@ export function InteractiveConstitutionPortal({
         <span className="font-semibold text-slate-900">Supreme Unification Constitution</span>
       </nav>
 
-      {/* CONSTITUTION METADATA HERO BANNER */}
-      <header className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* CONSTITUTION METADATA HERO BANNER (TASK 5 - COMPACT MOBILE HEADER CARD) */}
+      <header className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="bg-amber-400 text-slate-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+        <div className="relative z-10 max-w-4xl space-y-3 sm:space-y-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
               {selectedVersion.versionName}
             </span>
             {selectedVersion.isCurrent ? (
-              <span className="bg-emerald-900/90 text-emerald-300 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-600/50 inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="bg-emerald-900/90 text-emerald-300 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-600/50 inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-amber-400" />
                 ACTIVE SUPREME LAW
               </span>
             ) : (
-              <span className="bg-slate-800 text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase border border-slate-700">
+              <span className="bg-slate-800 text-slate-300 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full uppercase border border-slate-700">
                 ARCHIVED GAZETTE
               </span>
             )}
-            <span className="text-xs text-amber-300 font-semibold bg-slate-900 px-3 py-1 rounded-full border border-slate-800">
+            <span className="text-[10px] sm:text-xs text-amber-300 font-semibold bg-slate-900 px-2.5 py-0.5 rounded-full border border-slate-800">
               {selectedVersion.edition || '1st Harmonized Edition'}
             </span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
             The Unification Constitution of YOSU
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
             Federal University Dutse Chapter. Ratified by the House of Representatives on Friday, 10 July 2026 and assented by President Asiwaju Abdulsalam Abdulgafar Oluwagbenga on Saturday, 11 July 2026.
           </p>
 
           {/* Metadata Cards Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-800/80">
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">EFFECTIVE DATE</span>
-              <span className="text-xs font-bold text-amber-300">{selectedVersion.effectiveDate}</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">EFFECTIVE DATE</span>
+              <span className="text-xs font-bold text-amber-300 truncate block">{selectedVersion.effectiveDate}</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">ASSENTED BY</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">ASSENTED BY</span>
               <span className="text-xs font-bold text-white truncate block">{selectedVersion.assentedBy || 'President'}</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">SPEAKER CERTIFICATE</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">SPEAKER CERTIFICATE</span>
               <span className="text-xs font-bold text-white truncate block">{selectedVersion.speakerCertBy || 'Speaker'}</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">READING TIME</span>
-              <span className="text-xs font-bold text-emerald-400">~{estimatedReadingTime} mins read</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">READING TIME</span>
+              <span className="text-xs font-bold text-emerald-400 truncate block">~{estimatedReadingTime} mins read</span>
             </div>
           </div>
 
           {/* Action Bar */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <a
               href={selectedVersion.pdfUrl || '/downloads/YOSU_Unification_Constitution_2026.pdf'}
               download
               onClick={handleDownloadPdf}
-              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl shadow transition-all inline-flex items-center gap-1.5 cursor-pointer"
             >
-              <Download className="w-4 h-4" />
-              <span>Download Official PDF Gazette ({localDownloadsCount})</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Download PDF Gazette ({localDownloadsCount})</span>
             </a>
 
             <button
               type="button"
               onClick={() => window.print()}
-              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-2 cursor-pointer border border-slate-700"
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-700"
             >
-              <Printer className="w-4 h-4 text-amber-400" />
-              <span>Print Constitution</span>
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              <span>Print</span>
             </button>
           </div>
         </div>

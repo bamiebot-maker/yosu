@@ -282,53 +282,42 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
         <span className="font-semibold text-slate-900">Official Historical Archive</span>
       </nav>
 
-      {/* 1. HERO SECTION WITH DECORATIVE TIMELINE ELEMENTS */}
-      <header className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
+      {/* 1. HERO SECTION WITH DECORATIVE TIMELINE ELEMENTS (TASK 5 - COMPACT MOBILE HEADER CARD) */}
+      <header className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
         {/* Background decorative glows */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Decorative timeline nodes SVG overlay */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-10 hidden lg:block pointer-events-none">
-          <svg width="320" height="240" viewBox="0 0 320 240" fill="none">
-            <path d="M40 20V220" stroke="#F59E0B" strokeWidth="3" strokeDasharray="6 6" />
-            <circle cx="40" cy="40" r="14" fill="#10B981" />
-            <circle cx="40" cy="120" r="14" fill="#F59E0B" />
-            <circle cx="40" cy="200" r="14" fill="#3B82F6" />
-            <path d="M60 40H280M60 120H280M60 200H280" stroke="#FFFFFF" strokeWidth="2" />
-          </svg>
-        </div>
-
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-amber-400/30">
-            <History className="w-4 h-4 text-amber-400" />
-            <span>YOSU FUD • OFFICIAL DIGITAL GAZETTE & HISTORICAL REPOSITORY</span>
+        <div className="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+          <div className="inline-flex items-center gap-1.5 bg-amber-400/15 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider border border-amber-400/30">
+            <History className="w-3.5 h-3.5 text-amber-400" />
+            <span>YOSU FUD • HISTORICAL REPOSITORY</span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
             Institutional Evolution & Heritage Archive
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
-            The codified historical chronicle of the Yoruba Students' Union (YOSU), Federal University Dutse Chapter. Inspect active and archived executive cabinets, state legislative assemblies, ratified constitutional versions, capital projects, landmark achievements, and media gazettes.
+          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed max-w-2xl line-clamp-2 sm:line-clamp-none">
+            The codified historical chronicle of the Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter. Inspect active and archived executive cabinets, legislative assemblies, ratified constitutional versions, projects, achievements, and media gazettes.
           </p>
 
           {/* Quick Hero Statistics Banner */}
-          <div className="pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-6 text-xs text-slate-300">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+          <div className="pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center gap-3 sm:gap-6 text-[11px] sm:text-xs text-slate-300">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>
                 <strong className="text-white font-bold">{stats.totalAdministrations}</strong> Recorded Administrations
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>
                 <strong className="text-white font-bold">{stats.totalExecutives + stats.totalRepresentatives}</strong> Sworn Delegates
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <FolderKanban className="w-4 h-4 text-blue-400" />
+            <div className="flex items-center gap-1.5">
+              <FolderKanban className="w-3.5 h-3.5 text-blue-400 shrink-0" />
               <span>
                 <strong className="text-white font-bold">{stats.totalProjectsCompleted}</strong> Completed Projects
               </span>

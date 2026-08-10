@@ -187,45 +187,45 @@ export function InteractiveContactCentre({ settings, faqs }: InteractiveContactC
         <span className="font-semibold text-slate-900">Contact & Communication Centre</span>
       </nav>
 
-      {/* HERO BANNER */}
-      <header className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* HERO BANNER (TASK 5 - COMPACT MOBILE HEADER CARD) */}
+      <header className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-4xl space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="bg-amber-400 text-slate-950 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+        <div className="relative z-10 max-w-4xl space-y-3 sm:space-y-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="bg-amber-400 text-slate-950 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
               OFFICIAL SECRETARIAT CHANNEL
             </span>
-            <span className="bg-emerald-950 text-emerald-300 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" /> 24-48 HR RESPONSE GUARANTEE
+            <span className="bg-emerald-950 text-emerald-300 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-amber-400" /> 24-48 HR RESPONSE GUARANTEE
             </span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
             {settings.contact_intro_title || 'Official Communication & Enquiry Portal'}
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
             {settings.contact_intro_subtitle ||
               'Connect directly with the Executive Council, Secretariat, or House of Representatives of the Yoruba Students\' Union (YOSU), Federal University Dutse Chapter.'}
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-800/80 text-xs">
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">SECRETARIAT STATUS</span>
-              <span className="text-xs font-bold text-emerald-400">OPERATIONAL & OPEN</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-800/80 text-xs">
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">SECRETARIAT STATUS</span>
+              <span className="text-xs font-bold text-emerald-400">OPERATIONAL</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">OFFICIAL EMAIL</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">OFFICIAL EMAIL</span>
               <span className="text-xs font-bold text-amber-300 truncate block">{settings.contact_email || 'info@yosufud.org.ng'}</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">HELPLINE</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">HELPLINE</span>
               <span className="text-xs font-bold text-white truncate block">{settings.contact_phone || '+234 803 123 4567'}</span>
             </div>
-            <div className="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block">LOCATION</span>
+            <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+              <span className="text-[9px] font-bold text-slate-400 uppercase block">LOCATION</span>
               <span className="text-xs font-bold text-white truncate block">FUD Campus, Dutse</span>
             </div>
           </div>
