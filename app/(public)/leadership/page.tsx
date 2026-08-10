@@ -145,7 +145,25 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
     return acc;
   }, {});
 
-  const constituentStateList = Object.keys(stateRepresentativesMap);
+  // Sort constituent states so the state containing the Speaker (Rt. Hon. Speaker) is ALWAYS FIRST at the top of the Legislative section!
+  const sortedConstituentStateList = Object.keys(stateRepresentativesMap).sort((stateA, stateB) => {
+    const repsA = stateRepresentativesMap[stateA] || [];
+    const repsB = stateRepresentativesMap[stateB] || [];
+    
+    const hasSpeakerA = repsA.some((r) => r.positionTitle.toLowerCase().includes('speaker') && !r.positionTitle.toLowerCase().includes('deputy'));
+    const hasSpeakerB = repsB.some((r) => r.positionTitle.toLowerCase().includes('speaker') && !r.positionTitle.toLowerCase().includes('deputy'));
+
+    if (hasSpeakerA && !hasSpeakerB) return -1;
+    if (!hasSpeakerA && hasSpeakerB) return 1;
+
+    const hasDeputyA = repsA.some((r) => r.positionTitle.toLowerCase().includes('deputy speaker'));
+    const hasDeputyB = repsB.some((r) => r.positionTitle.toLowerCase().includes('deputy speaker'));
+
+    if (hasDeputyA && !hasDeputyB) return -1;
+    if (!hasDeputyA && hasDeputyB) return 1;
+
+    return stateA.localeCompare(stateB);
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 font-sans">
@@ -412,92 +430,134 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
         </section>
       )}
 
-      {/* DYNAMIC HOUSE OF REPRESENTATIVES (TASK 2) */}
-      <section id="house-of-reps" className="space-y-6">
-        <div className="border-b border-stone-200 pb-3">
-          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">LEGISLATIVE ARM</span>
-          <h2 className="text-2xl font-serif font-bold text-slate-900">House of Representatives</h2>
-          <p className="text-xs text-slate-600 mt-1">
-            Dynamic assembly of constituent state delegates for the <strong className="text-slate-900">{currentSession.title}</strong>.
-          </p>
+      {/* DYNAMIC HOUSE OF REPRESENTATIVES (LARGE PROFILE CARDS WITH SPEAKER AT TOP) */}
+      <section id="house-of-reps" className="space-y-8">
+        <div className="border-b border-stone-200 pb-4 flex justify-between items-end">
+          <div>
+            <span className="text-xs font-bold text-amber-600 uppercase tracking-wider block">LEGISLATIVE ARM</span>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-1">
+              House of Representatives ({dbRepresentatives.length} Members Enrolled)
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Dynamic legislative assembly representing Yoruba constituent states for <strong className="text-slate-900">{currentSession.title}</strong>.
+            </p>
+          </div>
+          <span className="text-xs font-semibold text-slate-500 hidden sm:inline">{dbRepresentatives.length} Delegated Members</span>
         </div>
 
-        {/* Principal Officers (Speaker Always First) */}
-        {houseOfficers.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[...houseOfficers]
-              .sort((a, b) => {
-                const titleA = a.office.title.toLowerCase();
-                const titleB = b.office.title.toLowerCase();
+        {/* State Delegations Grid with Large Portrait Profile Cards (Matching Executive & Royal Court) */}
+        <div className="space-y-10">
+          {sortedConstituentStateList.length === 0 ? (
+            <div className="bg-white p-8 rounded-3xl border border-stone-200 text-center text-slate-500 text-sm">
+              No legislative representatives enrolled for this session yet.
+            </div>
+          ) : (
+            sortedConstituentStateList.map((stateName) => {
+              const reps = [...stateRepresentativesMap[stateName]].sort((a, b) => {
+                const titleA = a.positionTitle.toLowerCase();
+                const titleB = b.positionTitle.toLowerCase();
                 if (titleA.includes('speaker') && !titleA.includes('deputy')) return -1;
                 if (titleB.includes('speaker') && !titleB.includes('deputy')) return 1;
                 if (titleA.includes('deputy speaker')) return -1;
                 if (titleB.includes('deputy speaker')) return 1;
                 return 0;
-              })
-              .map((ho) => (
-                <div key={ho.id} className="bg-amber-50/70 border border-amber-300 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 font-bold flex items-center justify-center shrink-0 shadow-md">
-                    <Shield className="w-6 h-6" />
+              });
+
+              const isSpeakerState = reps.some((r) => r.positionTitle.toLowerCase().includes('speaker') && !r.positionTitle.toLowerCase().includes('deputy'));
+
+              return (
+                <div key={stateName} className="space-y-4">
+                  {/* State Header Badge */}
+                  <div className="flex items-center justify-between bg-emerald-950 text-white px-5 py-3 rounded-2xl border border-emerald-900 shadow-sm">
+                    <div className="flex items-center gap-2.5">
+                      <Building2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      <h3 className="font-serif font-bold text-base text-amber-300">
+                        {stateName} State Legislative Delegation
+                      </h3>
+                      {isSpeakerState && (
+                        <span className="bg-amber-400 text-slate-950 font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          SPEAKER'S DELEGATION
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-300 font-semibold">{reps.length} Representative{reps.length > 1 ? 's' : ''}</span>
                   </div>
-                  <div>
-                    <span className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider block">
-                      {ho.office.title}
-                    </span>
-                    <h3 className="font-serif font-bold text-base text-slate-900">{ho.person.fullName}</h3>
-                    <span className="text-xs text-slate-600 font-medium">{(ho as any).stateRepresented || ho.person.stateOfOrigin} State Delegation</span>
+
+                  {/* Representative Large Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {reps.map((r) => {
+                      const isSpeaker = r.positionTitle.toLowerCase().includes('speaker') && !r.positionTitle.toLowerCase().includes('deputy');
+                      const fallbackPhoto = r.photoUrl || (isSpeaker ? '/images/leadership/speaker-alabi.jpg' : null);
+
+                      return (
+                        <div
+                          key={r.id}
+                          className={`bg-white rounded-3xl border ${
+                            isSpeaker ? 'border-2 border-amber-400 shadow-lg' : 'border-stone-200 shadow-sm'
+                          } hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group`}
+                        >
+                          <div>
+                            {/* Big High-Resolution Photo Container (Same size as Excos & Royal Court) */}
+                            <div className="relative h-64 sm:h-72 bg-slate-950 border-b border-stone-100 overflow-hidden flex items-center justify-center">
+                              {fallbackPhoto ? (
+                                <Image
+                                  src={fallbackPhoto}
+                                  alt={r.fullName}
+                                  fill
+                                  className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                                />
+                              ) : (
+                                <div className="w-20 h-20 rounded-full bg-emerald-950 text-amber-400 font-bold text-2xl flex items-center justify-center border border-amber-400/40">
+                                  {r.fullName.charAt(0)}
+                                </div>
+                              )}
+
+                              {/* LEGISLATIVE BADGE TAG */}
+                              <div className="absolute top-4 left-4 bg-emerald-950 text-white font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/50 shadow-md flex items-center gap-1.5">
+                                <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                <span>{r.positionTitle}</span>
+                              </div>
+
+                              <div className="absolute top-4 right-4 bg-amber-400 text-slate-950 font-bold text-[10px] uppercase px-2.5 py-1 rounded-md shadow">
+                                {r.stateOfOrigin} State
+                              </div>
+                            </div>
+
+                            <div className="p-6 space-y-2">
+                              <div>
+                                <h4 className="font-serif font-bold text-xl text-slate-900 leading-snug">
+                                  {r.fullName}
+                                </h4>
+                                <p className="text-xs text-amber-800 font-extrabold mt-1 uppercase tracking-wider">
+                                  {r.positionTitle}
+                                </p>
+                              </div>
+
+                              {(r as any).department && (
+                                <p className="text-xs text-slate-500 font-medium">
+                                  Department: <span className="text-slate-900 font-bold">{(r as any).department}</span>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="p-6 pt-0">
+                            <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-slate-500">
+                              <span className="font-bold text-slate-700">Session: {currentSession.title}</span>
+                              <span className="text-emerald-800 font-bold flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
+                                Enrolled Delegate
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
-          </div>
-        )}
-
-        {/* Dynamic State Representation Table */}
-        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
-          <div className="bg-slate-950 text-white px-6 py-4 font-serif font-bold text-sm flex justify-between items-center">
-            <span>{currentSession.title} Constituent State Legislative Delegations</span>
-            <span className="text-xs font-normal text-amber-400">{dbRepresentatives.length} Representatives Enrolled</span>
-          </div>
-
-          <div className="divide-y divide-stone-100">
-            {constituentStateList.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 text-xs">
-                No representatives enrolled for this session yet.
-              </div>
-            ) : (
-              constituentStateList.map((stateName) => {
-                const reps = [...stateRepresentativesMap[stateName]].sort((a, b) => {
-                  const titleA = a.positionTitle.toLowerCase();
-                  const titleB = b.positionTitle.toLowerCase();
-                  if (titleA.includes('speaker') && !titleA.includes('deputy')) return -1;
-                  if (titleB.includes('speaker') && !titleB.includes('deputy')) return 1;
-                  if (titleA.includes('deputy speaker')) return -1;
-                  if (titleB.includes('deputy speaker')) return 1;
-                  return 0;
-                });
-                return (
-                  <div key={stateName} className="p-4 px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-emerald-950" />
-                      <span className="font-bold text-xs text-slate-900">{stateName} State</span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {reps.map((r) => (
-                        <div key={r.id} className="bg-stone-50 text-slate-900 text-xs px-3 py-1.5 rounded-xl border border-stone-200 font-bold flex items-center gap-2">
-                          {r.photoUrl && (
-                            <img src={r.photoUrl} alt={r.fullName} className="w-5 h-5 rounded-full object-cover" />
-                          )}
-                          <span>{r.fullName}</span>
-                          <span className="text-[10px] text-amber-700 font-mono">({r.positionTitle})</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+              );
+            })
+          )}
         </div>
       </section>
     </div>
