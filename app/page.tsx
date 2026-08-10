@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { ExecutiveCarousel, ExecutiveOfficerItem } from '@/components/home/executive-carousel';
 import { HeroBackgroundSlider } from '@/components/home/hero-background-slider';
+import { HeroInteractiveCardSlider } from '@/components/home/hero-interactive-card-slider';
 import { ScrollingMarquee } from '@/components/home/scrolling-marquee';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
@@ -234,65 +235,83 @@ export default async function HomePage() {
 
   const heroBackgroundImages = [
     {
-      url: '/images/gallery/inauguration-handover.jpg',
-      alt: 'Official Swearing-in & Certificate Presentation of the 2026/2027 Comdr Sobur-Led Administration',
-    },
-    {
-      url: '/images/gallery/sobur-certificate-presentation.jpg',
-      alt: 'President Cmrd. Ibrahim Sobur Bamidele Receiving Certificate of Office',
+      url: '/images/hero/hero-bg-1.jpg',
+      alt: 'Yoruba Students Union FUD Member Delegation in Traditional Attire',
+      badgeText: 'YORUBA STUDENTS\' UNION',
     },
     {
       url: '/images/gallery/inauguration-stage-group.jpg',
       alt: 'Executive Officers Assembly on Auditorium Stage',
-    },
-    {
-      url: '/images/gallery/outdoor-executive-delegation.jpg',
-      alt: 'Outdoor Executive Delegation Portrait on FUD Campus Grounds',
+      badgeText: 'EXECUTIVE INAUGURATION',
     },
     {
       url: '/images/leadership/oba-fouad.jpg',
       alt: 'Royal Court: OBA Fouad Adegoke Adedotun & Oloris Seated in Dignity',
+      badgeText: 'ROYAL CULTURAL COURT',
     },
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFBF7] font-sans antialiased text-slate-900 selection:bg-amber-200 selection:text-emerald-950 overflow-x-hidden">
-      {/* 1. HERO SECTION WITH BACKGROUND SLIDER (TASK 1 - REDESIGNED HERO FOR MOBILE) */}
-      <section className="relative w-full h-[480px] sm:h-[600px] lg:h-[720px] flex items-center justify-center overflow-hidden bg-slate-950">
-        <HeroBackgroundSlider images={heroBackgroundImages} intervalMs={6500} />
+      {/* 1. HERO SECTION (ATTACHMENT 2 - EXACT MATCH FOR DESIGN & MOBILE UI) */}
+      <section className="relative w-full bg-[#FAF8F5] pt-6 sm:pt-10 pb-8 sm:pb-12 border-b border-stone-200/70 font-sans overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left Content Column (Matching Attachment 2) */}
+            <div className="lg:col-span-6 space-y-4 sm:space-y-6">
+              {/* FUD CHAPTER Badge with gold accent line */}
+              <div className="space-y-1">
+                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#B8860B] block">
+                  FUD CHAPTER
+                </span>
+                <div className="w-10 h-0.5 bg-[#D4A311] rounded-full" />
+              </div>
 
-        <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white space-y-3 sm:space-y-5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-amber-400/50 backdrop-blur-md shadow-md">
-            <Crown className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-amber-300">
-              YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
-            </span>
-          </div>
+              {/* Main Headline */}
+              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0D2818] tracking-tight leading-[1.15]">
+                Promoting Heritage, <br className="hidden sm:inline" />
+                Unity <span className="text-[#D4A311]">&amp;</span> Academic <br />
+                Excellence
+              </h1>
 
-          <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-snug drop-shadow-md">
-            Promoting Heritage, Unity & Academic Excellence
-          </h1>
+              {/* Subtitle */}
+              <p className="text-slate-700 text-xs sm:text-sm font-normal leading-relaxed max-w-lg">
+                Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting 8 constituent Yoruba state delegations under one supreme constitution.
+              </p>
 
-          <p className="text-xs sm:text-base text-slate-200 font-light leading-relaxed drop-shadow max-w-xl mx-auto line-clamp-3 sm:line-clamp-none">
-            Official Enterprise Portal of Federal University Dutse Yoruba Students — Uniting 8 constituent Yoruba state delegations under one supreme constitution.
-          </p>
+              {/* Action Buttons */}
+              <div className="space-y-3.5 pt-1">
+                <Link
+                  href="/leadership"
+                  className="w-full sm:w-max px-6 py-3.5 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-lg shadow-md transition-all flex items-center justify-between gap-4 group"
+                >
+                  <span>Explore Executive Roster</span>
+                  <ArrowRight className="w-4 h-4 text-[#D4A311] group-hover:translate-x-1 transition-transform" />
+                </Link>
 
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 pt-1">
-            <Link
-              href="/leadership"
-              className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[#E5A91A] hover:bg-[#d49b14] text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center gap-1.5"
-            >
-              <span>Explore Executive Roster</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <BookOpen className="w-4 h-4 text-[#D4A311] shrink-0" />
+                  <Link
+                    href="/constitution"
+                    className="text-xs font-bold text-[#B8860B] hover:text-[#0D2818] transition-colors underline underline-offset-4 decoration-[#D4A311]/60"
+                  >
+                    Interactive Supreme Constitution
+                  </Link>
+                </div>
+              </div>
 
-            <Link
-              href="/constitution"
-              className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-emerald-950/90 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl border border-amber-400/40 shadow-lg backdrop-blur-md transition-all flex items-center gap-1.5"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-              <span>Supreme Constitution</span>
-            </Link>
+              {/* Motto */}
+              <p className="italic font-serif text-[#0D2818] text-xs sm:text-sm tracking-wide pt-1">
+                &apos;Ìpínlẹ̀ Ọmọ Odùdú: &apos;Ìfé Sókàpò&apos;
+              </p>
+            </div>
+
+            {/* Right Interactive Image Slider Card Column */}
+            <div className="lg:col-span-6 w-full">
+              <HeroInteractiveCardSlider images={heroBackgroundImages} autoSlideIntervalMs={4500} />
+            </div>
+
           </div>
         </div>
       </section>

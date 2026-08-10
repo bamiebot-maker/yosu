@@ -18,6 +18,7 @@ import {
   Sparkles,
   Clock,
   ChevronRight,
+  ChevronDown,
   Download,
   ExternalLink,
   ShieldCheck,
@@ -689,12 +690,38 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
               </div>
             </div>
 
-            {/* TABBED SESSION ARCHIVE NAVIGATION */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+            {/* TABBED SESSION ARCHIVE NAVIGATION (ATTACHMENT 1 - RESPONSIVE MOBILE DROPDOWN FILTER) */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-8 space-y-6">
+              {/* Mobile Select Dropdown Filter */}
+              <div className="block sm:hidden w-full space-y-1.5 pb-2">
+                <label htmlFor="history-tab-select" className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Filter Archive View:
+                </label>
+                <div className="relative">
+                  <select
+                    id="history-tab-select"
+                    value={activeTab}
+                    onChange={(e) => setActiveTab(e.target.value as any)}
+                    className="w-full bg-slate-950 text-amber-300 font-bold text-xs py-3 px-4 rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none shadow-md pr-10"
+                  >
+                    <option value="cabinet">👥 Executive Cabinet ({currentSession.executives.length})</option>
+                    <option value="reps">🏛️ House Representatives ({currentSession.houseRepresentatives.length})</option>
+                    <option value="achievements">🏅 Achievements ({currentSession.achievements.length})</option>
+                    <option value="projects">📊 Projects ({currentSession.projects.length})</option>
+                    <option value="media">🖼️ Media Archive ({currentSession.mediaItems.length})</option>
+                    <option value="documents">📜 Documents ({currentSession.constitutions.length + currentSession.documents.length})</option>
+                    <option value="news">📰 Gazette News ({currentSession.newsArticles.length})</option>
+                    <option value="stats">📈 Session Metrics</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-amber-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Desktop Horizontal Tab Pills Bar */}
               <div
                 role="tablist"
                 aria-label="Administration Session Details Navigation"
-                className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-4"
+                className="hidden sm:flex sm:flex-wrap items-center gap-2 border-b border-slate-200 pb-4"
               >
                 {[
                   { id: 'cabinet', label: `Executive Cabinet (${currentSession.executives.length})`, icon: Users },
