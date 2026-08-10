@@ -284,7 +284,7 @@ export default async function HomePage() {
               <div className="space-y-3.5 pt-1">
                 <Link
                   href="/leadership"
-                  className="w-full sm:w-max px-6 py-3.5 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-lg shadow-md transition-all flex items-center justify-between gap-4 group"
+                  className="w-max px-5 py-3 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-lg shadow-md transition-all flex items-center justify-between gap-3 group"
                 >
                   <span>Explore Executive Roster</span>
                   <ArrowRight className="w-4 h-4 text-[#D4A311] group-hover:translate-x-1 transition-transform" />
@@ -318,60 +318,6 @@ export default async function HomePage() {
 
       {/* MARQUEE ANNOUNCEMENTS */}
       <ScrollingMarquee text="OFFICIAL GAZETTE: 2026/2027 Progress Era Administration Fully Inaugurated • Cmrd. Ibrahim Sobur Bamidele Sworn In as President • Supreme Constitution v2.1 Ratified • Central Media Library Online" />
-
-      {/* DYNAMIC REGISTRATION WINDOW ANNOUNCEMENT STRIP (TASK 2 - SLIM COMPACT ANNOUNCEMENT STRIP) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-4 sm:my-6 relative z-30 font-sans">
-        {regWindow.isOpen ? (
-          <div className="bg-emerald-950 text-white rounded-2xl p-3.5 sm:p-5 border border-emerald-700/70 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="space-y-0.5 text-center sm:text-left flex-1 min-w-0">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  REGISTRATION OPEN
-                </span>
-                <span className="text-emerald-300 text-[11px] font-mono font-bold truncate">
-                  {regWindow.academicSession} Session
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-sm sm:text-lg text-white truncate">
-                Official YOSU Membership Data Capture
-              </h3>
-              <p className="text-[11px] sm:text-xs text-stone-200 font-light truncate max-w-xl">
-                {regWindow.closesAt
-                  ? `Registration is currently open for all bona fide students before ${regWindow.closesAt}.`
-                  : 'Registration is open for all bona fide Yoruba students at Federal University Dutse.'}
-              </p>
-            </div>
-
-            <Link
-              href="/register"
-              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs rounded-xl shadow transition-all shrink-0 flex items-center gap-1.5"
-            >
-              <span>Register Now</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
-            </Link>
-          </div>
-        ) : (
-          <div className="bg-slate-900 text-white rounded-2xl p-3.5 sm:p-5 border border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="space-y-0.5 text-center sm:text-left flex-1 min-w-0">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="bg-rose-950 text-rose-300 border border-rose-800 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  REGISTRATION CLOSED
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-sm sm:text-lg text-white">
-                Membership Registration Window Closed
-              </h3>
-            </div>
-
-            <Link
-              href="/contact"
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl border border-slate-700 transition-all shrink-0"
-            >
-              Contact Secretariat
-            </Link>
-          </div>
-        )}
-      </section>
 
       {/* 2. DEDICATED PRESIDENT SHOWCASE SECTION WITH SLIDING PICTURE ANIMATION */}
       <PresidentShowcase

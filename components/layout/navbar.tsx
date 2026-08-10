@@ -362,28 +362,28 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Left Slide-In Drawer Sidebar Panel */}
-          <aside className="fixed top-0 left-0 bottom-0 h-full w-[85vw] max-w-xs bg-slate-950 text-white border-r border-slate-800 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300">
-            {/* Top Drawer Header with Brand Logo & Close Button - PINNED STICKY AT TOP */}
-            <div className="shrink-0 p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-md">
+          {/* Left Slide-In Drawer Sidebar Panel (ATTACHMENT 3 - THIN, SPACE-SAVING MOBILE SIDEBAR) */}
+          <aside className="fixed top-0 left-0 bottom-0 h-full w-[72vw] max-w-[260px] bg-slate-950 text-white border-r border-slate-800/80 shadow-2xl z-[100001] flex flex-col justify-between overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
+            {/* Top Drawer Header - Pinned */}
+            <div className="shrink-0 p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900 shadow-sm">
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 overflow-hidden"
+                className="flex items-center gap-2 overflow-hidden"
               >
-                <div className="relative w-9 h-9 shrink-0 bg-white p-1 rounded-xl shadow">
+                <div className="relative w-7 h-7 shrink-0 bg-white p-0.5 rounded-lg shadow">
                   <Image
                     src="/images/logo.png"
                     alt="YOSU Seal"
                     fill
-                    className="object-contain p-0.5"
+                    className="object-contain"
                   />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="font-serif text-sm font-bold text-white leading-tight truncate">
+                  <span className="font-serif text-xs font-bold text-white leading-tight truncate">
                     YOSU FUD
                   </span>
-                  <span className="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider truncate">
+                  <span className="text-[8px] text-amber-400 font-bold uppercase tracking-wider truncate">
                     Official Secretariat
                   </span>
                 </div>
@@ -392,40 +392,40 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                 aria-label="Close Mobile Sidebar"
               >
-                <X className="w-6 h-6 text-amber-400" />
+                <X className="w-4 h-4 text-amber-400" />
               </button>
             </div>
 
             {/* Scrollable Navigation Body */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Main Registration Callout */}
-              <div className="p-4 bg-emerald-950/80 border-b border-emerald-800 space-y-2">
+            <div className="flex-1 overflow-y-auto space-y-1">
+              {/* Callout Actions */}
+              <div className="p-3 bg-slate-900/90 border-b border-slate-800 space-y-1.5">
                 {isRegistrationOpen && (
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 p-3 bg-amber-400 text-slate-950 text-xs font-extrabold rounded-xl w-full shadow-md"
+                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-[11px] font-extrabold rounded-lg w-full shadow-sm transition-colors"
                   >
-                    <UserCheck className="w-4 h-4 text-slate-950" />
-                    <span>Student & Member Registration</span>
+                    <UserCheck className="w-3.5 h-3.5 text-slate-950" />
+                    <span>Member Registration</span>
                   </Link>
                 )}
                 <Link
                   href="/constitution"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 p-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl w-full border border-slate-700"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-2 bg-slate-950 hover:bg-slate-800 text-slate-200 text-[10px] font-bold rounded-lg w-full border border-slate-700/80 transition-colors"
                 >
-                  <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                  <span>2026 Ratified Constitution</span>
+                  <BookOpen className="w-3 h-3 text-amber-400" />
+                  <span>2026 Constitution</span>
                 </Link>
               </div>
 
               {/* Primary Navigation Links */}
-              <div className="p-4 space-y-1 border-b border-slate-800">
-                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+              <div className="p-3 space-y-0.5 border-b border-slate-800">
+                <p className="text-[9px] font-extrabold tracking-wider text-amber-400/90 uppercase px-2 mb-1">
                   PRIMARY NAVIGATION
                 </p>
                 {primaryNav.map((link) => (
@@ -433,15 +433,15 @@ export function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 text-xs font-bold rounded-xl transition-colors ${
+                    className={`flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold rounded-lg transition-colors ${
                       isActive(link.href)
-                        ? 'bg-emerald-900 text-amber-300 border border-emerald-700 shadow-sm'
+                        ? 'bg-emerald-950 text-amber-300 border border-emerald-800/90'
                         : 'text-slate-200 hover:bg-slate-900 hover:text-white'
                     }`}
                   >
                     <span>{link.name}</span>
                     {link.badge && (
-                      <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-1.5 py-0.2 rounded-full uppercase">
+                      <span className="bg-amber-400 text-slate-950 text-[8px] font-extrabold px-1.5 py-0.2 rounded uppercase">
                         {link.badge}
                       </span>
                     )}
@@ -450,8 +450,8 @@ export function Navbar() {
               </div>
 
               {/* Governance Section */}
-              <div className="p-4 space-y-1 border-b border-slate-800">
-                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+              <div className="p-3 space-y-0.5 border-b border-slate-800">
+                <p className="text-[9px] font-extrabold tracking-wider text-amber-400/90 uppercase px-2 mb-1">
                   GOVERNANCE & ROSTER
                 </p>
                 {governanceLinks.map((item) => {
@@ -461,9 +461,9 @@ export function Navbar() {
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                      className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:bg-slate-900 hover:text-amber-300 rounded-lg transition-colors"
                     >
-                      <Icon className="w-4 h-4 text-amber-400 shrink-0" />
+                      <Icon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span className="truncate">{item.name}</span>
                     </Link>
                   );
@@ -471,8 +471,8 @@ export function Navbar() {
               </div>
 
               {/* Additional Resources */}
-              <div className="p-4 space-y-1">
-                <p className="text-[10px] font-extrabold tracking-widest text-amber-400 uppercase px-2 mb-2">
+              <div className="p-3 space-y-0.5">
+                <p className="text-[9px] font-extrabold tracking-wider text-amber-400/90 uppercase px-2 mb-1">
                   MEDIA & RESOURCES
                 </p>
                 {secondaryNav.map((item) => {
@@ -482,9 +482,9 @@ export function Navbar() {
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-emerald-950 hover:text-amber-300 rounded-xl transition-colors"
+                      className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:bg-slate-900 hover:text-amber-300 rounded-lg transition-colors"
                     >
-                      <Icon className="w-4 h-4 text-amber-400 shrink-0" />
+                      <Icon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span className="truncate">{item.name}</span>
                     </Link>
                   );

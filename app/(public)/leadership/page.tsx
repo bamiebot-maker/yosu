@@ -61,55 +61,40 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
   const constituentStateList = Object.keys(stateRepresentativesMap);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-12 font-sans">
-      {/* Header Banner (TASK 5 - COMPACT MOBILE HEADER CARD) */}
-      <div className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-9 shadow-xl relative overflow-hidden border border-slate-800">
-        <div className="relative z-10 max-w-3xl space-y-2.5 sm:space-y-4">
-          <div className="inline-flex items-center gap-1.5 bg-amber-400/15 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold uppercase tracking-wider border border-amber-400/30">
-            <Users className="w-3.5 h-3.5 text-amber-400" />
-            <span>OFFICIAL GOVERNANCE & LEADERSHIP ROSTER</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 font-sans">
+      {/* Streamlined Header & Session Selector (ATTACHMENT 4 - ULTRA COMPACT HEADER) */}
+      <div className="space-y-4 font-sans border-b border-stone-200/80 pb-4 sm:pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">
+              OFFICIAL GOVERNANCE & ROSTER
+            </span>
+            <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-slate-900">
+              Executive Council & Legislative Arms
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Currently viewing: <span className="font-bold text-emerald-950">{currentSession.title}</span> — {currentSession.theme || 'Administration'}. Governed under the ratified provisions of the Supreme Constitution.
+            </p>
           </div>
 
-          <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-snug">
-            Executive Council & Legislative Arms
-          </h1>
-
-          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
-            Currently viewing: <span className="font-bold text-amber-400">{currentSession.title}</span> — {currentSession.theme || 'Administration'}. Governed under the ratified provisions of the Supreme Constitution.
-          </p>
-        </div>
-      </div>
-
-      {/* SESSION SWITCHER & HISTORICAL ARCHIVE SELECTOR */}
-      <div className="bg-slate-900 text-white rounded-3xl p-6 border border-slate-800 shadow-md space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-              <History className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-serif font-bold text-base text-white">Administration Session Selector</h3>
-              <p className="text-xs text-slate-400">Select any active or historical administration session to switch governance data.</p>
-            </div>
-          </div>
-
-          {/* Session Timeline Selector Buttons */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Thin & Compact Session Selector Pills */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-1 sm:pt-0">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">Session:</span>
             {sessions.map((s) => {
               const isSelected = s.id === currentSession.id;
               return (
                 <Link
                   key={s.id}
                   href={`/leadership?session=${s.slug}`}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 border ${
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md scale-105'
-                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                      ? 'bg-emerald-950 text-amber-300 shadow-sm'
+                      : 'bg-stone-100 hover:bg-stone-200 text-slate-700 border border-stone-200'
                   }`}
                 >
                   <span>{s.title}</span>
                   {s.isCurrent && (
-                    <span className="bg-emerald-950 text-emerald-300 text-[9px] px-2 py-0.5 rounded-md uppercase font-extrabold border border-emerald-800">
+                    <span className="bg-emerald-800 text-emerald-100 text-[8px] px-1.5 py-0.2 rounded uppercase font-extrabold">
                       ACTIVE
                     </span>
                   )}
@@ -120,72 +105,36 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
         </div>
       </div>
 
-      {/* DYNAMIC SESSION ACHIEVEMENTS BANNER (TASK 3) */}
+      {/* COMPACT COLLAPSIBLE ACHIEVEMENTS INITIATIVE STRIP */}
       {dbAchievements.length > 0 && (
-        <section className="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white space-y-6 shadow-xl">
-          <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="font-serif font-bold text-xl text-white">
-                  Key Achievements of {currentSession.title} ({currentSession.theme})
-                </h2>
-                <p className="text-xs text-slate-400">Dynamic completion telemetry for flagship administration goals</p>
-              </div>
+        <details className="group bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 sm:p-4 text-slate-900 space-y-3 font-sans transition-all">
+          <summary className="flex justify-between items-center cursor-pointer list-none select-none font-bold text-xs sm:text-sm text-emerald-950">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              <span>Key Initiatives & Achievements ({currentSession.title})</span>
             </div>
-            <span className="text-xs font-bold text-amber-400 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
-              {dbAchievements.length} Initiatives Tracked
+            <span className="text-[10px] font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-md">
+              {dbAchievements.length} Initiatives • Details ▾
             </span>
-          </div>
+          </summary>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2 border-t border-amber-200/60">
             {dbAchievements.map((ach) => {
               const isCompleted = ach.progressPercentage >= 100;
               return (
-                <div key={ach.id} className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span
-                        className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase flex items-center gap-1 ${
-                          isCompleted
-                            ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-500/40'
-                            : 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-                        }`}
-                      >
-                        {isCompleted ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Clock className="w-3 h-3 text-amber-400" />}
-                        {isCompleted ? 'Completed' : `${ach.progressPercentage}% Progress`}
-                      </span>
-
-                      <span className="text-[10px] text-slate-400 font-mono font-bold">
-                        {currentSession.title}
-                      </span>
-                    </div>
-
-                    <h4 className="font-serif font-bold text-base text-white">{ach.title}</h4>
-                    <p className="text-xs text-slate-300 font-light leading-relaxed line-clamp-3">{ach.description}</p>
+                <div key={ach.id} className="bg-white p-3 rounded-lg border border-amber-200/60 space-y-1.5 shadow-2xs">
+                  <div className="flex justify-between items-center text-[10px] font-bold">
+                    <span className="text-slate-900 font-serif font-bold truncate max-w-[180px]">{ach.title}</span>
+                    <span className={isCompleted ? 'text-emerald-700' : 'text-amber-700'}>
+                      {isCompleted ? 'Completed' : `${ach.progressPercentage}%`}
+                    </span>
                   </div>
-
-                  <div className="space-y-1 pt-2 border-t border-slate-800">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-400">
-                      <span>Completion Ratio</span>
-                      <span className="text-amber-400">{ach.progressPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          isCompleted ? 'bg-emerald-400' : 'bg-gradient-to-r from-amber-400 to-emerald-500'
-                        }`}
-                        style={{ width: `${ach.progressPercentage}%` }}
-                      />
-                    </div>
-                  </div>
+                  {ach.description && <p className="text-[11px] text-slate-600 line-clamp-2">{ach.description}</p>}
                 </div>
               );
             })}
           </div>
-        </section>
+        </details>
       )}
 
       {/* EXECUTIVE COUNCIL GRID (TASK 13) */}
