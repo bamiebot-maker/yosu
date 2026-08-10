@@ -23,17 +23,17 @@ export function AnnouncementsCrudPage({ announcements }: { announcements: Announ
   const [announcementToDelete, setAnnouncementToDelete] = useState<AnnouncementItem | null>(null);
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm">
         <div>
-          <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
+          <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 uppercase tracking-wider block">
             PUBLIC BROADCAST SYSTEM
           </span>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
             Announcements & Emergency Banners ({announcements.length})
           </h1>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-slate-600 mt-0.5">
             Publish homepage alerts, breaking ticker notices, pinned bulletins, and emergency banners.
           </p>
         </div>
@@ -43,9 +43,9 @@ export function AnnouncementsCrudPage({ announcements }: { announcements: Announ
             setAnnouncementToEdit(null);
             setIsAddModalOpen(true);
           }}
-          className="px-5 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition-all"
+          className="px-4 py-2 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
         >
-          <Plus className="w-4 h-4 text-amber-400" />
+          <Plus className="w-3.5 h-3.5 text-amber-400" />
           <span>New Announcement</span>
         </button>
       </div>

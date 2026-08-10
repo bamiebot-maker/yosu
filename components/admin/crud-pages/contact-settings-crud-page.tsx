@@ -86,17 +86,17 @@ export function ContactSettingsCrudPage({
   };
 
   return (
-    <div className="space-y-10 font-sans">
+    <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm">
         <div>
-          <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
+          <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 uppercase tracking-wider block">
             SUPER ADMIN CONFIGURATION
           </span>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
             Contact Details, Socials & FAQ CMS
           </h1>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-slate-600 mt-0.5">
             Manage official secretariat addresses, helplines, social channels, office hours, map URLs, and FAQ items.
           </p>
         </div>

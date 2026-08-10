@@ -208,17 +208,17 @@ export function StudentsCrudPage({
   };
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6 font-sans">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm">
         <div>
-          <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest block">
+          <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 uppercase tracking-wider block">
             SUPER ADMIN MEMBER DATABASE
           </span>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
             Central Student & Member Database ({filteredStudents.length})
           </h1>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-slate-600 mt-0.5">
             Centralized searchable repository of registered YOSU members, including monthly birthday rosters and state demographics.
           </p>
         </div>
@@ -226,41 +226,41 @@ export function StudentsCrudPage({
         <button
           type="button"
           onClick={exportFilteredCSV}
-          className="px-5 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-amber-300 font-bold text-xs rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
+          className="px-4 py-2 bg-emerald-950 hover:bg-emerald-900 text-amber-300 font-bold text-xs rounded-xl shadow flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
         >
-          <FileSpreadsheet className="w-4 h-4" />
+          <FileSpreadsheet className="w-3.5 h-3.5" />
           <span>Export {monthFilter !== 'ALL' ? `${monthFilter} Birthdays` : 'Filtered CSV'} ({filteredStudents.length})</span>
         </button>
       </div>
 
-      {/* STATS ANALYTICS CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-slate-900">{stats.totalStudents}</span>
-          <span className="text-xs text-slate-500 block font-medium">Total Registered</span>
+      {/* STATS ANALYTICS CARDS (TASK 3 & 6 - COMPACT RESPONSIVE METRICS) */}
+      <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-1 scrollbar-none sm:grid sm:grid-cols-6">
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm">
+          <span className="text-xl font-extrabold font-serif text-slate-900">{stats.totalStudents}</span>
+          <span className="text-[10px] text-slate-500 block font-medium truncate">Total Registered</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-emerald-700">{stats.verifiedCount}</span>
-          <span className="text-xs text-slate-500 block font-medium">Verified Members</span>
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm">
+          <span className="text-xl font-extrabold font-serif text-emerald-700">{stats.verifiedCount}</span>
+          <span className="text-[10px] text-slate-500 block font-medium truncate">Verified Members</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-amber-600">{stats.pendingCount}</span>
-          <span className="text-xs text-slate-500 block font-medium">Pending Review</span>
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm">
+          <span className="text-xl font-extrabold font-serif text-amber-600">{stats.pendingCount}</span>
+          <span className="text-[10px] text-slate-500 block font-medium truncate">Pending Review</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-blue-700">{stats.maleCount}</span>
-          <span className="text-xs text-slate-500 block font-medium">Male Students</span>
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm">
+          <span className="text-xl font-extrabold font-serif text-blue-700">{stats.maleCount}</span>
+          <span className="text-[10px] text-slate-500 block font-medium truncate">Male Students</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm">
-          <span className="text-2xl font-extrabold font-serif text-pink-700">{stats.femaleCount}</span>
-          <span className="text-xs text-slate-500 block font-medium">Female Students</span>
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm">
+          <span className="text-xl font-extrabold font-serif text-pink-700">{stats.femaleCount}</span>
+          <span className="text-[10px] text-slate-500 block font-medium truncate">Female Students</span>
         </div>
-        <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-1 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
-          <span className="text-2xl font-extrabold font-serif text-amber-700">
+        <div className="shrink-0 snap-start min-w-[120px] sm:min-w-0 p-3 bg-white rounded-xl border border-stone-200 text-center space-y-0.5 shadow-sm bg-gradient-to-br from-amber-50 to-amber-100/50">
+          <span className="text-xl font-extrabold font-serif text-amber-700">
             {monthlyBirthdayCounts[currentCalendarMonth] || 0}
           </span>
-          <span className="text-xs text-amber-900 block font-bold flex items-center gap-1">
-            <Cake className="w-3.5 h-3.5 text-amber-600" /> {currentCalendarMonth} Birthdays
+          <span className="text-[10px] text-amber-900 block font-bold flex items-center justify-center gap-1 truncate">
+            <Cake className="w-3 h-3 text-amber-600" /> {currentCalendarMonth}
           </span>
         </div>
       </div>

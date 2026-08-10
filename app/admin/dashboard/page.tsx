@@ -150,60 +150,60 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6 sm:space-y-8 font-sans">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm relative overflow-hidden">
-        <div className="relative z-10 space-y-2 max-w-2xl">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm relative overflow-hidden">
+        <div className="relative z-10 space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-300">
+            <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-200">
               {isSuperAdmin ? 'SUPER ADMIN ENTERPRISE CONTROL PANEL' : 'EXECUTIVE DIGITAL WORKSPACE'}
             </span>
-            <span className="text-xs text-slate-500 font-semibold">• {activeSession?.title || '2025/2026 Session'}</span>
+            <span className="text-[11px] text-slate-500 font-semibold">• {activeSession?.title || '2025/2026 Session'}</span>
           </div>
 
-          <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+          <h1 className="font-serif text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
             Greetings, {session?.fullName || 'Executive Administrator'}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-            Manage institutional publications, constitutional archives, executive rosters, and central media assets with full audit trail capabilities.
+          <p className="text-xs text-slate-600 font-normal leading-relaxed max-w-xl">
+            Manage institutional publications, constitutional archives, executive rosters, and central media assets with audit trail capabilities.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 relative z-10">
+        <div className="flex flex-wrap items-center gap-2 relative z-10">
           <Link
             href="/admin/news"
-            className="px-4 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+            className="px-3.5 py-2 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <PlusCircle className="w-4 h-4 text-amber-400" />
+            <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
             <span>Publish Gazette</span>
           </Link>
           <Link
             href="/"
             target="_blank"
-            className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl border border-stone-300 transition-all flex items-center gap-2"
+            className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl border border-stone-300 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span>Live Portal</span>
-            <Eye className="w-4 h-4 text-slate-500" />
+            <Eye className="w-3.5 h-3.5 text-slate-500" />
           </Link>
         </div>
       </div>
 
-      {/* Super Admin Exclusive Security & Telemetry Dashboard (TASK 11) */}
+      {/* Super Admin Exclusive Security & Telemetry Dashboard */}
       {isSuperAdmin && (
-        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
-                <ShieldAlert className="w-5 h-5" />
+        <div className="bg-slate-950 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-xl space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
+                <ShieldAlert className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-serif text-lg font-bold text-white">System Security Telemetry & Infrastructure Health</h3>
-                <p className="text-xs text-slate-400">Exclusive Super Admin database metrics & server state</p>
+                <h3 className="font-serif text-sm sm:text-base font-bold text-white">System Security Telemetry & Health</h3>
+                <p className="text-[10px] text-slate-400">Super Admin database metrics & server state</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <Activity className="w-3 h-3 text-emerald-400 animate-pulse" /> Neon DB: Operational
               </span>
               <Link
@@ -216,83 +216,83 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5">
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
                 <span>Total Users</span>
-                <Users className="w-4 h-4 text-amber-400" />
+                <Users className="w-3.5 h-3.5 text-amber-400" />
               </div>
-              <p className="font-serif text-2xl font-bold text-white">{totalUsersCount}</p>
-              <span className="text-[10px] text-slate-400 font-mono">Accounts</span>
+              <p className="font-serif text-xl font-bold text-white">{totalUsersCount}</p>
+              <span className="text-[9px] text-slate-400 font-mono">Accounts</span>
             </div>
 
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
                 <span>Active Accounts</span>
-                <UserCheck className="w-4 h-4 text-emerald-400" />
+                <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
               </div>
-              <p className="font-serif text-2xl font-bold text-emerald-400">{activeUsersCount}</p>
-              <span className="text-[10px] text-slate-400 font-mono">Status: ACTIVE</span>
+              <p className="font-serif text-xl font-bold text-emerald-400">{activeUsersCount}</p>
+              <span className="text-[9px] text-slate-400 font-mono">ACTIVE</span>
             </div>
 
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
                 <span>Suspended</span>
-                <UserX className="w-4 h-4 text-rose-400" />
+                <UserX className="w-3.5 h-3.5 text-rose-400" />
               </div>
-              <p className="font-serif text-2xl font-bold text-rose-400">{inactiveUsersCount}</p>
-              <span className="text-[10px] text-slate-400 font-mono">Status: SUSPENDED</span>
+              <p className="font-serif text-xl font-bold text-rose-400">{inactiveUsersCount}</p>
+              <span className="text-[9px] text-slate-400 font-mono">SUSPENDED</span>
             </div>
 
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
                 <span>Today Logins</span>
-                <UserCheck2 className="w-4 h-4 text-emerald-400" />
+                <UserCheck2 className="w-3.5 h-3.5 text-emerald-400" />
               </div>
-              <p className="font-serif text-2xl font-bold text-amber-400">{todayLoginsCount}</p>
-              <span className="text-[10px] text-slate-400 font-mono">Today&apos;s Sessions</span>
+              <p className="font-serif text-xl font-bold text-amber-400">{todayLoginsCount}</p>
+              <span className="text-[9px] text-slate-400 font-mono">Sessions</span>
             </div>
 
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
                 <span>Failed Logins</span>
-                <Lock className="w-4 h-4 text-amber-400" />
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
               </div>
-              <p className="font-serif text-2xl font-bold text-amber-400">{failedLoginCount}</p>
-              <span className="text-[10px] text-slate-400 font-mono">Failed Attempts</span>
+              <p className="font-serif text-xl font-bold text-amber-400">{failedLoginCount}</p>
+              <span className="text-[9px] text-slate-400 font-mono">Failed</span>
             </div>
 
-            <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-              <div className="flex justify-between items-center text-slate-400 text-xs font-bold">
-                <span>Latest Constitution</span>
-                <BookOpen className="w-4 h-4 text-amber-400" />
+            <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-0.5">
+              <div className="flex justify-between items-center text-slate-400 text-[11px] font-bold">
+                <span>Constitution</span>
+                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
               </div>
               <p className="font-serif text-xs font-bold text-white truncate">{latestConstitution?.versionName || 'v2.1 (2026)'}</p>
-              <span className="text-[10px] text-slate-400 font-mono">July 11, 2026 Ratified</span>
+              <span className="text-[9px] text-slate-400 font-mono">Ratified</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* Primary Metrics Grid (TASK 3 & TASK 6 - SWIPEABLE RESPONSIVE METRICS ON MOBILE) */}
+      <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-1 scrollbar-none sm:grid sm:grid-cols-5">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
             <div
               key={m.label}
-              className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm space-y-2 hover:shadow-md transition-shadow"
+              className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl border border-stone-200 shadow-sm space-y-1 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-center">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">
                   {m.label}
                 </span>
-                <div className={`p-2 rounded-xl border ${m.color}`}>
-                  <Icon className="w-4 h-4" />
+                <div className={`p-1.5 rounded-lg border ${m.color}`}>
+                  <Icon className="w-3.5 h-3.5" />
                 </div>
               </div>
-              <p className="font-serif text-2xl font-bold text-slate-900">{m.value}</p>
-              <span className="text-[10px] font-semibold text-emerald-800 bg-stone-100 px-2 py-0.5 rounded block w-max">
+              <p className="font-serif text-xl sm:text-2xl font-bold text-slate-900">{m.value}</p>
+              <span className="text-[9px] font-semibold text-emerald-800 bg-stone-100 px-1.5 py-0.5 rounded block w-max truncate">
                 {m.change}
               </span>
             </div>

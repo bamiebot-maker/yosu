@@ -58,17 +58,17 @@ export function WelcomeMessageCrudPage({
   };
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">
+          <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 uppercase tracking-wider block">
             HOMEPAGE HERO CMS & PRESIDENTIAL WELCOME
           </span>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
             Executive President&apos;s Welcome Address
           </h1>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-slate-600 mt-0.5">
             Dynamic welcome speech displayed prominently on the homepage hero section.
           </p>
         </div>
