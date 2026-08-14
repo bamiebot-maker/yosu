@@ -163,7 +163,14 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Action Buttons */}
-            <div className="hidden lg:flex items-center gap-3 shrink-0">
+            <div className="hidden lg:flex items-center gap-2.5 shrink-0">
+              <Link
+                href="/member/login"
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-amber-300 bg-slate-950 hover:bg-slate-900 rounded-xl transition-all shadow-sm border border-amber-400/40 focus-visible:ring-2 focus-visible:ring-amber-400"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>Member Login</span>
+              </Link>
               {isRegistrationOpen && (
                 <Link
                   href="/register"
@@ -175,17 +182,17 @@ export function Navbar() {
               )}
               <Link
                 href="/search"
-                className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-900 bg-stone-100 hover:bg-amber-50 rounded-xl transition-colors border border-stone-200 focus-visible:ring-2 focus-visible:ring-emerald-900"
+                className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-900 bg-stone-100 hover:bg-amber-50 rounded-xl transition-colors border border-stone-200 focus-visible:ring-2 focus-visible:ring-emerald-900"
               >
                 <Search className="w-3.5 h-3.5 text-amber-600" />
-                <span>Search Portal</span>
+                <span>Search</span>
               </Link>
               <Link
                 href="/constitution"
-                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-emerald-900 hover:bg-emerald-800 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-amber-400"
+                className="flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-white bg-emerald-900 hover:bg-emerald-800 rounded-xl transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-amber-400"
               >
                 <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                <span>2026 Constitution</span>
+                <span>Constitution</span>
               </Link>
             </div>
 
@@ -389,6 +396,14 @@ export function Navbar() {
             <div className="flex-1 overflow-y-auto space-y-1">
               {/* Callout Actions */}
               <div className="p-3 bg-slate-900/90 border-b border-slate-800 space-y-1.5">
+                <Link
+                  href="/member/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-emerald-950 hover:bg-emerald-900 text-amber-300 text-[11px] font-extrabold rounded-lg w-full border border-amber-400/40 shadow-sm transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Member Portal Login</span>
+                </Link>
                 {isRegistrationOpen && (
                   <Link
                     href="/register"

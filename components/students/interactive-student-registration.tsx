@@ -451,6 +451,14 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
                   <span>Print Official Slip</span>
                 </button>
 
+                <Link
+                  href={`/member/login?identifier=${encodeURIComponent(successResult.regNumber)}`}
+                  className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-amber-400/40"
+                >
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>Proceed to Member Login</span>
+                </Link>
+
                 <button
                   type="button"
                   onClick={() => setSuccessResult(null)}

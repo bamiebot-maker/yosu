@@ -22,6 +22,8 @@ import {
   MapPin,
   Globe,
   Sparkles,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { ExecutiveCarousel, ExecutiveOfficerItem } from '@/components/home/executive-carousel';
 import { HeroBackgroundSlider } from '@/components/home/hero-background-slider';
@@ -282,19 +284,37 @@ export default async function HomePage() {
 
               {/* Action Buttons */}
               <div className="space-y-3.5 pt-1">
-                <Link
-                  href="/leadership"
-                  className="w-max px-5 py-3 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-lg shadow-md transition-all flex items-center justify-between gap-3 group"
-                >
-                  <span>Explore Executive Roster</span>
-                  <ArrowRight className="w-4 h-4 text-[#D4A311] group-hover:translate-x-1 transition-transform" />
-                </Link>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/member/login"
+                    className="px-5 py-3 bg-[#0D2818] hover:bg-[#07180E] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-2.5 border border-amber-400/40 group"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-400" />
+                    <span>Member Portal Login</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                  </Link>
 
-                <div className="flex items-center gap-2 pt-0.5">
-                  <BookOpen className="w-4 h-4 text-[#D4A311] shrink-0" />
+                  <Link
+                    href="/register"
+                    className="px-5 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-2"
+                  >
+                    <UserCheck className="w-4 h-4 text-slate-950" />
+                    <span>Student Registration</span>
+                  </Link>
+                </div>
+
+                <div className="flex items-center gap-4 text-xs font-semibold pt-1">
+                  <Link
+                    href="/leadership"
+                    className="text-[#0D2818] hover:text-[#B8860B] transition-colors flex items-center gap-1 font-bold"
+                  >
+                    <span>Executive Roster</span>
+                    <ArrowRight className="w-3 h-3 text-[#D4A311]" />
+                  </Link>
+                  <span className="text-slate-300">•</span>
                   <Link
                     href="/constitution"
-                    className="text-xs font-bold text-[#B8860B] hover:text-[#0D2818] transition-colors underline underline-offset-4 decoration-[#D4A311]/60"
+                    className="text-[#B8860B] hover:text-[#0D2818] transition-colors underline underline-offset-4 decoration-[#D4A311]/60"
                   >
                     Interactive Supreme Constitution
                   </Link>
