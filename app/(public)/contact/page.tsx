@@ -7,7 +7,7 @@ import {
   FaqItemClient,
 } from '@/components/contact/interactive-contact-centre';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Official Contact & Communication Centre | Yoruba Students\' Union (YOSU) FUD',
@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     description:
       'Official Secretariat Communication Portal for student enquiries, welfare complaints, sponsorships, and petitions.',
     url: 'https://yosufud.org.ng/contact',
+    siteName: 'YOSU FUD Official Platform',
+    locale: 'en_NG',
     type: 'website',
   },
   twitter: {
@@ -28,13 +30,22 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const [siteSettings, faqsData] = await Promise.all([
-    db.siteSetting.findMany(),
-    db.faqItem.findMany({
-      where: { isPublished: true },
-      orderBy: { displayOrder: 'asc' },
-    }),
-  ]);
+  let siteSettings: any[] = [];
+  let faqsData: any[] = [];
+
+  try {
+    const [fetchedSettings, fetchedFaqs] = await Promise.all([
+      db.siteSetting.findMany().catch(() => []),
+      db.faqItem.findMany({
+        where: { isPublished: true },
+        orderBy: { displayOrder: 'asc' },
+      }).catch(() => []),
+    ]);
+    siteSettings = fetchedSettings;
+    faqsData = fetchedFaqs;
+  } catch (error) {
+    console.error('Error loading contact page data:', error);
+  }
 
   const settingsMap: ContactSettingsMap = {};
   siteSettings.forEach((s) => {
