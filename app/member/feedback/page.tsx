@@ -5,7 +5,8 @@ import { getSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { FeedbackCentre, MemberFeedbackItem } from '@/components/member/feedback-centre';
 
-export const revalidate = 0; // Dynamic server component
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function MemberFeedbackPage() {
   const memberSession = await getMemberSession();
@@ -16,23 +17,28 @@ export default async function MemberFeedbackPage() {
   }
 
   const studentId = memberSession?.studentId;
+  let feedbacks: MemberFeedbackItem[] = [];
 
-  const rawFeedbacks = studentId
-    ? await db.memberFeedback.findMany({
-        where: { studentId },
-        orderBy: { createdAt: 'desc' },
-      })
-    : [];
+  try {
+    const rawFeedbacks = studentId
+      ? await db.memberFeedback.findMany({
+          where: { studentId },
+          orderBy: { createdAt: 'desc' },
+        })
+      : [];
 
-  const feedbacks: MemberFeedbackItem[] = rawFeedbacks.map((f) => ({
-    id: f.id,
-    subject: f.subject,
-    category: f.category,
-    message: f.message,
-    status: f.status,
-    adminNotes: f.adminNotes,
-    createdAt: f.createdAt,
-  }));
+    feedbacks = rawFeedbacks.map((f) => ({
+      id: f.id,
+      subject: f.subject,
+      category: f.category,
+      message: f.message,
+      status: f.status,
+      adminNotes: f.adminNotes,
+      createdAt: f.createdAt,
+    }));
+  } catch (error) {
+    console.error('Error fetching member feedback:', error);
+  }
 
   return <FeedbackCentre feedbacks={feedbacks} />;
 }

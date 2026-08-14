@@ -6,7 +6,8 @@ import { db } from '@/lib/db';
 import { buildMemberSessionData } from '@/lib/membership';
 import { DigitalIdCard } from '@/components/member/digital-id-card';
 
-export const revalidate = 0; // Dynamic server component
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function MemberDashboardPage() {
   const memberSession = await getMemberSession();
@@ -17,15 +18,18 @@ export default async function MemberDashboardPage() {
   }
 
   let student = null;
-  if (memberSession?.studentId) {
-    student = await db.studentRegistration.findUnique({
-      where: { id: memberSession.studentId },
-    });
-  }
+  try {
+    if (memberSession?.studentId) {
+      student = await db.studentRegistration.findUnique({
+        where: { id: memberSession.studentId },
+      });
+    }
 
-  // If no student record found (e.g. logged in as admin previewing), pick first student or dummy fallback
-  if (!student) {
-    student = await db.studentRegistration.findFirst();
+    if (!student) {
+      student = await db.studentRegistration.findFirst();
+    }
+  } catch (error) {
+    console.error('Error loading student profile:', error);
   }
 
   if (!student) {

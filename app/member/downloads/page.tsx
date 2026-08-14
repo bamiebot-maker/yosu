@@ -2,7 +2,7 @@ import React from 'react';
 import { db } from '@/lib/db';
 import { DownloadCentre, MemberDownloadResource } from '@/components/member/download-centre';
 
-export const revalidate = 60; // Cache for 60 seconds
+export const dynamic = 'force-dynamic';
 
 function formatBytes(bytes: number): string {
   if (!bytes || bytes === 0) return '0 B';
@@ -13,25 +13,31 @@ function formatBytes(bytes: number): string {
 }
 
 export default async function MemberDownloadsPage() {
-  const downloadRecords = await db.downloadResource.findMany({
-    where: { isPublic: true },
-    include: {
-      fileMedia: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  let resources: MemberDownloadResource[] = [];
 
-  const resources: MemberDownloadResource[] = downloadRecords.map((res) => ({
-    id: res.id,
-    title: res.title,
-    description: res.description,
-    category: res.category,
-    fileUrl: res.fileMedia.url,
-    fileSizeFormatted: formatBytes(res.fileMedia.sizeBytes || 102400),
-    mimeType: res.fileMedia.mimeType,
-    createdAt: res.createdAt,
-    downloadsCount: res.downloadsCount,
-  }));
+  try {
+    const downloadRecords = await db.downloadResource.findMany({
+      where: { isPublic: true },
+      include: {
+        fileMedia: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    resources = downloadRecords.map((res) => ({
+      id: res.id,
+      title: res.title,
+      description: res.description,
+      category: res.category,
+      fileUrl: res.fileMedia.url,
+      fileSizeFormatted: formatBytes(res.fileMedia.sizeBytes || 102400),
+      mimeType: res.fileMedia.mimeType,
+      createdAt: res.createdAt,
+      downloadsCount: res.downloadsCount,
+    }));
+  } catch (error) {
+    console.error('Error loading download resources:', error);
+  }
 
   return <DownloadCentre resources={resources} />;
 }
