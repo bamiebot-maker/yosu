@@ -8,7 +8,7 @@ interface LeadershipPageProps {
   searchParams: Promise<{ session?: string }>;
 }
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function LeadershipPage({ searchParams }: LeadershipPageProps) {
   const { session: selectedSessionSlug } = await searchParams;

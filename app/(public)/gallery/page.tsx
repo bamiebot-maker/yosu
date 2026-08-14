@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { Camera } from 'lucide-react';
 import { GalleryGrid, GalleryPhotoItem } from '@/components/gallery/gallery-grid';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function GalleryPage() {
   const albums = await db.album.findMany({

@@ -24,7 +24,7 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
 import { HeroInteractiveCardSlider } from '@/components/home/hero-interactive-card-slider';
 
-export const revalidate = 60; // ISR 60 seconds
+export const dynamic = 'force-dynamic';
 
 export default async function AboutPage() {
   // 1. Fetch Active Session
@@ -61,7 +61,7 @@ export default async function AboutPage() {
   const presSummary = presidentialWelcome?.welcomeSummary || "Leading with dedication, integrity, and an unyielding commitment to every Yoruba student's success.";
   const presFullMessage = presidentialWelcome?.fullMessage || `Greetings Great Yoruba Students of Federal University Dutse!\n\nIt is with immense humility and gratitude that I address you as the President of our esteemed union for the 2026/2027 Progress Era.\n\nOur administration stands firmly on the pillars of Unity, Integrity, Academic Superiority, and Cultural Heritage. Through our interactive digital platforms, transparency initiatives, and legislative representation across all 8 Yoruba constituent states, we are transforming student governance at FUD.\n\nI encourage every member to engage with our supreme constitution, participate in union projects, and leverage our central media library. Together, we shall elevate YOSU to unprecedented heights.\n\nLong Live YOSU! Long Live Federal University Dutse! Long Live the Federal Republic of Nigeria!`;
 
-  // 3. Fetch Dynamic About Content Sections from Prisma DB
+  // Fetch Dynamic About Content Sections from Prisma DB
   const dbAboutSections = await db.aboutContent.findMany({
     orderBy: { displayOrder: 'asc' },
   }).catch(() => []);
@@ -272,7 +272,7 @@ export default async function AboutPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dbAboutSections.length > 0
-                ? dbAboutSections.map((sec) => (
+                ? dbAboutSections.map((sec: any) => (
                     <div
                       key={sec.id}
                       className="bg-white p-7 rounded-3xl border border-stone-200 shadow-sm hover:shadow-md transition-all space-y-3 flex flex-col justify-between"

@@ -2,7 +2,7 @@ import React from 'react';
 import { db } from '@/lib/db';
 import { FolderKanban, CheckCircle2, Clock, ShieldCheck, DollarSign } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage() {
   const projects = await db.project.findMany({

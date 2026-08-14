@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { db } from '@/lib/db';
 import { Newspaper, Calendar, Clock, ArrowRight } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function NewsroomPage() {
   const articles = await db.newsArticle.findMany({
