@@ -68,7 +68,7 @@ export default function MemberLoginPage() {
             {/* Identifier Field */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Registration No. OR Matric No.
+                Reg No. / Matric No. / Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -80,8 +80,8 @@ export default function MemberLoginPage() {
                   required
                   value={identifierInput}
                   onChange={(e) => setIdentifierInput(e.target.value)}
-                  placeholder="e.g. YOSU-2026-00001 or FUD/2023/CS/0012"
-                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all uppercase"
+                  placeholder="e.g. YOSU-2026-00004, FCP/CSE/23/1091, or student@gmail.com"
+                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
                 />
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function MemberLoginPage() {
                   required
                   value={verificationInput}
                   onChange={(e) => setVerificationInput(e.target.value)}
-                  placeholder="e.g. 08012345678 or student@gmail.com"
+                  placeholder="e.g. 08012345678, student@gmail.com, or Matric No."
                   className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
                 />
               </div>

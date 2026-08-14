@@ -36,20 +36,25 @@ export async function memberLoginAction(
   }
 
   const cleanId = validated.data.identifier.toUpperCase();
-  const cleanVerification = validated.data.verification.toLowerCase();
-  const cleanPhone = validated.data.verification.replace(/[^0-9+]/g, '');
+  const cleanEmail = validated.data.identifier.toLowerCase();
+  const cleanPhone = validated.data.identifier.replace(/[^0-9+]/g, '');
+
+  const verLower = validated.data.verification.toLowerCase();
+  const verCleanPhone = validated.data.verification.replace(/[^0-9+]/g, '');
 
   const reqHeaders = await headers();
   const ipAddress = reqHeaders.get('x-forwarded-for') || '127.0.0.1';
   const userAgent = reqHeaders.get('user-agent') || 'Unknown Browser';
 
   try {
-    // 1. Search for student record by Reg Number or Matric Number
+    // 1. Search for student record by Reg Number, Matric Number, Email, or Phone
     const student = await db.studentRegistration.findFirst({
       where: {
         OR: [
           { regNumber: { equals: cleanId } },
           { matricNumber: { equals: cleanId } },
+          { email: { equals: cleanEmail } },
+          ...(cleanPhone.length >= 7 ? [{ phone: { contains: cleanPhone } }] : []),
           { regNumber: { equals: validated.data.identifier } },
           { matricNumber: { equals: validated.data.identifier } },
         ],
@@ -60,13 +65,13 @@ export async function memberLoginAction(
       await db.auditLog.create({
         data: {
           action: 'MEMBER_LOGIN_FAILED',
-          details: `Member login attempt failed: Identifier "${cleanId}" not found`,
+          details: `Member login attempt failed: Identifier "${validated.data.identifier}" not found`,
           ipAddress,
           userAgent,
         },
       });
       return {
-        error: `No registered student found with Registration/Matriculation Number "${validated.data.identifier}". Please verify your credentials or complete student registration first.`,
+        error: `No registered student found matching "${validated.data.identifier}". Please verify your credentials (Reg No, Matric No, Email, or Phone).`,
       };
     }
 
@@ -76,28 +81,32 @@ export async function memberLoginAction(
       };
     }
 
-    // 2. Verify Phone Number or Email matches
+    // 2. Verify secondary detail (Phone Number, Email, Reg No, or Matric No)
     const studentEmailLower = student.email.toLowerCase().trim();
     const studentPhoneClean = student.phone.replace(/[^0-9+]/g, '');
     const studentWhatsappClean = (student.whatsapp || '').replace(/[^0-9+]/g, '');
+    const studentMatricLower = student.matricNumber.toLowerCase().trim();
+    const studentRegLower = student.regNumber.toLowerCase().trim();
 
-    const emailMatches = studentEmailLower === cleanVerification;
+    const emailMatches = studentEmailLower === verLower;
     const phoneMatches =
-      (cleanPhone.length >= 7 && studentPhoneClean.includes(cleanPhone)) ||
-      (studentPhoneClean.length >= 7 && cleanPhone.includes(studentPhoneClean)) ||
-      (cleanPhone.length >= 7 && studentWhatsappClean.includes(cleanPhone));
+      (verCleanPhone.length >= 7 && studentPhoneClean.includes(verCleanPhone)) ||
+      (studentPhoneClean.length >= 7 && verCleanPhone.includes(studentPhoneClean)) ||
+      (verCleanPhone.length >= 7 && studentWhatsappClean.includes(verCleanPhone));
+    const matricMatches = studentMatricLower === verLower;
+    const regMatches = studentRegLower === verLower;
 
-    if (!emailMatches && !phoneMatches) {
+    if (!emailMatches && !phoneMatches && !matricMatches && !regMatches) {
       await db.auditLog.create({
         data: {
           action: 'MEMBER_LOGIN_FAILED',
-          details: `Member login failed for ${student.matricNumber}: Phone/Email mismatch`,
+          details: `Member login failed for ${student.matricNumber}: Verification mismatch`,
           ipAddress,
           userAgent,
         },
       });
       return {
-        error: 'Verification failed. The phone number or email address provided does not match the record on file for this student ID.',
+        error: 'Verification failed. The secondary detail (Phone Number, Email, Reg No, or Matric No) provided does not match the record on file for this student.',
       };
     }
 

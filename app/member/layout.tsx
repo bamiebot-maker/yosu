@@ -14,7 +14,7 @@ export default async function MemberLayout({ children }: { children: React.React
   const adminSession = await getSession();
 
   if (!memberSession && !adminSession) {
-    redirect('/member/login');
+    return <>{children}</>;
   }
 
   // Fetch full student registration record if memberSession exists
