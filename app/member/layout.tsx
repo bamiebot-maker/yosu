@@ -31,8 +31,8 @@ export default async function MemberLayout({ children }: { children: React.React
 
   return (
     <div className="min-h-screen bg-stone-100 font-sans flex flex-col justify-between pb-20 md:pb-8">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-slate-950 text-white border-b border-slate-800 shadow-md">
+      {/* Sticky Top Navigation Bar */}
+      <header className="sticky top-0 z-50 bg-slate-950 text-white border-b border-slate-800 shadow-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           {/* Brand Logo */}
           <Link href="/member" className="flex items-center gap-3">
@@ -69,7 +69,7 @@ export default async function MemberLayout({ children }: { children: React.React
             <form action={memberLogoutAction}>
               <button
                 type="submit"
-                className="px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-800/50 text-rose-200 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                className="px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 border border-rose-800/50 text-rose-200 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
                 title="Sign Out of Member Centre"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -91,19 +91,6 @@ export default async function MemberLayout({ children }: { children: React.React
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full flex-grow">
         {children}
       </main>
-
-      {/* Footer */}
-      <footer className="no-print border-t border-stone-200 bg-white py-4 text-center text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© {new Date().getFullYear()} Yoruba Students' Union (YOSU) • Federal University Dutse</p>
-          <div className="flex items-center gap-4">
-            <Link href="/" target="_blank" className="hover:text-emerald-950 font-semibold flex items-center gap-1">
-              <span>Main Website</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
-          </div>
-        </div>
-      </footer>
 
       {/* Sticky Mobile Navigation Bar */}
       <nav className="no-print fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 md:hidden py-2 px-3">

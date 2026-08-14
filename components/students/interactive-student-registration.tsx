@@ -205,53 +205,53 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
         <span className="font-semibold text-slate-900">Student & Membership Registration</span>
       </nav>
 
-      {/* HERO BANNER (ATTACHMENT 1 - SINGLE COMPACT HEADER CARD) */}
-      <header className="bg-slate-950 text-white rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden border border-slate-800 font-sans">
-        <div className="relative z-10 max-w-4xl space-y-2.5 sm:space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                CENTRAL MEMBER DATABASE
+      {/* HERO BANNER (COMPACT MOBILE & DESKTOP HEADER CARD) */}
+      <header className="bg-slate-950 text-white rounded-2xl p-3.5 sm:p-5 shadow-lg relative overflow-hidden border border-slate-800 font-sans">
+        <div className="relative z-10 max-w-4xl space-y-2 sm:space-y-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="bg-amber-400 text-slate-950 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                MEMBER DATABASE
               </span>
               {isOpen ? (
-                <span className="bg-emerald-950 text-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1">
+                <span className="bg-emerald-950 text-emerald-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-800 flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-amber-400" /> REGISTRATION OPEN
                 </span>
               ) : (
-                <span className="bg-rose-950 text-rose-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-rose-800 flex items-center gap-1">
+                <span className="bg-rose-950 text-rose-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider border border-rose-800 flex items-center gap-1">
                   <Lock className="w-3 h-3 text-rose-400" /> REGISTRATION CLOSED
                 </span>
               )}
             </div>
 
             {isOpen && windowStatus?.closesAt && (
-              <span className="text-[11px] text-amber-300 font-bold bg-slate-900 px-2.5 py-0.5 rounded-lg border border-slate-800">
+              <span className="text-[10px] text-amber-300 font-bold bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
                 Closes: {windowStatus.closesAt}
               </span>
             )}
           </div>
 
-          <h1 className="font-serif text-xl sm:text-3xl font-extrabold tracking-tight text-white leading-snug">
+          <h1 className="font-serif text-lg sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
             YOSU Student &amp; Membership Registration
           </h1>
 
-          <p className="text-slate-300 text-xs font-light leading-relaxed">
-            Official digital registration portal of the Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter ({windowStatus?.academicSession || '2026/2027'} Academic Session).
+          <p className="text-slate-300 text-[11px] sm:text-xs font-light leading-relaxed">
+            Official digital registration portal of YOSU FUD Chapter ({windowStatus?.academicSession || '2026/2027'} Academic Session).
           </p>
 
-          {/* Benefits Single-Line Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
+          {/* Benefits Strip (Compact) */}
+          <div className="hidden sm:grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
             <div className="flex items-center gap-1.5 text-slate-300">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Official Constitutional Union Record</span>
+              <span>Official Union Record</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-300">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Welfare &amp; State Bursary Priority</span>
+              <span>Welfare &amp; Bursary Priority</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-300">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Instant Digital ID Registration Slip</span>
+              <span>Digital ID Registration Slip</span>
             </div>
           </div>
         </div>
