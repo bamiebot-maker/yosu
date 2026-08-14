@@ -7,9 +7,12 @@ import { Footer } from '@/components/layout/footer';
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdminOrLogin = pathname.startsWith('/admin') || pathname === '/login';
+  const isStandalonePortal =
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/member') ||
+    pathname === '/login';
 
-  if (isAdminOrLogin) {
+  if (isStandalonePortal) {
     return <main className="w-full min-h-screen">{children}</main>;
   }
 
