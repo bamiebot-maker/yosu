@@ -1037,6 +1037,101 @@ async function main() {
     },
   });
 
+  // 10. STUDENT REGISTRATIONS & MEMBER DOWNLOAD RESOURCES
+  console.log('  -> Seeding Student Registrations & Download Resources...');
+  await prisma.studentRegistration.deleteMany();
+
+  await prisma.studentRegistration.create({
+    data: {
+      regNumber: 'YOSU-2026-00001',
+      fullName: 'Ibrahim Sobur Bamidele',
+      gender: 'MALE',
+      passportUrl: '/images/gallery/inauguration-handover.jpg',
+      matricNumber: 'FUD/2023/CS/0001',
+      faculty: 'Faculty of Computing',
+      department: 'Computer Science',
+      programme: 'B.Sc. Computer Science',
+      level: '300L',
+      phone: '08012345678',
+      whatsapp: '08012345678',
+      email: 'sobur@student.fud.edu.ng',
+      stateOfOrigin: 'Ogun',
+      lga: 'Abeokuta South',
+      homeTown: 'Abeokuta',
+      emergencyContactName: 'Bamidele Senior',
+      emergencyContactRelationship: 'Father',
+      emergencyContactPhone: '08099887766',
+      status: 'VERIFIED',
+    },
+  });
+
+  await prisma.studentRegistration.create({
+    data: {
+      regNumber: 'YOSU-2026-00002',
+      fullName: 'Oladipupo Mercy Adewale',
+      gender: 'FEMALE',
+      passportUrl: null,
+      matricNumber: 'FUD/2024/BCH/0045',
+      faculty: 'Faculty of Basic Medical Sciences',
+      department: 'Biochemistry',
+      programme: 'B.Sc. Biochemistry',
+      level: '200L',
+      phone: '08023456789',
+      whatsapp: '08023456789',
+      email: 'mercy@student.fud.edu.ng',
+      stateOfOrigin: 'Oyo',
+      lga: 'Ibadan North',
+      homeTown: 'Ibadan',
+      emergencyContactName: 'Adewale Senior',
+      emergencyContactRelationship: 'Mother',
+      emergencyContactPhone: '08033221100',
+      status: 'VERIFIED',
+    },
+  });
+
+  // Seed Download Resources for Members
+  const pdfMedia1 = await prisma.media.create({
+    data: {
+      filename: 'YOSU_Official_Constitution_1st_Edition.pdf',
+      url: '/documents/yosu-constitution-2026.pdf',
+      mimeType: 'application/pdf',
+      sizeBytes: 2450000,
+      altText: 'YOSU Official Constitution Harmonized Edition',
+    },
+  });
+
+  const pdfMedia2 = await prisma.media.create({
+    data: {
+      filename: 'YOSU_Member_Handbook_2026.pdf',
+      url: '/documents/yosu-member-handbook.pdf',
+      mimeType: 'application/pdf',
+      sizeBytes: 1850000,
+      altText: 'YOSU Membership Guide and Code of Conduct',
+    },
+  });
+
+  await prisma.downloadResource.create({
+    data: {
+      title: 'YOSU Supreme Constitution (1st Harmonized Edition)',
+      description: 'Official governing document of Yoruba Students\' Union, Federal University Dutse Chapter.',
+      category: 'Constitution',
+      fileMediaId: pdfMedia1.id,
+      downloadsCount: 142,
+      isPublic: true,
+    },
+  });
+
+  await prisma.downloadResource.create({
+    data: {
+      title: 'YOSU Official Membership Handbook & Code of Conduct',
+      description: 'Comprehensive guide covering member rights, executive directory, congress rules, and welfare benefits.',
+      category: 'Gazette',
+      fileMediaId: pdfMedia2.id,
+      downloadsCount: 98,
+      isPublic: true,
+    },
+  });
+
   console.log('✅ YOSU Official Multi-Session Database Seeding Completed Successfully!');
 }
 

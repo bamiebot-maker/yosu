@@ -20,6 +20,7 @@ import {
   BarChart3,
   Layers,
   Crown,
+  MessageSquare,
 } from 'lucide-react';
 import { SessionPayload } from '@/lib/auth';
 
@@ -50,6 +51,7 @@ export function Sidebar({ session }: SidebarProps) {
         { name: 'Central Media Library', href: '/admin/media', icon: Layers },
         { name: 'Transparency Projects', href: '/admin/projects', icon: FolderGit2 },
         { name: 'Interactive Constitution', href: '/admin/constitution', icon: BookOpen },
+        { name: 'Member Feedback Inbox', href: '/admin/feedback', icon: MessageSquare },
         { name: 'Contact Messages Inbox', href: '/admin/contact-messages', icon: Newspaper },
         { name: 'Contact & Social CMS', href: '/admin/contact-settings', icon: Settings },
       ],

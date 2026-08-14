@@ -887,6 +887,7 @@ model StudentRegistration {
   status                        RegistrationStatus @default(PENDING)
   notes                         String?
   ipAddress                     String?
+  feedbacks                     MemberFeedback[]
   createdAt                     DateTime           @default(now())
   updatedAt                     DateTime           @updatedAt
 
@@ -909,6 +910,27 @@ model RegistrationSettings {
   academicSession  String?   @default("2026/2027")
   updatedAt        DateTime  @updatedAt
 }
+
+// ==========================================
+// 20. MEMBER FEEDBACK CENTRE
+// ==========================================
+
+model MemberFeedback {
+  id         String              @id @default(cuid())
+  studentId  String
+  student    StudentRegistration @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject    String
+  category   String              @default("SUGGESTION") // SUGGESTION, COMPLAINT, RECOMMENDATION
+  message    String
+  status     String              @default("PENDING") // PENDING, REVIEWED, RESOLVED
+  adminNotes String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@index([studentId])
+  @@index([status, createdAt])
+}
+
 
 
 

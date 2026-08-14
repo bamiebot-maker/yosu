@@ -12,7 +12,50 @@ const SUPER_ADMIN_ONLY_ROUTES = ['/admin/audit', '/admin/feature-flags'];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only protect /admin routes
+  // 1. MEMBER CENTRE ROUTE PROTECTION
+  if (pathname.startsWith('/member')) {
+    // Allow public access to login page
+    if (pathname === '/member/login') {
+      return NextResponse.next();
+    }
+
+    const memberToken = request.cookies.get('yosu_member_session')?.value;
+    const adminToken = request.cookies.get('yosu_session')?.value;
+
+    if (!memberToken && !adminToken) {
+      const loginUrl = new URL('/member/login', request.url);
+      loginUrl.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Verify token validity
+    if (memberToken) {
+      try {
+        await jwtVerify(memberToken, JWT_SECRET, { algorithms: ['HS256'] });
+        return NextResponse.next();
+      } catch (e) {
+        // Expired or invalid member token
+        const loginUrl = new URL('/member/login', request.url);
+        loginUrl.searchParams.set('callbackUrl', pathname);
+        const response = NextResponse.redirect(loginUrl);
+        response.cookies.set('yosu_member_session', '', { maxAge: 0, path: '/' });
+        return response;
+      }
+    }
+
+    if (adminToken) {
+      try {
+        await jwtVerify(adminToken, JWT_SECRET, { algorithms: ['HS256'] });
+        return NextResponse.next();
+      } catch (e) {
+        // Admin token invalid, redirect to member login
+        const loginUrl = new URL('/member/login', request.url);
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+  }
+
+  // 2. ADMIN PANEL ROUTE PROTECTION
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next();
   }
@@ -67,5 +110,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/member/:path*'],
 };
+
