@@ -65,43 +65,43 @@ export default function MemberLoginPage() {
           )}
 
           <form action={formAction} className="space-y-4">
-            {/* Identifier Field */}
+            {/* Registered Email Field */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Reg No. / Matric No. / Email
+                Registered Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <KeyRound className="w-4 h-4" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   name="identifier"
                   required
                   value={identifierInput}
                   onChange={(e) => setIdentifierInput(e.target.value)}
-                  placeholder="e.g. YOSU-2026-00004, FCP/CSE/23/1091, or student@gmail.com"
+                  placeholder="e.g. student@gmail.com (or Reg No / Matric No)"
                   className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
                 />
               </div>
             </div>
 
-            {/* Verification Detail Field */}
+            {/* Registered Phone Number Field */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Registered Phone No. OR Email
+                Registered Phone Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <PhoneCall className="w-4 h-4" />
                 </div>
                 <input
-                  type="text"
+                  type="tel"
                   name="verification"
                   required
                   value={verificationInput}
                   onChange={(e) => setVerificationInput(e.target.value)}
-                  placeholder="e.g. 08012345678, student@gmail.com, or Matric No."
+                  placeholder="e.g. 08012345678"
                   className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
                 />
               </div>

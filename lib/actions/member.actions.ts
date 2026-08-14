@@ -9,8 +9,8 @@ import { requireRole } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
 const memberLoginSchema = z.object({
-  identifier: z.string().min(3, 'Please enter your Registration Number or Matriculation Number.'),
-  verification: z.string().min(3, 'Please enter your registered Phone Number or Email address.'),
+  identifier: z.string().min(3, 'Please enter your registered Email address (or Reg No / Matric No).'),
+  verification: z.string().min(3, 'Please enter your registered Phone Number.'),
 });
 
 export type MemberAuthState = {
@@ -35,11 +35,8 @@ export async function memberLoginAction(
     return { error: validated.error.issues[0].message };
   }
 
-  const cleanId = validated.data.identifier.toUpperCase();
   const cleanEmail = validated.data.identifier.toLowerCase();
-  const cleanPhone = validated.data.identifier.replace(/[^0-9+]/g, '');
-
-  const verLower = validated.data.verification.toLowerCase();
+  const cleanId = validated.data.identifier.toUpperCase();
   const verCleanPhone = validated.data.verification.replace(/[^0-9+]/g, '');
 
   const reqHeaders = await headers();
@@ -47,16 +44,13 @@ export async function memberLoginAction(
   const userAgent = reqHeaders.get('user-agent') || 'Unknown Browser';
 
   try {
-    // 1. Search for student record by Reg Number, Matric Number, Email, or Phone
+    // 1. Search for student record primarily by Email (with Reg No / Matric No fallback)
     const student = await db.studentRegistration.findFirst({
       where: {
         OR: [
+          { email: { equals: cleanEmail } },
           { regNumber: { equals: cleanId } },
           { matricNumber: { equals: cleanId } },
-          { email: { equals: cleanEmail } },
-          ...(cleanPhone.length >= 7 ? [{ phone: { contains: cleanPhone } }] : []),
-          { regNumber: { equals: validated.data.identifier } },
-          { matricNumber: { equals: validated.data.identifier } },
         ],
       },
     });
@@ -65,13 +59,13 @@ export async function memberLoginAction(
       await db.auditLog.create({
         data: {
           action: 'MEMBER_LOGIN_FAILED',
-          details: `Member login attempt failed: Identifier "${validated.data.identifier}" not found`,
+          details: `Member login attempt failed: Email/Identifier "${validated.data.identifier}" not found`,
           ipAddress,
           userAgent,
         },
       });
       return {
-        error: `No registered student found matching "${validated.data.identifier}". Please verify your credentials (Reg No, Matric No, Email, or Phone).`,
+        error: `No registered student found with email address "${validated.data.identifier}". Please verify your email or complete registration first.`,
       };
     }
 
@@ -81,32 +75,26 @@ export async function memberLoginAction(
       };
     }
 
-    // 2. Verify secondary detail (Phone Number, Email, Reg No, or Matric No)
-    const studentEmailLower = student.email.toLowerCase().trim();
+    // 2. Verify Phone Number matches registered record
     const studentPhoneClean = student.phone.replace(/[^0-9+]/g, '');
     const studentWhatsappClean = (student.whatsapp || '').replace(/[^0-9+]/g, '');
-    const studentMatricLower = student.matricNumber.toLowerCase().trim();
-    const studentRegLower = student.regNumber.toLowerCase().trim();
 
-    const emailMatches = studentEmailLower === verLower;
     const phoneMatches =
-      (verCleanPhone.length >= 7 && studentPhoneClean.includes(verCleanPhone)) ||
-      (studentPhoneClean.length >= 7 && verCleanPhone.includes(studentPhoneClean)) ||
-      (verCleanPhone.length >= 7 && studentWhatsappClean.includes(verCleanPhone));
-    const matricMatches = studentMatricLower === verLower;
-    const regMatches = studentRegLower === verLower;
+      (verCleanPhone.length >= 6 && studentPhoneClean.includes(verCleanPhone)) ||
+      (studentPhoneClean.length >= 6 && verCleanPhone.includes(studentPhoneClean)) ||
+      (verCleanPhone.length >= 6 && studentWhatsappClean.includes(verCleanPhone));
 
-    if (!emailMatches && !phoneMatches && !matricMatches && !regMatches) {
+    if (!phoneMatches) {
       await db.auditLog.create({
         data: {
           action: 'MEMBER_LOGIN_FAILED',
-          details: `Member login failed for ${student.matricNumber}: Verification mismatch`,
+          details: `Member login failed for ${student.email}: Phone number mismatch`,
           ipAddress,
           userAgent,
         },
       });
       return {
-        error: 'Verification failed. The secondary detail (Phone Number, Email, Reg No, or Matric No) provided does not match the record on file for this student.',
+        error: 'Verification failed. The phone number provided does not match the record on file for this email address.',
       };
     }
 
