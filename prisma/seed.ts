@@ -12,35 +12,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting YOSU Official Database Seeding (Progress Era & Historical Archives)...');
 
-  // 0. CLEANUP EXISTING DATA (IDEMPOTENCY)
-  console.log('  -> Cleaning existing records...');
-  await prisma.auditLog.deleteMany();
-  await prisma.downloadResource.deleteMany();
-  await prisma.event.deleteMany();
-  await prisma.projectMilestone.deleteMany();
-  await prisma.projectUpdate.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.newsArticle.deleteMany();
-  await prisma.newsCategory.deleteMany();
-  await prisma.newsTag.deleteMany();
-  await prisma.constitutionSection.deleteMany();
-  await prisma.constitutionArticle.deleteMany();
-  await prisma.constitutionVersion.deleteMany();
-  await prisma.officeAppointment.deleteMany();
-  await prisma.office.deleteMany();
-  await prisma.committeeMember.deleteMany();
-  await prisma.committee.deleteMany();
-  await prisma.department.deleteMany();
-  await prisma.userRole.deleteMany();
-  await prisma.rolePermission.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.person.deleteMany();
-  await prisma.sessionAchievement.deleteMany();
-  await prisma.albumMedia.deleteMany();
-  await prisma.announcement.deleteMany();
-  await prisma.album.deleteMany();
-  await prisma.media.deleteMany();
-  await prisma.administrationSession.deleteMany();
+  // 0. IDEMPOTENT SAFETY (PRESERVE LIVE DATA)
+  console.log('  -> Safe seed mode: preserving live production database records...');
 
   // 1. ROLES & PERMISSIONS
   console.log('  -> Seeding System Roles...');
@@ -1131,6 +1104,94 @@ async function main() {
       isPublic: true,
     },
   });
+
+  // Seed Constitution Version & Articles if missing
+  console.log('  -> Seeding Constitution Supreme Gazette (2026 Edition)...');
+  const constVerCount = await prisma.constitutionVersion.count();
+  if (constVerCount === 0) {
+    await prisma.constitutionVersion.create({
+      data: {
+        versionName: '2026 Unification Constitution',
+        edition: '1st Harmonized Edition',
+        sessionId: currentSession.id,
+        effectiveDate: new Date('2026-01-01'),
+        isCurrent: true,
+        assentedBy: 'Cmrd. Ibrahim Sobur Bamidele (Executive President)',
+        speakerCertBy: 'Rt. Hon. Alabi Oyeniyi (Speaker of the House)',
+        pdfMediaId: pdfMedia1.id,
+        articles: {
+          create: [
+            {
+              articleNumber: 1,
+              title: 'Name, Emblem, Supremacy & Motto',
+              slug: 'article-1-name-supremacy',
+              overview: 'Establishment of the Yoruba Students Union (YOSU), FUD Chapter as the supreme umbrella body.',
+              sections: {
+                create: [
+                  { sectionNumber: '1(1)', title: 'Official Title', content: 'The union shall be known and styled as the Yoruba Students\' Union (YOSU), Federal University Dutse Chapter.' },
+                  { sectionNumber: '1(2)', title: 'Motto & Heritage', content: 'The motto of the Union shall be: "Ìpínlẹ̀ Ọmọ Odùdúwà: Ìfẹ́ Sówapọ̀".' },
+                  { sectionNumber: '1(3)', title: 'Constitutional Supremacy', content: 'This Constitution is supreme and binding on all bona fide Yoruba student members, Executive Officers, and Legislative Delegates.' },
+                ],
+              },
+            },
+            {
+              articleNumber: 2,
+              title: 'Membership & Rights',
+              slug: 'article-2-membership-rights',
+              overview: 'Qualifications, rights, privileges, and duties of student members.',
+              sections: {
+                create: [
+                  { sectionNumber: '2(1)', title: 'Bona Fide Qualification', content: 'Membership is open to all registered students of Yoruba heritage or origin at Federal University Dutse.' },
+                  { sectionNumber: '2(2)', title: 'Rights & Privileges', content: 'Every verified member has the right to vote in congress elections, access welfare benefits, and participate in union programs.' },
+                ],
+              },
+            },
+            {
+              articleNumber: 3,
+              title: 'Executive Council Architecture',
+              slug: 'article-3-executive-council',
+              overview: 'Composition, powers, and duties of the 17 Executive Offices.',
+              sections: {
+                create: [
+                  { sectionNumber: '3(1)', title: 'Executive Power', content: 'Executive authority is vested in the Executive Council led by the Executive President.' },
+                  { sectionNumber: '3(2)', title: 'Duties of President', content: 'The President shall be the Chief Executive Officer and Head of Delegation.' },
+                ],
+              },
+            },
+            {
+              articleNumber: 4,
+              title: 'House of Representatives Assembly',
+              slug: 'article-4-house-of-representatives',
+              overview: 'Legislative representation across all 8 Constituent Yoruba States.',
+              sections: {
+                create: [
+                  { sectionNumber: '4(1)', title: 'State Representation', content: 'Each of the 8 Constituent Yoruba States shall be represented by elected legislative delegates.' },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  // Seed House Representatives Delegates for 8 Constituent States if missing
+  console.log('  -> Seeding House of Representatives Delegates (8 Constituent States)...');
+  const existingRepsCount = await prisma.houseRepresentative.count();
+  if (existingRepsCount === 0) {
+    await prisma.houseRepresentative.createMany({
+      data: [
+        { fullName: 'Hon. Adebayo Sunkanmi', stateOfOrigin: 'Ekiti', positionTitle: 'Chief Whip & Representative', sessionId: currentSession.id, displayOrder: 1 },
+        { fullName: 'Hon. Folashade Adeleke', stateOfOrigin: 'Lagos', positionTitle: 'Representative Delegate', sessionId: currentSession.id, displayOrder: 2 },
+        { fullName: 'Hon. Babatunde Ogunyemi', stateOfOrigin: 'Ogun', positionTitle: 'Representative Delegate', sessionId: currentSession.id, displayOrder: 3 },
+        { fullName: 'Hon. Temitope Akindele', stateOfOrigin: 'Ondo', positionTitle: 'Representative Delegate', sessionId: currentSession.id, displayOrder: 4 },
+        { fullName: 'Hon. Olamide Aderibigbe', stateOfOrigin: 'Osun', positionTitle: 'House Majority Leader', sessionId: currentSession.id, displayOrder: 5 },
+        { fullName: 'Hon. Kehinde Popoola', stateOfOrigin: 'Oyo', positionTitle: 'Representative Delegate', sessionId: currentSession.id, displayOrder: 6 },
+        { fullName: 'Hon. Zainab Abiola', stateOfOrigin: 'Kwara', positionTitle: 'Representative Delegate', sessionId: currentSession.id, displayOrder: 7 },
+        { fullName: 'Hon. Emmanuel Olorunfemi', stateOfOrigin: 'Kogi', positionTitle: 'Okun Cultural Representative', sessionId: currentSession.id, displayOrder: 8 },
+      ],
+    });
+  }
 
   console.log('✅ YOSU Official Multi-Session Database Seeding Completed Successfully!');
 }

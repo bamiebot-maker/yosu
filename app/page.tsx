@@ -33,6 +33,7 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { WelcomeMessageModal } from '@/components/home/welcome-message-modal';
 import { PresidentShowcase } from '@/components/home/president-showcase';
 import { RepresentativeCarousel } from '@/components/home/representative-carousel';
+import { YorubaStatesMap } from '@/components/home/yoruba-states-map';
 import { getRegistrationWindowStatus } from '@/lib/registration-window';
 
 export const revalidate = 60; // ISR 60 seconds
@@ -426,81 +427,32 @@ export default async function HomePage() {
         </section>
       </ScrollReveal>
 
-      {/* 4. 100% DYNAMIC HOMEPAGE STATISTICS (TASK 3 - COMPACT SWIPEABLE RESPONSIVE METRICS) */}
+      {/* 4. INTERACTIVE YORUBA 8-CONSTITUENT STATES MAP GRID & TELEMETRY */}
       <ScrollReveal animation="fade-up" delayMs={100} durationMs={800}>
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full my-8 sm:my-12 space-y-4">
           <div className="flex justify-between items-end border-b border-stone-200 pb-2">
             <div>
               <span className="text-[9px] font-extrabold text-amber-700 uppercase tracking-widest block">
-                LIVE DATABASE TELEMETRY
+                CONSTITUENT DELEGATIONS &amp; REGIONAL MAP
               </span>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">Institutional Metrics</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
+                Yoruba Constituent States Map &amp; Assembly
+              </h3>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium sm:hidden">Swipe ← →</span>
+            <Link
+              href="/constituent-states"
+              className="text-xs font-bold text-emerald-950 hover:text-amber-600 flex items-center gap-1 transition-colors"
+            >
+              <span>Explore All 8 States</span>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-500" />
+            </Link>
           </div>
 
-          {/* Swipeable Metrics Row on Mobile, Grid on Tablet/Desktop */}
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-2 scrollbar-none sm:grid sm:grid-cols-5 lg:grid-cols-10">
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Yoruba States</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">8 States</div>
-              <div className="text-[8px] text-slate-400 font-medium">Representation</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Active Excos</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{excoCount} Officers</div>
-              <div className="text-[8px] text-slate-400 font-medium">Cabinet</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">House Delegates</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{repCount} Reps</div>
-              <div className="text-[8px] text-slate-400 font-medium">Assembly</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Achievements</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{achieveCount} Goals</div>
-              <div className="text-[8px] text-slate-400 font-medium">Progress Era</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Projects</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{projectCount} Projects</div>
-              <div className="text-[8px] text-slate-400 font-medium">Tracker</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">News Gazettes</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{newsCount} Articles</div>
-              <div className="text-[8px] text-slate-400 font-medium">Press</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Media Assets</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{mediaCount} Media</div>
-              <div className="text-[8px] text-slate-400 font-medium">CDN Gallery</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Downloads</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{downloadCount} PDFs</div>
-              <div className="text-[8px] text-slate-400 font-medium">Resources</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow border-t-2 border-t-emerald-800">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Members</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-emerald-950">{registeredStudentCount}</div>
-              <div className="text-[8px] text-emerald-800 font-bold">Registered</div>
-            </div>
-
-            <div className="shrink-0 snap-start min-w-[130px] sm:min-w-0 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm text-center space-y-0.5 hover:shadow-md transition-shadow">
-              <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Sessions</span>
-              <div className="text-xl sm:text-2xl font-extrabold text-amber-600">{sessionCount}</div>
-              <div className="text-[8px] text-slate-400 font-medium">Timeline</div>
-            </div>
-          </div>
+          <YorubaStatesMap
+            excoCount={excoCount}
+            repCount={repCount}
+            registeredStudentCount={registeredStudentCount}
+          />
         </section>
       </ScrollReveal>
 
