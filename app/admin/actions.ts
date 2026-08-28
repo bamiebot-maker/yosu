@@ -6,6 +6,25 @@ import { ArticleStatus, ProjectStatus, OfficeCategory } from '@prisma/client';
 import { hashPassword } from '@/lib/password';
 import { getSession } from '@/lib/auth';
 
+async function logAuditAction(userId: string | null | undefined, action: string, details: string) {
+  try {
+    let validUserId: string | null = null;
+    if (userId) {
+      const user = await db.user.findUnique({ where: { id: userId }, select: { id: true } });
+      if (user) validUserId = user.id;
+    }
+    await db.auditLog.create({
+      data: {
+        userId: validUserId,
+        action,
+        details,
+      },
+    });
+  } catch (error) {
+    console.warn('AuditLog creation warning:', error);
+  }
+}
+
 // ==========================================
 // 1. NEWS GAZETTES ACTIONS
 // ==========================================
@@ -766,13 +785,11 @@ export async function createRepresentativeAction(formData: FormData) {
       },
     });
 
-    await db.auditLog.create({
-      data: {
-        userId: session?.userId || null,
-        action: 'REPRESENTATIVE_CREATE',
-        details: `Created House Representative ${fullName} for state ${stateOfOrigin}`,
-      },
-    });
+    await logAuditAction(
+      session?.userId,
+      'REPRESENTATIVE_CREATE',
+      `Created House Representative ${fullName} for state ${stateOfOrigin}`
+    );
 
     revalidatePath('/admin/representatives');
     revalidatePath('/leadership');
@@ -801,13 +818,11 @@ export async function updateRepresentativeAction(id: string, formData: FormData)
       },
     });
 
-    await db.auditLog.create({
-      data: {
-        userId: session?.userId || null,
-        action: 'REPRESENTATIVE_UPDATE',
-        details: `Updated House Representative ${fullName}`,
-      },
-    });
+    await logAuditAction(
+      session?.userId,
+      'REPRESENTATIVE_UPDATE',
+      `Updated House Representative ${fullName}`
+    );
 
     revalidatePath('/admin/representatives');
     revalidatePath('/leadership');
@@ -823,13 +838,11 @@ export async function deleteRepresentativeAction(id: string) {
     const session = await getSession();
     const rep = await db.houseRepresentative.delete({ where: { id } });
 
-    await db.auditLog.create({
-      data: {
-        userId: session?.userId || null,
-        action: 'REPRESENTATIVE_DELETE',
-        details: `Deleted House Representative ${rep.fullName}`,
-      },
-    });
+    await logAuditAction(
+      session?.userId,
+      'REPRESENTATIVE_DELETE',
+      `Deleted House Representative ${rep.fullName}`
+    );
 
     revalidatePath('/admin/representatives');
     revalidatePath('/leadership');

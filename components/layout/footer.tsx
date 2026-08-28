@@ -1,13 +1,29 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Mail, MapPin, Phone } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const [address, setAddress] = useState('Federal University Dutse, PMB 7156, Dutse, Jigawa State, Nigeria');
+  const [email, setEmail] = useState('info@yosu.fud.edu.ng');
+  const [phone, setPhone] = useState('+234 801 234 5678');
+
+  useEffect(() => {
+    fetch('/api/site-settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.address) setAddress(data.address);
+        if (data?.email) setEmail(data.email);
+        if (data?.phone) setPhone(data.phone);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t-4 border-[#E5A91A] mt-auto">
+    <footer className="bg-slate-950 text-slate-300 border-t-4 border-[#E5A91A] mt-auto font-sans">
       {/* Upper Footer - Main Columns */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -28,11 +44,11 @@ export function Footer() {
               </div>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              The official digital headquarters of the Yoruba Students' Union, Federal University Dutse Chapter. Empowering student leaders, preserving Yoruba heritage, and promoting unity.
+              The official digital headquarters of the Yoruba Students&apos; Union, Federal University Dutse Chapter. Empowering student leaders, preserving Yoruba heritage, and promoting unity.
             </p>
             <div className="pt-2">
               <span className="inline-block bg-emerald-950 border border-emerald-700 text-amber-300 text-[11px] font-serif italic px-3 py-1 rounded">
-                "Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ"
+                &quot;Ìpínlẹ̀ Ọmọ Oòduà: Ìfẹ̀ Sówapọ&quot;
               </span>
             </div>
           </div>
@@ -45,7 +61,7 @@ export function Footer() {
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/about" className="hover:text-amber-400 transition-colors">
-                  About YOSU & Objectives
+                  About YOSU &amp; Objectives
                 </Link>
               </li>
               <li>
@@ -80,17 +96,17 @@ export function Footer() {
           {/* Col 3: Media & Resources */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
-              Media & Downloads
+              Media &amp; Downloads
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/news" className="hover:text-amber-400 transition-colors">
-                  Press Releases & Newsroom
+                  Press Releases &amp; Newsroom
                 </Link>
               </li>
               <li>
                 <Link href="/events" className="hover:text-amber-400 transition-colors">
-                  Upcoming Events & Programs
+                  Upcoming Events &amp; Programs
                 </Link>
               </li>
               <li>
@@ -100,23 +116,23 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/gallery" className="hover:text-amber-400 transition-colors">
-                  Official Photo Gallery & Albums
+                  Official Photo Gallery &amp; Albums
                 </Link>
               </li>
               <li>
                 <Link href="/downloads" className="hover:text-amber-400 transition-colors">
-                  Gazettes & Downloadable Forms
+                  Gazettes &amp; Downloadable Forms
                 </Link>
               </li>
               <li>
                 <Link href="/culture" className="hover:text-amber-400 transition-colors">
-                  Traditional Titles & Heritage
+                  Traditional Titles &amp; Heritage
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Official Contact & Address */}
+          {/* Col 4: Official Contact & Address (Dynamic DB Driven) */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
               Official Headquarters
@@ -124,17 +140,19 @@ export function Footer() {
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Federal University Dutse, PMB 7156, Dutse, Jigawa State, Nigeria</span>
+                <span>{address}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <a href="mailto:info@yosu.fud.edu.ng" className="hover:text-amber-400">
-                  info@yosu.fud.edu.ng
+                <a href={`mailto:${email}`} className="hover:text-amber-400">
+                  {email}
                 </a>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>+234 801 234 5678</span>
+                <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-amber-400">
+                  {phone}
+                </a>
               </div>
             </div>
           </div>
@@ -144,9 +162,9 @@ export function Footer() {
       {/* Bottom Bar - Copyright */}
       <div className="bg-slate-900 border-t border-slate-800 py-4 px-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <p>© {currentYear} Yoruba Students' Union (YOSU), Federal University Dutse Chapter. All Rights Reserved.</p>
+          <p>© {currentYear} Yoruba Students&apos; Union (YOSU), Federal University Dutse Chapter. All Rights Reserved.</p>
           <p className="text-[11px] text-slate-400">
-            Official 2026 Unification Constitution Ratified & Assented.
+            Official 2026 Unification Constitution Ratified &amp; Assented.
           </p>
         </div>
       </div>
