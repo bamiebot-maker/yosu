@@ -37,12 +37,12 @@ async function main() {
   if (!session) {
     session = await prisma.administrationSession.create({
       data: {
-        sessionName: '2026/2027 Progress Era Administration',
-        presidentName: 'Cmrd. Ibrahim Sobur Bamidele',
+        title: '2026/2027 Progress Era Administration',
+        slug: '2026-2027-progress-era',
         startDate: new Date('2026-07-15'),
         endDate: new Date('2027-07-15'),
         isCurrent: true,
-        motto: 'Progress, Unity & Student Welfare',
+        theme: 'Progress, Unity & Student Welfare',
       },
     });
   }
