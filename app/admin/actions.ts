@@ -480,8 +480,8 @@ export async function createProjectAction(formData: FormData) {
 export async function updateProjectAction(id: string, formData: FormData) {
   try {
     const title = formData.get('title') as string;
-    const summary = formData.get('summary') as string;
-    const description = formData.get('description') as string;
+    const summary = (formData.get('summary') as string) || title;
+    const description = (formData.get('description') as string) || summary || title;
     const status = formData.get('status') as ProjectStatus;
     const progressPercentage = parseInt(formData.get('progressPercentage') as string) || 0;
 
