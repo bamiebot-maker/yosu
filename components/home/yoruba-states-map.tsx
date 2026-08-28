@@ -9,19 +9,18 @@ export interface YorubaStateData {
   motto: string;
   capital: string;
   code: string;
-  colorClass: string;
-  badgeBg: string;
+  isGreen: boolean;
 }
 
 const YORUBA_STATES: YorubaStateData[] = [
-  { name: 'Ekiti', motto: 'Fountain of Knowledge', capital: 'Ado-Ekiti', code: 'EKT', colorClass: 'from-emerald-950 via-slate-900 to-emerald-950', badgeBg: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40' },
-  { name: 'Lagos', motto: 'Centre of Excellence', capital: 'Ikeja', code: 'LOS', colorClass: 'from-amber-950 via-slate-900 to-amber-950', badgeBg: 'bg-amber-950/80 text-amber-300 border-amber-500/40' },
-  { name: 'Ogun', motto: 'Gateway State', capital: 'Abeokuta', code: 'OGN', colorClass: 'from-emerald-950 via-slate-900 to-slate-950', badgeBg: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40' },
-  { name: 'Ondo', motto: 'Sunshine State', capital: 'Akure', code: 'OND', colorClass: 'from-amber-950 via-slate-900 to-slate-950', badgeBg: 'bg-amber-950/80 text-amber-300 border-amber-500/40' },
-  { name: 'Osun', motto: 'State of the Living Spring', capital: 'Osogbo', code: 'OSN', colorClass: 'from-emerald-900 via-slate-950 to-slate-900', badgeBg: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40' },
-  { name: 'Oyo', motto: 'Pace Setter State', capital: 'Ibadan', code: 'OYO', colorClass: 'from-amber-900 via-slate-950 to-slate-900', badgeBg: 'bg-amber-950/80 text-amber-300 border-amber-500/40' },
-  { name: 'Kwara', motto: 'State of Harmony', capital: 'Ilorin', code: 'KWR', colorClass: 'from-emerald-950 via-slate-900 to-emerald-900', badgeBg: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40' },
-  { name: 'Kogi', motto: 'Okun Cultural Heritage', capital: 'Lokoja', code: 'KGI', colorClass: 'from-amber-950 via-slate-900 to-amber-900', badgeBg: 'bg-amber-950/80 text-amber-300 border-amber-500/40' },
+  { name: 'Ekiti', motto: 'Fountain of Knowledge', capital: 'Ado-Ekiti', code: 'EKT', isGreen: true },
+  { name: 'Lagos', motto: 'Centre of Excellence', capital: 'Ikeja', code: 'LOS', isGreen: false },
+  { name: 'Ogun', motto: 'Gateway State', capital: 'Abeokuta', code: 'OGN', isGreen: true },
+  { name: 'Ondo', motto: 'Sunshine State', capital: 'Akure', code: 'OND', isGreen: false },
+  { name: 'Osun', motto: 'State of the Living Spring', capital: 'Osogbo', code: 'OSN', isGreen: true },
+  { name: 'Oyo', motto: 'Pace Setter State', capital: 'Ibadan', code: 'OYO', isGreen: false },
+  { name: 'Kwara', motto: 'State of Harmony', capital: 'Ilorin', code: 'KWR', isGreen: true },
+  { name: 'Kogi', motto: 'Okun Cultural Heritage', capital: 'Lokoja', code: 'KGI', isGreen: false },
 ];
 
 export function YorubaStatesMap({
@@ -64,42 +63,81 @@ export function YorubaStatesMap({
         </div>
       </div>
 
-      {/* Interactive 8-State Grid */}
+      {/* Interactive 8-State Grid in Green-White-Green Flag Sequence */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {YORUBA_STATES.map((state) => (
-          <Link
-            key={state.code}
-            href={`/constituent-states?state=${encodeURIComponent(state.name)}`}
-            className={`bg-gradient-to-br ${state.colorClass} border border-slate-800 hover:border-amber-400/60 p-4 rounded-2xl text-white space-y-3 shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden block`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-extrabold text-amber-400 tracking-widest uppercase">
-                STATE CODE: {state.code}
-              </span>
-              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border uppercase ${state.badgeBg}`}>
-                CONSTITUENT
-              </span>
-            </div>
+        {YORUBA_STATES.map((state) => {
+          if (state.isGreen) {
+            return (
+              <Link
+                key={state.code}
+                href={`/constituent-states?state=${encodeURIComponent(state.name)}`}
+                className="bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 border border-emerald-800/80 hover:border-amber-400 p-4.5 rounded-2xl text-white space-y-3 shadow-lg hover:-translate-y-1 transition-all group relative overflow-hidden block"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-extrabold text-amber-400 tracking-widest uppercase">
+                    STATE CODE: {state.code}
+                  </span>
+                  <span className="text-[9px] font-extrabold px-2.5 py-0.5 rounded-full border uppercase bg-emerald-900/90 text-emerald-300 border-emerald-500/50">
+                    CONSTITUENT
+                  </span>
+                </div>
 
-            <div>
-              <h4 className="font-serif text-base sm:text-lg font-extrabold text-white group-hover:text-amber-300 transition-colors flex items-center gap-1">
-                <span>{state.name} State</span>
-                <ChevronRight className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </h4>
-              <p className="text-[11px] text-amber-200/90 font-serif italic">
-                &quot;{state.motto}&quot;
-              </p>
-            </div>
+                <div>
+                  <h4 className="font-serif text-lg font-extrabold text-white group-hover:text-amber-300 transition-colors flex items-center gap-1">
+                    <span>{state.name} State</span>
+                    <ChevronRight className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </h4>
+                  <p className="text-[11px] text-amber-200/90 font-serif italic">
+                    &quot;{state.motto}&quot;
+                  </p>
+                </div>
 
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-300 font-semibold">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-amber-400" />
-                Capital: {state.capital}
-              </span>
-              <span className="text-emerald-400 font-bold">Assembly Roster</span>
-            </div>
-          </Link>
-        ))}
+                <div className="pt-2 border-t border-emerald-800/60 flex items-center justify-between text-[10px] text-emerald-200/80 font-semibold">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-amber-400" />
+                    Capital: {state.capital}
+                  </span>
+                  <span className="text-amber-300 font-bold">Assembly Roster</span>
+                </div>
+              </Link>
+            );
+          }
+
+          return (
+            <Link
+              key={state.code}
+              href={`/constituent-states?state=${encodeURIComponent(state.name)}`}
+              className="bg-white border border-stone-200 hover:border-emerald-600 p-4.5 rounded-2xl text-slate-900 space-y-3 shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden block"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-extrabold text-emerald-800 tracking-widest uppercase">
+                  STATE CODE: {state.code}
+                </span>
+                <span className="text-[9px] font-extrabold px-2.5 py-0.5 rounded-full border uppercase bg-amber-50 text-amber-800 border-amber-300">
+                  CONSTITUENT
+                </span>
+              </div>
+
+              <div>
+                <h4 className="font-serif text-lg font-extrabold text-slate-900 group-hover:text-emerald-800 transition-colors flex items-center gap-1">
+                  <span>{state.name} State</span>
+                  <ChevronRight className="w-4 h-4 text-emerald-700 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </h4>
+                <p className="text-[11px] text-slate-600 font-serif italic">
+                  &quot;{state.motto}&quot;
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[10px] text-slate-500 font-semibold">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-emerald-700" />
+                  Capital: {state.capital}
+                </span>
+                <span className="text-emerald-800 font-bold">Assembly Roster</span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
