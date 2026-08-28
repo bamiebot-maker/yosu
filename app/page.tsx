@@ -162,13 +162,35 @@ export default async function HomePage() {
     }).catch(() => []),
   ]);
 
-  // 6. Active Session Achievements (Requirement 5)
-  const dynamicAchievements = await db.achievement.findMany({
-    where: {
-      ...(activeSessionId ? { sessionId: activeSessionId } : {}),
-    },
-    orderBy: [{ progressPercentage: 'desc' }, { createdAt: 'desc' }],
-  }).catch(() => []);
+  // 6. Active Session Achievements & Development Projects
+  const [dynamicAchievements, dbProjects] = await Promise.all([
+    db.achievement.findMany({
+      where: {
+        ...(activeSessionId ? { sessionId: activeSessionId } : {}),
+      },
+      orderBy: [{ progressPercentage: 'desc' }, { createdAt: 'desc' }],
+    }).catch(() => []),
+    db.project.findMany({
+      orderBy: [{ progressPercentage: 'desc' }, { createdAt: 'desc' }],
+    }).catch(() => []),
+  ]);
+
+  const combinedFlagshipItems = [
+    ...dynamicAchievements.map((ach) => ({
+      id: ach.id,
+      title: ach.title,
+      description: ach.description,
+      progressPercentage: ach.progressPercentage,
+      categoryLabel: 'SESSION ACHIEVEMENT',
+    })),
+    ...dbProjects.map((proj) => ({
+      id: proj.id,
+      title: proj.title,
+      description: proj.summary || proj.description,
+      progressPercentage: proj.progressPercentage,
+      categoryLabel: 'UNION PROJECT',
+    })),
+  ];
 
   // 7. Active Session Representatives Grouped by Yoruba State (Requirement 6)
   const dbRepresentatives = await db.houseRepresentative.findMany({
@@ -638,11 +660,11 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {dynamicAchievements.map((ach) => {
-                const isCompleted = ach.progressPercentage >= 100;
+              {combinedFlagshipItems.map((item) => {
+                const isCompleted = item.progressPercentage >= 100;
                 return (
                   <div
-                    key={ach.id}
+                    key={item.id}
                     className="bg-slate-900/90 border border-slate-800 hover:border-amber-400/60 rounded-3xl p-6 space-y-4 hover-lift transition-all flex flex-col justify-between"
                   >
                     <div className="space-y-3">
@@ -658,29 +680,35 @@ export default async function HomePage() {
                           }`}
                         >
                           {isCompleted ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Clock className="w-3 h-3 text-amber-400" />}
-                          {isCompleted ? 'Completed' : `${ach.progressPercentage}% Ongoing`}
+                          {isCompleted ? 'Completed' : `${item.progressPercentage}% Ongoing`}
                         </span>
                       </div>
 
-                      <h3 className="font-serif font-bold text-base text-white leading-snug">
-                        {ach.title}
-                      </h3>
+                      <div>
+                        <span className="text-[9px] font-extrabold text-amber-400/90 uppercase tracking-widest block mb-0.5">
+                          {item.categoryLabel}
+                        </span>
+                        <h3 className="font-serif font-bold text-base text-white leading-snug">
+                          {item.title}
+                        </h3>
+                      </div>
+
                       <p className="text-xs text-slate-300 font-light leading-relaxed line-clamp-3">
-                        {ach.description}
+                        {item.description}
                       </p>
                     </div>
 
                     <div className="space-y-1.5 pt-2 border-t border-slate-800">
                       <div className="flex justify-between text-[10px] font-bold text-slate-400">
                         <span>Completion Milestone</span>
-                        <span className="text-amber-400">{ach.progressPercentage}%</span>
+                        <span className="text-amber-400">{item.progressPercentage}%</span>
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all duration-500 ${
                             isCompleted ? 'bg-emerald-400' : 'bg-gradient-to-r from-amber-400 to-emerald-500'
                           }`}
-                          style={{ width: `${ach.progressPercentage}%` }}
+                          style={{ width: `${item.progressPercentage}%` }}
                         />
                       </div>
                     </div>
