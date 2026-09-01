@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, ChevronRight, FolderOpen, Image as ImageIcon, FileText, FolderKanban, ExternalLink } from 'lucide-react';
+import { Home, ChevronRight, FolderOpen, Image as ImageIcon, FileText, FolderKanban, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react';
 import { HistoryStats } from './history-archive-client';
 
 interface HistoryHeritageArchiveClientProps {
@@ -101,6 +101,25 @@ export function HistoryHeritageArchiveClient({ stats }: HistoryHeritageArchiveCl
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         </div>
+      </div>
+
+      {/* Dual Bottom Navigation Links */}
+      <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Link
+          href="/history/timeline"
+          className="w-full sm:w-auto px-6 py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4 text-amber-700" />
+          <span>Previous: 4. Chronological Timeline</span>
+        </Link>
+
+        <Link
+          href="/history/origin"
+          className="w-full sm:w-auto px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
+        >
+          <span>Next Page: 1. Origin & Genesis of YOSU</span>
+          <ArrowRight className="w-4 h-4 text-amber-400" />
+        </Link>
       </div>
     </div>
   );

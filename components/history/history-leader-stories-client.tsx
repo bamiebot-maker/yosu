@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Home, ChevronRight, Sparkles, Share2, MessageCircle, Globe, Copy, CheckCircle2, X, ArrowRight, BookOpen, Quote } from 'lucide-react';
+import { Home, ChevronRight, Sparkles, Share2, MessageCircle, Globe, Copy, CheckCircle2, X, ArrowRight, ArrowLeft, BookOpen, Quote } from 'lucide-react';
 
 interface LeaderStory {
   id: string;
@@ -191,7 +191,7 @@ export function HistoryLeaderStoriesClient() {
           onClick={() => setActiveModalStory(null)}
         >
           <div
-            className="relative max-w-2xl w-full bg-white rounded-3xl overflow-hidden border border-stone-200 shadow-2xl my-8 p-6 sm:p-8 space-y-6"
+            className="relative max-w-2xl w-full max-h-[85vh] overflow-y-auto bg-white rounded-3xl border border-stone-200 shadow-2xl my-8 p-6 sm:p-8 space-y-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -261,11 +261,19 @@ export function HistoryLeaderStoriesClient() {
         </div>
       )}
 
-      {/* Next Page Link */}
-      <div className="pt-6 border-t border-stone-200 flex justify-end">
+      {/* Dual Bottom Navigation Links */}
+      <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Link
+          href="/history/past-leadership"
+          className="w-full sm:w-auto px-6 py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4 text-amber-700" />
+          <span>Previous: 2. Past Administrations & Roster</span>
+        </Link>
+
         <Link
           href="/history/timeline"
-          className="px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center gap-2"
+          className="w-full sm:w-auto px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
         >
           <span>Next Page: 4. Chronological Timeline</span>
           <ArrowRight className="w-4 h-4 text-amber-400" />

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, ChevronRight, BookOpen, ShieldCheck, Building2, Download, ArrowRight } from 'lucide-react';
+import { Home, ChevronRight, BookOpen, ShieldCheck, Building2, Download, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export function HistoryOriginClient() {
   return (
@@ -67,11 +67,19 @@ export function HistoryOriginClient() {
           </div>
         </div>
 
-        {/* Next Subpage Link */}
-        <div className="pt-6 border-t border-stone-200 flex justify-end">
+        {/* Dual Bottom Navigation Links */}
+        <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="w-full sm:w-auto px-6 py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4 text-amber-700" />
+            <span>Back to Home</span>
+          </Link>
+
           <Link
             href="/history/past-leadership"
-            className="px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
           >
             <span>Next Page: 2. Past Administrations & Roster</span>
             <ArrowRight className="w-4 h-4 text-amber-400" />
