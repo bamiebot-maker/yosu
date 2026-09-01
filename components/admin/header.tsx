@@ -21,6 +21,7 @@ import {
   Layers,
   Crown,
   ExternalLink,
+  Building2,
 } from 'lucide-react';
 import { Breadcrumbs } from './breadcrumbs';
 import { UserDropdown } from './user-dropdown';
@@ -99,6 +100,7 @@ export function Header({ session }: HeaderProps) {
         ...(isSuperAdmin
           ? [
               { name: 'Registration Window CMS', href: '/admin/registration-settings', icon: Sliders },
+              { name: 'Faculties & Departments CMS', href: '/admin/departments', icon: Building2 },
               { name: 'Audit Security Log', href: '/admin/audit', icon: ShieldAlert, highlight: true },
               { name: 'Site Settings', href: '/admin/settings', icon: Settings },
             ]

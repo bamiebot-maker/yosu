@@ -1732,6 +1732,107 @@ export async function updateRegistrationSettingsAction(formData: FormData) {
   }
 }
 
+// ==========================================
+// 21. ACADEMIC FACULTIES & DEPARTMENTS MANAGEMENT
+// ==========================================
+export async function getDepartmentsConfigAction() {
+  try {
+    const setting = await db.siteSetting.findUnique({
+      where: { key: 'academic_faculties_and_departments' },
+    });
+    if (!setting) {
+      const defaultData: Record<string, string[]> = {
+        'Faculty of Computing': [
+          'Computer Science',
+          'Cybersecurity',
+          'Software Engineering',
+          'Information Technology',
+        ],
+        'Faculty of Science': [
+          'Biochemistry',
+          'Microbiology',
+          'Biotechnology',
+          'Physics',
+          'Chemistry',
+          'Mathematics',
+        ],
+        'Faculty of Management Sciences': [
+          'Accounting',
+          'Business Administration',
+          'Banking and Finance',
+          'Public Administration',
+        ],
+        'Faculty of Agriculture': [
+          'Agronomy',
+          'Animal Science',
+          'Agricultural Economics & Extension',
+          'Fisheries and Aquaculture',
+        ],
+        'Faculty of Arts & Humanities': [
+          'English Language',
+          'History and International Studies',
+          'Linguistics',
+          'Islamic Studies',
+        ],
+        'Faculty of Social Sciences': [
+          'Economics',
+          'Political Science',
+          'Sociology',
+          'Criminology & Security Studies',
+        ],
+        'Faculty of Allied Health Sciences': [
+          'Nursing Science',
+          'Medical Laboratory Science',
+          'Public Health',
+        ],
+      };
+      await db.siteSetting.create({
+        data: {
+          key: 'academic_faculties_and_departments',
+          label: 'Academic Faculties & Departments',
+          value: JSON.stringify(defaultData),
+          group: 'GENERAL',
+          description: 'Configured academic faculties and departments list for YOSU FUD',
+        },
+      });
+      return defaultData;
+    }
+    return JSON.parse(setting.value);
+  } catch (error) {
+    console.error('Error fetching departments config:', error);
+    return {};
+  }
+}
+
+export async function saveDepartmentsConfigAction(configData: Record<string, string[]>) {
+  try {
+    const session = await getSession();
+    await db.siteSetting.upsert({
+      where: { key: 'academic_faculties_and_departments' },
+      update: {
+        value: JSON.stringify(configData),
+      },
+      create: {
+        key: 'academic_faculties_and_departments',
+        label: 'Academic Faculties & Departments',
+        value: JSON.stringify(configData),
+        group: 'GENERAL',
+        description: 'Configured academic faculties and departments list for YOSU FUD',
+      },
+    });
+
+    await logAuditAction(session?.userId, 'UPDATE_DEPARTMENTS_CONFIG', 'Updated academic faculties and departments config.');
+
+    revalidatePath('/admin/departments');
+    revalidatePath('/register');
+    revalidatePath('/member');
+
+    return { success: true, message: 'Academic faculties and departments updated successfully!' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to update faculties and departments.' };
+  }
+}
+
 
 
 

@@ -80,29 +80,30 @@ export default function MemberLoginPage() {
                   required
                   value={identifierInput}
                   onChange={(e) => setIdentifierInput(e.target.value)}
-                  placeholder="e.g. student@gmail.com (or Reg No / Matric No)"
-                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
+                  placeholder="e.g. student@fud.edu.ng"
+                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all font-medium"
                 />
               </div>
             </div>
 
-            {/* Registered Phone Number Field */}
+            {/* Registered Phone Number (Password) Field */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Registered Phone Number
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between items-center">
+                <span>Registered Phone Number</span>
+                <span className="text-[10px] text-amber-700 font-extrabold normal-case bg-amber-50 px-2 py-0.5 rounded border border-amber-200">(Serves as Password)</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <PhoneCall className="w-4 h-4" />
                 </div>
                 <input
-                  type="tel"
+                  type="password"
                   name="verification"
                   required
                   value={verificationInput}
                   onChange={(e) => setVerificationInput(e.target.value)}
                   placeholder="e.g. 08012345678"
-                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all"
+                  className="w-full pl-9 pr-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 focus:bg-white transition-all font-medium"
                 />
               </div>
             </div>

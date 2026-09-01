@@ -4,7 +4,7 @@ import { getMemberSession } from '@/lib/member-auth';
 import { getSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { buildMemberSessionData } from '@/lib/membership';
-import { DigitalIdCard } from '@/components/member/digital-id-card';
+import { MemberPortalDashboardClient } from '@/components/member/member-portal-dashboard-client';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -45,18 +45,5 @@ export default async function MemberDashboardPage() {
 
   const memberData = await buildMemberSessionData(student);
 
-  return (
-    <div className="space-y-6">
-      <div className="text-center space-y-1">
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-          Digital Membership Card
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500">
-          Official digital credentials issued for {memberData.membership.academicSession}
-        </p>
-      </div>
-
-      <DigitalIdCard memberData={memberData} />
-    </div>
-  );
+  return <MemberPortalDashboardClient memberData={memberData} student={student} />;
 }

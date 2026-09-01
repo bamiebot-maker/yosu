@@ -219,3 +219,60 @@ export async function updateFeedbackStatusAction(
     return { success: false, error: error.message || 'Failed to update feedback status.' };
   }
 }
+
+/**
+ * Self-service Profile Edit Action for logged-in students in Member Portal
+ */
+export async function updateMemberProfileSelfAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const session = await requireMemberAuth();
+    const student = await db.studentRegistration.findUnique({
+      where: { id: session.studentId },
+    });
+
+    if (!student) {
+      return { success: false, error: 'Student record not found.' };
+    }
+
+    const fullName = (formData.get('fullName') as string || student.fullName).trim();
+    const phone = (formData.get('phone') as string || student.phone).trim();
+    const whatsapp = (formData.get('whatsapp') as string || student.whatsapp || '').trim();
+    const faculty = (formData.get('faculty') as string || student.faculty).trim();
+    const department = (formData.get('department') as string || student.department).trim();
+    const level = (formData.get('level') as string || student.level).trim();
+    const stateOfOrigin = (formData.get('stateOfOrigin') as string || student.stateOfOrigin).trim();
+    const lga = (formData.get('lga') as string || student.lga).trim();
+    const homeTown = (formData.get('homeTown') as string || student.homeTown).trim();
+    const passportUrl = (formData.get('passportUrl') as string || student.passportUrl || '').trim();
+
+    await db.studentRegistration.update({
+      where: { id: student.id },
+      data: {
+        fullName,
+        phone,
+        whatsapp: whatsapp || null,
+        faculty,
+        department,
+        level,
+        stateOfOrigin,
+        lga,
+        homeTown,
+        passportUrl: passportUrl || null,
+      },
+    });
+
+    revalidatePath('/member');
+    revalidatePath('/admin/students');
+
+    return {
+      success: true,
+      message: 'Your profile details have been updated successfully!',
+    };
+  } catch (error: any) {
+    console.error('Member self-update error:', error);
+    return { success: false, error: error.message || 'Failed to update profile details.' };
+  }
+}

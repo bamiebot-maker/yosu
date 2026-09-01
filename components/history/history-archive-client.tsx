@@ -32,12 +32,18 @@ import {
   Check,
   Layers,
   ArrowRight,
+  ArrowLeft,
   Home,
   FolderOpen,
   Info,
   MapPin,
   CheckCircle,
   LucideIcon,
+  Share2,
+  MessageCircle,
+  Globe,
+  Link2,
+  Copy,
 } from 'lucide-react';
 
 export interface SerializedPerson {
@@ -237,7 +243,39 @@ function EmptyState({
   );
 }
 
+const HISTORY_SUBSECTIONS = [
+  {
+    id: 'origin',
+    title: '1. Origin & Genesis of YOSU',
+    shortTitle: 'Origin & Genesis',
+    subtitle: 'What Brought About YOSU • Founding Story & Omoluabi Pillars',
+    icon: BookOpen,
+  },
+  {
+    id: 'leadership',
+    title: '2. Past Administrations & Roster',
+    shortTitle: 'Past Leadership',
+    subtitle: 'Session-by-session Timeline of Past Executives & Legislative Assemblies',
+    icon: History,
+  },
+  {
+    id: 'stories',
+    title: '3. Voices & Stories from Past Leaders',
+    shortTitle: 'Leader Stories',
+    subtitle: 'Memoirs, Quotations, and Reflections from Past Union Stalwarts',
+    icon: Sparkles,
+  },
+  {
+    id: 'archive',
+    title: '4. Heritage Gallery & Documents',
+    shortTitle: 'Heritage Archive',
+    subtitle: 'Capital Projects, Photo Albums, and Downloadable Gazettes',
+    icon: FolderOpen,
+  },
+];
+
 export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientProps) {
+  const [currentSubsectionIndex, setCurrentSubsectionIndex] = useState(0);
   const [selectedSessionId, setSelectedSessionId] = useState<string>(
     sessions.find((s) => s.isCurrent)?.id || sessions[0]?.id || ''
   );
@@ -246,7 +284,9 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
   >('cabinet');
   const [mediaFilter, setMediaFilter] = useState<'ALL' | 'IMAGE' | 'VIDEO'>('ALL');
   const [lightboxMedia, setLightboxMedia] = useState<SerializedMediaItem | null>(null);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
 
+  const activeSubsection = HISTORY_SUBSECTIONS[currentSubsectionIndex];
   const currentSession = sessions.find((s) => s.id === selectedSessionId) || sessions[0];
   const activeAdministration = sessions.find((s) => s.isCurrent);
   const archivedAdministrations = sessions.filter((s) => !s.isCurrent);
@@ -271,8 +311,31 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
     return true;
   });
 
+  const shareStory = (title: string, text: string) => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({
+        title: `YOSU History: ${title}`,
+        text: `"${title}" - Read on YOSU FUD History Portal:`,
+        url,
+      }).catch(() => {});
+    } else if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(`${title} - ${url}`);
+      setCopyToast('Story link copied to clipboard!');
+      setTimeout(() => setCopyToast(null), 3000);
+    }
+  };
+
   return (
-    <div className="space-y-10 font-sans pb-16">
+    <div className="space-y-8 font-sans pb-16">
+      {/* Toast Notification */}
+      {copyToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-950 text-amber-300 border border-amber-400/50 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{copyToast}</span>
+        </div>
+      )}
+
       {/* BREADCRUMB */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500">
         <Link href="/" className="hover:text-emerald-700 transition-colors flex items-center gap-1">
@@ -327,54 +390,357 @@ export function HistoryArchiveClient({ stats, sessions }: HistoryArchiveClientPr
         </div>
       </header>
 
-      {/* 2. HISTORICAL STATISTICS DASHBOARD CARDS */}
-      <section aria-labelledby="stats-heading" className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest">
-              LIVE SYSTEM STATISTICS
-            </span>
-            <h2 id="stats-heading" className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-              Union Heritage & Impact Metrics
-            </h2>
+      {/* SUBSECTION DROPDOWN NAVBAR (DESKTOP & MOBILE) */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-sans">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-950 text-amber-400 flex items-center justify-center font-bold shrink-0">
+            <activeSubsection.icon className="w-5 h-5" />
           </div>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-semibold border border-slate-200">
-            <BarChart3 className="w-3.5 h-3.5 text-emerald-700" /> Database Live Query
-          </span>
+          <div>
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">
+              HISTORY SUBSECTION NAVBAR
+            </span>
+            <h2 className="font-serif text-base sm:text-lg font-bold text-slate-900 leading-snug">
+              {activeSubsection.title}
+            </h2>
+            <p className="text-xs text-slate-500 font-light">{activeSubsection.subtitle}</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {[
-            { label: 'Administrations', value: stats.totalAdministrations, icon: History, color: 'text-amber-700 bg-amber-50 border-amber-200' },
-            { label: 'Executives', value: stats.totalExecutives, icon: Users, color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-            { label: 'Representatives', value: stats.totalRepresentatives, icon: Building2, color: 'text-blue-700 bg-blue-50 border-blue-200' },
-            { label: 'Constitutions', value: stats.totalConstitutions, icon: ShieldCheck, color: 'text-purple-700 bg-purple-50 border-purple-200' },
-            { label: 'Projects Done', value: stats.totalProjectsCompleted, icon: FolderKanban, color: 'text-indigo-700 bg-indigo-50 border-indigo-200' },
-            { label: 'Achievements', value: stats.totalAchievements, icon: Award, color: 'text-amber-700 bg-amber-50 border-amber-200' },
-            { label: 'Published News', value: stats.totalPublishedNews, icon: Newspaper, color: 'text-teal-700 bg-teal-50 border-teal-200' },
-            { label: 'Photo Galleries', value: stats.totalGalleries, icon: ImageIcon, color: 'text-rose-700 bg-rose-50 border-rose-200' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition-all hover:border-amber-400/50"
-            >
-              <div className="flex items-center justify-between">
-                <div className={`p-2 rounded-xl border ${item.color}`}>
-                  <item.icon className="w-4 h-4" />
-                </div>
+        {/* Dropdown Selector on Mobile & Desktop */}
+        <div className="w-full sm:w-auto flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-600 whitespace-nowrap hidden sm:inline">
+            History Dropdown:
+          </span>
+          <select
+            id="history-subsection-select"
+            aria-label="Select History Subsection"
+            value={currentSubsectionIndex}
+            onChange={(e) => setCurrentSubsectionIndex(Number(e.target.value))}
+            className="w-full sm:w-auto px-4 py-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-800 shadow-2xs transition-colors cursor-pointer"
+          >
+            {HISTORY_SUBSECTIONS.map((sub, idx) => (
+              <option key={sub.id} value={idx}>
+                {sub.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* SUBSECTION CONTENT DISPLAY */}
+      {currentSubsectionIndex === 0 && (
+        <section className="space-y-6 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-md">
+          <div className="border-b border-stone-200 pb-4 space-y-1">
+            <span className="text-xs font-extrabold text-amber-700 uppercase tracking-wider block">
+              HISTORICAL SUBSECTION 1
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              What Brought About YOSU • Origin & Founding Genesis
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 font-light">
+              The foundational history of the Yoruba Students&apos; Union (YOSU) at Federal University Dutse, Jigawa State.
+            </p>
+          </div>
+
+          <div className="prose prose-slate max-w-none space-y-6 text-sm text-slate-700 leading-relaxed">
+            <div className="bg-emerald-950 text-white p-6 rounded-2xl border border-emerald-900 space-y-3 shadow-sm">
+              <h3 className="font-serif text-lg font-bold text-amber-300">The Omoluabi Vision at FUD</h3>
+              <p className="text-slate-200 text-xs sm:text-sm leading-relaxed">
+                Established as a socio-cultural beacon for Yoruba students at the Federal University Dutse, the Yoruba Students&apos; Union (YOSU) was birthed out of a collective aspiration to preserve Yoruba heritage, foster academic excellence, promote unity among constituent state students, and provide robust welfare support in Northern Nigeria.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-2">
+                <h4 className="font-serif font-bold text-slate-900 text-base flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-800" /> Core Union Pillars
+                </h4>
+                <ul className="text-xs text-slate-600 space-y-2 list-disc list-inside">
+                  <li><strong>Cultural Heritage:</strong> Preservation of Yoruba customs, language, and traditional titles.</li>
+                  <li><strong>Academic Excellence:</strong> Peer mentorship, tutorial support, and academic welfare.</li>
+                  <li><strong>Unity & Solidarity:</strong> Fostering brotherhood among students across the 8 Yoruba states.</li>
+                  <li><strong>Omoluabi Integrity:</strong> High moral standards, leadership accountability, and civic responsibility.</li>
+                </ul>
               </div>
-              <div>
-                <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">
-                  {item.value}
-                </div>
-                <div className="text-[11px] font-medium text-slate-600 leading-tight">
-                  {item.label}
-                </div>
+
+              <div className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-2">
+                <h4 className="font-serif font-bold text-slate-900 text-base flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-amber-700" /> The 8 Constituent Delegations
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  YOSU FUD unites students hailing from all Yoruba constituent states: <strong>Ekiti, Kwara, Oyo, Osun, Ondo, Ogun, Lagos, and Kogi (Okun Land)</strong>. Each state maintains honorable legislative representation in the YOSU House of Representatives.
+                </p>
               </div>
             </div>
-          ))}
+          </div>
+        </section>
+      )}
+
+      {/* SUBSECTION 1: PAST LEADERSHIP & SYSTEM STATS */}
+      {currentSubsectionIndex === 1 && (
+        <div className="space-y-10">
+          {/* 2. HISTORICAL STATISTICS DASHBOARD CARDS */}
+          <section aria-labelledby="stats-heading" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-extrabold text-amber-600 uppercase tracking-widest">
+                  LIVE SYSTEM STATISTICS
+                </span>
+                <h2 id="stats-heading" className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+                  Union Heritage & Impact Metrics
+                </h2>
+              </div>
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-semibold border border-slate-200">
+                <BarChart3 className="w-3.5 h-3.5 text-emerald-700" /> Database Live Query
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              {[
+                { label: 'Administrations', value: stats.totalAdministrations, icon: History, color: 'text-amber-700 bg-amber-50 border-amber-200' },
+                { label: 'Executives', value: stats.totalExecutives, icon: Users, color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+                { label: 'Representatives', value: stats.totalRepresentatives, icon: Building2, color: 'text-blue-700 bg-blue-50 border-blue-200' },
+                { label: 'Constitutions', value: stats.totalConstitutions, icon: ShieldCheck, color: 'text-purple-700 bg-purple-50 border-purple-200' },
+                { label: 'Projects Done', value: stats.totalProjectsCompleted, icon: FolderKanban, color: 'text-indigo-700 bg-indigo-50 border-indigo-200' },
+                { label: 'Achievements', value: stats.totalAchievements, icon: Award, color: 'text-amber-700 bg-amber-50 border-amber-200' },
+                { label: 'Published News', value: stats.totalPublishedNews, icon: Newspaper, color: 'text-teal-700 bg-teal-50 border-teal-200' },
+                { label: 'Photo Galleries', value: stats.totalGalleries, icon: ImageIcon, color: 'text-rose-700 bg-rose-50 border-rose-200' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition-all hover:border-amber-400/50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className={`p-2 rounded-xl border ${item.color}`}>
+                      <item.icon className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">
+                      {item.value}
+                    </div>
+                    <div className="text-[11px] font-medium text-slate-600 leading-tight">
+                      {item.label}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
-      </section>
+      )}
+
+      {/* SUBSECTION 2: VOICES & STORIES FROM PAST LEADERS (SHAREABLE) */}
+      {currentSubsectionIndex === 2 && (
+        <section className="space-y-6 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-md">
+          <div className="border-b border-stone-200 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <span className="text-xs font-extrabold text-amber-700 uppercase tracking-wider block">
+                HISTORICAL SUBSECTION 3
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+                Voices & Stories from Past Leaders
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 font-light">
+                Memoirs, inaugural speech excerpts, and reflections from past YOSU Presidents and Speakers.
+              </p>
+            </div>
+            <span className="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full uppercase">
+              3 Leader Memoirs
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                id: 'story-1',
+                title: 'The Sovereign Union Mandate',
+                author: 'Cmrd. Ibrahim Sobur Bamidele',
+                officeTitle: 'Executive President (2026/2027)',
+                avatarUrl: '/images/leadership/president-sobur.jpg',
+                excerpt: 'Leadership is about standing firm for student welfare and preserving the sacred Omoluabi heritage across all constituent states.',
+                fullText: 'Leadership is not about holding power; it is about standing firm for student welfare and preserving the sacred Omoluabi heritage across all 8 constituent states at Federal University Dutse. During our administration, we prioritized student bursaries, cultural day grand celebrations, and digital transparent governance.',
+              },
+              {
+                id: 'story-2',
+                title: 'Building Legislative Sovereignty',
+                author: 'Rt. Hon. Alabi Oyeniyi',
+                officeTitle: 'Speaker of the House (2026/2027)',
+                avatarUrl: '/images/leadership/speaker-alabi.jpg',
+                excerpt: 'The House of Representatives serves as the legislative shield of every Yoruba student studying in Northern Nigeria.',
+                fullText: 'The House of Representatives serves as the legislative shield of every Yoruba student studying in Northern Nigeria. We ensured that every state delegation—from Ekiti to Kogi—had an equal voice in ratifying laws and approving union budgets.',
+              },
+              {
+                id: 'story-3',
+                title: 'Preserving Cultural Majesty',
+                author: 'His Royal Majesty OBA Fouad Adegoke Adedotun',
+                officeTitle: 'OBA of YOSU FUD',
+                avatarUrl: '/images/leadership/oba-procession.jpg',
+                excerpt: 'Our culture is our dignity. As traditional custodians, we uphold Yoruba royal court traditions with pride.',
+                fullText: 'Our culture is our dignity. As traditional custodians of YOSU FUD, we uphold Yoruba royal court traditions with pride, ensuring our royal court procession and Olori court shine brilliantly at every university convention.',
+              },
+            ].map((story) => (
+              <div key={story.id} className="bg-stone-50 p-6 rounded-2xl border border-stone-200 space-y-4 flex flex-col justify-between hover:shadow-md transition-all">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden relative border-2 border-amber-400 bg-slate-900 shrink-0">
+                      {story.avatarUrl ? (
+                        <Image src={story.avatarUrl} alt={story.author} fill className="object-cover" />
+                      ) : (
+                        <Users className="w-5 h-5 text-amber-400 m-auto mt-3" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-serif font-bold text-base text-slate-900 leading-snug">{story.author}</h3>
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase block">{story.officeTitle}</span>
+                    </div>
+                  </div>
+
+                  <h4 className="font-serif font-bold text-slate-900 text-lg leading-snug text-emerald-950">
+                    &ldquo;{story.title}&rdquo;
+                  </h4>
+
+                  <p className="text-xs text-slate-600 font-light leading-relaxed">
+                    {story.fullText}
+                  </p>
+                </div>
+
+                {/* SHARE BAR BUTTONS */}
+                <div className="pt-3 border-t border-stone-200/80 flex items-center justify-between gap-2 text-xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    <Share2 className="w-3.5 h-3.5 text-amber-600" /> Share Story:
+                  </span>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => shareStory(story.title, story.fullText)}
+                      className="p-1.5 bg-emerald-900 text-amber-300 hover:bg-emerald-800 rounded-lg transition-colors cursor-pointer"
+                      title="Share via Native Share"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                    </button>
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`"${story.title}" - ${story.author} (${story.officeTitle})\n\nRead more on YOSU FUD History Portal!`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 bg-emerald-600 text-white hover:bg-emerald-500 rounded-lg transition-colors"
+                      title="Share on WhatsApp"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${story.title}" by ${story.author} - YOSU FUD History`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 bg-sky-600 text-white hover:bg-sky-500 rounded-lg transition-colors"
+                      title="Share on Social Media"
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof navigator !== 'undefined') {
+                          navigator.clipboard.writeText(`${story.title} - ${story.author}: ${story.fullText}`);
+                          setCopyToast('Story excerpt copied to clipboard!');
+                          setTimeout(() => setCopyToast(null), 3000);
+                        }
+                      }}
+                      className="p-1.5 bg-stone-200 text-slate-700 hover:bg-stone-300 rounded-lg transition-colors cursor-pointer"
+                      title="Copy Story Text"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SUBSECTION 3: HERITAGE GALLERY & ARCHIVES */}
+      {currentSubsectionIndex === 3 && (
+        <section className="space-y-6 bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-md">
+          <div className="border-b border-stone-200 pb-4">
+            <span className="text-xs font-extrabold text-amber-700 uppercase tracking-wider block">
+              HISTORICAL SUBSECTION 4
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              Heritage Gallery & Document Repository
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 font-light">
+              Inspect historical photo galleries, completed capital projects, and ratified constitutional versions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
+              <h3 className="font-serif font-bold text-slate-900 text-lg flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-amber-600" /> Historical Photo Albums ({stats.totalGalleries})
+              </h3>
+              <p className="text-xs text-slate-600">
+                Official high-resolution photography archives documenting Cultural Days, Inaugural Balls, and Assembly Congresses.
+              </p>
+              <Link href="/gallery" className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-700">
+                <span>Explore Full Photo Gallery</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
+              <h3 className="font-serif font-bold text-slate-900 text-lg flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-600" /> Ratified Supreme Constitutions
+              </h3>
+              <p className="text-xs text-slate-600">
+                Download the official codified Supreme Constitution of the Yoruba Students&apos; Union, Federal University Dutse.
+              </p>
+              <Link href="/constitution" className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-700">
+                <span>View Supreme Constitution</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* BOTTOM SUBSECTION NAVIGATION CONTROLS */}
+      <div className="bg-slate-950 text-white p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 font-sans mt-8">
+        <button
+          type="button"
+          disabled={currentSubsectionIndex === 0}
+          onClick={() => setCurrentSubsectionIndex((prev) => Math.max(0, prev - 1))}
+          className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+            currentSubsectionIndex === 0
+              ? 'opacity-40 cursor-not-allowed bg-slate-800 text-slate-500'
+              : 'bg-stone-800 hover:bg-stone-700 text-white cursor-pointer shadow-sm'
+          }`}
+        >
+          <ArrowLeft className="w-4 h-4 text-amber-400" />
+          <span>Previous: {HISTORY_SUBSECTIONS[currentSubsectionIndex - 1]?.shortTitle || 'Beginning'}</span>
+        </button>
+
+        <div className="text-center font-serif text-xs sm:text-sm text-slate-300">
+          <span>Subsection <strong className="text-amber-400">{currentSubsectionIndex + 1}</strong> of <strong className="text-amber-400">{HISTORY_SUBSECTIONS.length}</strong></span>
+          <span className="block text-[10px] text-slate-400 font-sans mt-0.5">{activeSubsection.shortTitle}</span>
+        </div>
+
+        <button
+          type="button"
+          disabled={currentSubsectionIndex === HISTORY_SUBSECTIONS.length - 1}
+          onClick={() => setCurrentSubsectionIndex((prev) => Math.min(HISTORY_SUBSECTIONS.length - 1, prev + 1))}
+          className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+            currentSubsectionIndex === HISTORY_SUBSECTIONS.length - 1
+              ? 'opacity-40 cursor-not-allowed bg-slate-800 text-slate-500'
+              : 'bg-emerald-800 hover:bg-emerald-700 text-amber-300 shadow-md cursor-pointer'
+          }`}
+        >
+          <span>Next: {HISTORY_SUBSECTIONS[currentSubsectionIndex + 1]?.shortTitle || 'End'}</span>
+          <ArrowRight className="w-4 h-4 text-amber-400" />
+        </button>
+      </div>
 
       {/* 3. VISUALLY ENGAGING CHRONOLOGICAL TIMELINE (ACTIVE VS PREVIOUS) */}
       <section aria-labelledby="timeline-heading" className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-8">
