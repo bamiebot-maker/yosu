@@ -323,79 +323,79 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
           {/* SUCCESS SLIP OR FORM */}
           {successResult ? (
             /* SUCCESS REGISTRATION SLIP EXPERIENCE */
-            <div className="bg-white p-8 sm:p-12 rounded-3xl border border-stone-200 shadow-xl space-y-8 max-w-3xl mx-auto font-sans print:p-0 print:border-none print:shadow-none">
-              <div className="text-center space-y-3">
-                <div className="w-16 h-16 bg-emerald-950 text-amber-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg border border-emerald-800">
-                  <CheckCircle2 className="w-10 h-10" />
+            <div className="bg-white p-5 sm:p-10 rounded-3xl border border-stone-200 shadow-xl space-y-6 max-w-2xl mx-auto font-sans print:p-0 print:border-none print:shadow-none">
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 bg-emerald-950 text-amber-400 rounded-2xl mx-auto flex items-center justify-center shadow-md border border-emerald-800">
+                  <CheckCircle2 className="w-7 h-7" />
                 </div>
-                <h2 className="font-serif font-bold text-3xl text-slate-900">Student Registration Successful!</h2>
+                <h2 className="font-serif font-bold text-2xl sm:text-3xl text-slate-900">Student Registration Successful!</h2>
                 <p className="text-xs text-slate-500">
                   Your information has been officially recorded in the YOSU Central Member Database.
                 </p>
               </div>
 
               {/* PRINTABLE SLIP CONTAINER WITH PASSPORT PHOTOGRAPH & BRANDING */}
-              <div id="printable-slip" className="p-6 sm:p-8 bg-white rounded-3xl border-2 border-emerald-800 space-y-6 shadow-md">
+              <div id="printable-slip" className="p-4 sm:p-6 bg-white rounded-2xl border-2 border-emerald-800 space-y-4 shadow-sm">
                 {/* Card Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-emerald-950 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 rounded-xl bg-white p-1 shadow border border-stone-200 shrink-0">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b-2 border-emerald-950 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="relative w-10 h-10 rounded-lg bg-white p-0.5 shadow border border-stone-200 shrink-0">
                       <Image src="/images/logo.png" alt="YOSU Logo" fill className="object-contain p-0.5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest block">
+                      <span className="text-[9px] font-extrabold text-amber-700 uppercase tracking-widest block">
                         YORUBA STUDENTS&apos; UNION (YOSU) — FUD CHAPTER
                       </span>
-                      <h3 className="font-serif font-bold text-xl text-slate-900">Official Membership Identification Slip</h3>
+                      <h3 className="font-serif font-bold text-base sm:text-lg text-slate-900">Official Membership Identification Slip</h3>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">REGISTRATION NO.</span>
-                    <span className="font-mono text-lg font-extrabold text-emerald-950">{successResult.regNumber}</span>
+                  <div className="text-left sm:text-right shrink-0">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase block">REGISTRATION NO.</span>
+                    <span className="font-mono text-base sm:text-lg font-extrabold text-emerald-950">{successResult.regNumber}</span>
                   </div>
                 </div>
 
                 {/* Card Body: Passport Image + Details */}
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                   {/* Passport Photograph */}
                   <div className="shrink-0">
                     {successResult.passportUrl ? (
-                      <div className="relative w-28 h-32 rounded-2xl overflow-hidden border-2 border-emerald-900 shadow-md bg-stone-100">
+                      <div className="relative w-24 h-28 rounded-xl overflow-hidden border-2 border-emerald-900 shadow-md bg-stone-100">
                         <Image src={successResult.passportUrl} alt={successResult.fullName} fill className="object-cover" />
                       </div>
                     ) : (
-                      <div className="w-28 h-32 rounded-2xl bg-emerald-950 text-amber-400 flex flex-col items-center justify-center font-bold text-2xl border-2 border-emerald-900 shadow-md">
+                      <div className="w-24 h-28 rounded-xl bg-emerald-950 text-amber-400 flex flex-col items-center justify-center font-bold text-xl border-2 border-emerald-900 shadow-md">
                         <span>{successResult.fullName.charAt(0)}</span>
-                        <span className="text-[9px] text-emerald-300 font-normal uppercase tracking-wider mt-1">YOSU MEMBER</span>
+                        <span className="text-[8px] text-emerald-300 font-normal uppercase tracking-wider mt-1">YOSU MEMBER</span>
                       </div>
                     )}
                   </div>
 
                   {/* Details Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs flex-1 w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs flex-1 w-full">
                     <div className="space-y-0.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">FULL NAME</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">FULL NAME</span>
                       <span className="font-bold text-slate-900 text-sm">{successResult.fullName}</span>
                     </div>
                     <div className="space-y-0.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">MATRICULATION NUMBER</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">MATRICULATION NUMBER</span>
                       <span className="font-mono font-bold text-slate-900 text-sm">{successResult.matricNumber}</span>
                     </div>
                     <div className="space-y-0.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">DEPARTMENT & LEVEL</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">DEPARTMENT & LEVEL</span>
                       <span className="font-semibold text-slate-800">{successResult.department} ({successResult.level})</span>
                     </div>
                     <div className="space-y-0.5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">STATE OF ORIGIN</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase block">STATE OF ORIGIN</span>
                       <span className="font-semibold text-slate-800">{successResult.stateOfOrigin}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Footer Status */}
-                <div className="pt-3 border-t border-stone-200 text-[11px] text-slate-500 font-light flex justify-between items-center">
+                <div className="pt-2.5 border-t border-stone-200 text-[10px] sm:text-[11px] text-slate-500 font-light flex justify-between items-center">
                   <span>Date Registered: {new Date(successResult.createdAt).toLocaleDateString()}</span>
-                  <span className="font-bold text-emerald-950 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+                  <span className="font-bold text-emerald-950 uppercase tracking-wider bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300 text-[9px] sm:text-[10px]">
                     STATUS: VERIFIED MEMBER
                   </span>
                 </div>
@@ -431,40 +431,40 @@ export function InteractiveStudentRegistration({ windowStatus }: Props) {
                 }
               `}</style>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
+              {/* Action Buttons (2x2 Grid on Mobile & Desktop) */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 print:hidden">
                 <button
                   type="button"
                   onClick={() => copyRefToClipboard(successResult.regNumber)}
-                  className="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl transition-all flex items-center gap-2 border border-stone-300 cursor-pointer"
+                  className="w-full py-2.5 px-3 bg-stone-100 hover:bg-stone-200 text-slate-800 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 border border-stone-300 cursor-pointer"
                 >
-                  {copiedRef ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
-                  <span>{copiedRef ? 'Copied to Clipboard!' : 'Copy Reg Number'}</span>
+                  {copiedRef ? <Check className="w-3.5 h-3.5 text-emerald-700 shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0 text-slate-600" />}
+                  <span className="truncate">{copiedRef ? 'Copied!' : 'Copy Reg No'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-5 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 px-3 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Printer className="w-4 h-4 text-amber-400" />
-                  <span>Print Official Slip</span>
+                  <Printer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">Print Official Slip</span>
                 </button>
 
                 <Link
                   href={`/member/login?identifier=${encodeURIComponent(successResult.regNumber)}`}
-                  className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-amber-400/40"
+                  className="w-full py-2.5 px-3 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-amber-400/40 text-center"
                 >
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
-                  <span>Proceed to Member Login</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">Member Login</span>
                 </Link>
 
                 <button
                   type="button"
                   onClick={() => setSuccessResult(null)}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  className="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs rounded-xl transition-all cursor-pointer text-center"
                 >
-                  Register Another Student
+                  <span className="truncate">Register Another</span>
                 </button>
               </div>
             </div>
