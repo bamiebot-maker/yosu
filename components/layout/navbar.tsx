@@ -20,6 +20,9 @@ import {
   ShieldCheck,
   Scale,
   UserCheck,
+  History,
+  Clock,
+  FolderOpen,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -27,6 +30,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [governanceDropdownOpen, setGovernanceDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
+  const [historyDropdownOpen, setHistoryDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -37,6 +41,7 @@ export function Navbar() {
 
   const govRef = useRef<HTMLDivElement>(null);
   const resRef = useRef<HTMLDivElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
 
   // Fetch registration window status
   useEffect(() => {
@@ -99,12 +104,19 @@ export function Navbar() {
   const primaryNav = [
     { name: 'Home', href: '/' },
     { name: 'About YOSU', href: '/about' },
-    { name: 'History', href: '/history' },
     { name: 'Constitution', href: '/constitution', highlight: true },
     ...(isRegistrationOpen ? [{ name: 'Student Registration', href: '/register', badge: 'NEW' }] : []),
     { name: 'Newsroom', href: '/news' },
     { name: 'Events', href: '/events' },
     { name: 'Projects', href: '/projects' },
+  ];
+
+  const historySubpages = [
+    { name: '1. Origin & Genesis of YOSU', href: '/history/origin', icon: BookOpen, desc: 'What brought about YOSU at FUD' },
+    { name: '2. Past Administrations & Roster', href: '/history/past-leadership', icon: History, desc: 'Session cabinet history & reps' },
+    { name: '3. Voices & Stories from Past Leaders', href: '/history/leader-stories', icon: Sparkles, desc: 'Memoirs & speech reflections' },
+    { name: '4. Chronological Timeline', href: '/history/timeline', icon: Clock, desc: 'Tenure directory & evolution' },
+    { name: '5. Heritage Gallery & Documents', href: '/history/heritage-archive', icon: FolderOpen, desc: 'Photo albums & gazettes' },
   ];
 
   const secondaryNav = [
@@ -245,7 +257,54 @@ export function Navbar() {
                   </Link>
                 ))}
 
-                {/* Governance Dropdown */}
+                {/* History 5-Subpages Dropdown */}
+                <div className="relative" ref={historyRef}>
+                  <button
+                    onClick={() => {
+                      setHistoryDropdownOpen(!historyDropdownOpen);
+                      setGovernanceDropdownOpen(false);
+                      setResourcesDropdownOpen(false);
+                    }}
+                    className={`flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      historyDropdownOpen || pathname.startsWith('/history')
+                        ? 'bg-emerald-900 text-amber-300 shadow-sm font-bold'
+                        : 'text-slate-700 hover:bg-stone-200/80 hover:text-emerald-950'
+                    }`}
+                    aria-haspopup="true"
+                    aria-expanded={historyDropdownOpen}
+                  >
+                    <span>History Archive</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${historyDropdownOpen ? 'rotate-180 text-amber-400' : 'text-slate-500'}`} />
+                  </button>
+
+                  {historyDropdownOpen && (
+                    <div className="absolute left-0 top-full mt-1.5 w-80 bg-slate-950 text-white rounded-2xl shadow-2xl border-2 border-amber-400/60 p-2 z-[99999] space-y-1 animate-in fade-in zoom-in-95 duration-150">
+                      {historySubpages.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            onClick={() => setHistoryDropdownOpen(false)}
+                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-900/90 transition-all border border-transparent hover:border-amber-400/30 group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-emerald-900/80 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 border border-emerald-700 group-hover:scale-105 transition-transform">
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <div className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                                {item.name}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-light leading-tight">
+                                {item.desc}
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
                 <div className="relative" ref={govRef}>
                   <button
                     onClick={() => {
@@ -448,6 +507,27 @@ export function Navbar() {
                     )}
                   </Link>
                 ))}
+              </div>
+
+              {/* History Subpages Section */}
+              <div className="p-3 space-y-0.5 border-b border-slate-800">
+                <p className="text-[9px] font-extrabold tracking-wider text-amber-400/90 uppercase px-2 mb-1">
+                  HISTORY & HERITAGE ARCHIVE (5 SUBPAGES)
+                </p>
+                {historySubpages.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:bg-slate-900 hover:text-amber-300 rounded-lg transition-colors"
+                    >
+                      <Icon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Governance Section */}
