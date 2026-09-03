@@ -3,6 +3,7 @@
 import React, { useState, useActionState } from 'react';
 import { UserCheck, X, Loader2, Save, CheckCircle2, AlertCircle, Phone, Building2, MapPin } from 'lucide-react';
 import { updateMemberProfileSelfAction } from '@/lib/actions/member.actions';
+import { ImageUploader } from '@/components/ui/image-uploader';
 
 const YORUBA_STATES = [
   'Ekiti',
@@ -263,15 +264,12 @@ export function MemberProfileEditModal({ student, isOpen, onClose }: MemberProfi
               />
             </div>
 
-            {/* Passport Photo URL */}
+            {/* Passport Photo Upload Space */}
             <div className="space-y-1 sm:col-span-2">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Passport Image URL</label>
-              <input
-                type="url"
+              <ImageUploader
                 name="passportUrl"
                 defaultValue={student.passportUrl || ''}
-                placeholder="https://example.com/photo.jpg"
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-950"
+                label="Passport / Profile Photograph Upload *"
               />
             </div>
           </div>
