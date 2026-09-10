@@ -254,95 +254,149 @@ export default async function LeadershipPage({ searchParams }: LeadershipPagePro
           <span className="text-xs font-semibold text-slate-500">{excos.length} Officers Listed</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {excos.map((appt) => (
-            <div
-              key={appt.id}
-              className="bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
-            >
-              <div>
-                <div className="relative h-64 bg-slate-950 border-b border-stone-100 overflow-hidden flex items-center justify-center">
-                  {appt.person.avatarMedia?.url ? (
-                    <Image
-                      src={appt.person.avatarMedia.url}
-                      alt={appt.person.fullName}
-                      fill
-                      className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-emerald-950 text-amber-400 font-bold text-2xl flex items-center justify-center border border-amber-400/40">
-                      {appt.person.fullName.charAt(0)}
-                    </div>
-                  )}
-
-                  <div className="absolute top-4 left-4 bg-emerald-950 text-white font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/50 shadow-md">
-                    {appt.office.title}
-                  </div>
-
-                  <div className="absolute top-4 right-4 bg-amber-400 text-slate-950 font-bold text-[10px] uppercase px-2.5 py-1 rounded-md shadow">
-                    {appt.person.stateOfOrigin} State
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-3">
-                  <div>
-                    <h3 className="font-serif font-bold text-xl text-slate-900 leading-snug">
-                      {appt.person.fullName}
-                    </h3>
-                    {appt.person.department && (
-                      <p className="text-xs text-slate-500 font-medium">
-                        {appt.person.department}
-                      </p>
-                    )}
-                  </div>
-
-                  {appt.person.bio && (
-                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-light">{appt.person.bio}</p>
-                  )}
+        {excos.length === 0 && currentSession.presidentName ? (
+          <div className="bg-stone-50 rounded-3xl border border-stone-200 p-6 sm:p-8 space-y-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              <div className="relative w-36 h-44 sm:w-44 sm:h-52 rounded-2xl overflow-hidden border-4 border-emerald-950 shadow-xl bg-stone-200 shrink-0">
+                <Image
+                  src={currentSession.presidentPhotoUrl || '/images/yosu-logo.png'}
+                  alt={currentSession.presidentName || 'Executive President'}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute bottom-2 left-2 right-2 text-center text-white">
+                  <span className="text-[9px] text-amber-300 font-extrabold uppercase">Executive President</span>
                 </div>
               </div>
 
-              <div className="p-6 pt-0 space-y-3">
-                {/* Contact & Social Links */}
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-100 text-xs text-slate-500">
-                  {appt.person.email && (
-                    <a href={`mailto:${appt.person.email}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Email Officer">
-                      <Mail className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {appt.person.phoneNumber && (
-                    <a href={`tel:${appt.person.phoneNumber}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Call Officer">
-                      <Phone className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {appt.person.twitterUrl && (
-                    <a href={appt.person.twitterUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Twitter Profile">
-                      <Globe className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {appt.person.linkedinUrl && (
-                    <a href={appt.person.linkedinUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="LinkedIn Profile">
-                      <Globe className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {appt.person.instagramUrl && (
-                    <a href={appt.person.instagramUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Instagram Profile">
-                      <Globe className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-slate-500">
-                  <span className="font-bold text-slate-700">Session: {currentSession.title}</span>
-                  <span className="text-emerald-800 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
-                    Confirmed Exco
-                  </span>
+              <div className="space-y-3 flex-1 text-center sm:text-left">
+                <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-3 py-0.5 rounded-full border border-amber-300 inline-block">
+                  TENURE LEADERSHIP RECORD
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+                  {currentSession.presidentName}
+                </h3>
+                {currentSession.theme && (
+                  <p className="text-xs sm:text-sm font-semibold text-emerald-900 italic">
+                    &ldquo;{currentSession.theme}&rdquo;
+                  </p>
+                )}
+                {currentSession.presidentBio && (
+                  <p className="text-xs text-slate-600 font-light leading-relaxed max-w-2xl">
+                    {currentSession.presidentBio}
+                  </p>
+                )}
+                {currentSession.historicalNarrative && (
+                  <p className="text-xs text-slate-700 bg-white p-4 rounded-xl border border-stone-200 line-clamp-4 font-light">
+                    {currentSession.historicalNarrative}
+                  </p>
+                )}
+                <div className="pt-2">
+                  <Link
+                    href="/history/past-leadership"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-950 hover:bg-emerald-900 text-amber-300 text-xs font-bold rounded-xl shadow-sm transition-all"
+                  >
+                    <span>View Complete Historical Chapter in Archive</span>
+                    <History className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {excos.map((appt) => (
+              <div
+                key={appt.id}
+                className="bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="relative h-64 bg-slate-950 border-b border-stone-100 overflow-hidden flex items-center justify-center">
+                    {appt.person.avatarMedia?.url ? (
+                      <Image
+                        src={appt.person.avatarMedia.url}
+                        alt={appt.person.fullName}
+                        fill
+                        className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-emerald-950 text-amber-400 font-bold text-2xl flex items-center justify-center border border-amber-400/40">
+                        {appt.person.fullName.charAt(0)}
+                      </div>
+                    )}
+
+                    <div className="absolute top-4 left-4 bg-emerald-950 text-white font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/50 shadow-md">
+                      {appt.office.title}
+                    </div>
+
+                    <div className="absolute top-4 right-4 bg-amber-400 text-slate-950 font-bold text-[10px] uppercase px-2.5 py-1 rounded-md shadow">
+                      {appt.person.stateOfOrigin} State
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-3">
+                    <div>
+                      <h3 className="font-serif font-bold text-xl text-slate-900 leading-snug">
+                        {appt.person.fullName}
+                      </h3>
+                      {appt.person.department && (
+                        <p className="text-xs text-slate-500 font-medium">
+                          {appt.person.department}
+                        </p>
+                      )}
+                    </div>
+
+                    {appt.person.bio && (
+                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed font-light">{appt.person.bio}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6 pt-0 space-y-3">
+                  {/* Contact & Social Links */}
+                  <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-stone-100 text-xs text-slate-500">
+                    {appt.person.email && (
+                      <a href={`mailto:${appt.person.email}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Email Officer">
+                        <Mail className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {appt.person.phoneNumber && (
+                      <a href={`tel:${appt.person.phoneNumber}`} className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Call Officer">
+                        <Phone className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {appt.person.twitterUrl && (
+                      <a href={appt.person.twitterUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Twitter Profile">
+                        <Globe className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {appt.person.linkedinUrl && (
+                      <a href={appt.person.linkedinUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="LinkedIn Profile">
+                        <Globe className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {appt.person.instagramUrl && (
+                      <a href={appt.person.instagramUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-stone-100 hover:bg-stone-200 rounded-lg text-slate-700 transition-colors" title="Instagram Profile">
+                        <Globe className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="font-bold text-slate-700">Session: {currentSession.title}</span>
+                    <span className="text-emerald-800 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />
+                      Confirmed Exco
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* TRADITIONAL & CULTURAL ROYAL COURT SECTION (AFTER EXECUTIVE, BEFORE LEGISLATIVE) */}

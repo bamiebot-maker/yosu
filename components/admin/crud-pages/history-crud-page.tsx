@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   BookOpen,
   Plus,
@@ -17,6 +18,7 @@ import {
   FileText,
   Clock,
 } from 'lucide-react';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import {
   createHistoryChapterAction,
   updateHistoryChapterAction,
@@ -191,15 +193,31 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
               </p>
             </div>
 
-            {ch.presidentName && (
-              <div className="bg-stone-50 p-3 rounded-2xl border border-stone-200 text-xs space-y-1">
-                <div className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-amber-700" />
-                  <span>President: {ch.presidentName}</span>
-                </div>
-                {ch.theme && (
-                  <p className="text-slate-600 italic line-clamp-1">&ldquo;{ch.theme}&rdquo;</p>
+            {(ch.presidentName || ch.presidentPhotoUrl) && (
+              <div className="bg-stone-50 p-3 rounded-2xl border border-stone-200 text-xs flex items-center gap-3">
+                {ch.presidentPhotoUrl ? (
+                  <div className="w-12 h-14 rounded-xl overflow-hidden relative border border-emerald-900 shrink-0 bg-stone-200 shadow-sm">
+                    <Image
+                      src={ch.presidentPhotoUrl}
+                      alt={ch.presidentName || 'President'}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-14 rounded-xl bg-stone-200 border border-stone-300 flex items-center justify-center shrink-0 text-stone-400">
+                    <User className="w-5 h-5 text-stone-500" />
+                  </div>
                 )}
+                <div className="space-y-0.5 min-w-0 flex-1">
+                  <div className="font-bold text-slate-800 flex items-center gap-1.5 truncate">
+                    <span>{ch.presidentName || 'Presiding Executive'}</span>
+                  </div>
+                  {ch.theme && (
+                    <p className="text-slate-600 italic truncate text-[11px]">&ldquo;{ch.theme}&rdquo;</p>
+                  )}
+                </div>
               </div>
             )}
 
@@ -298,7 +316,7 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
                   />
                 </div>
 
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     President Name
                   </label>
@@ -311,16 +329,12 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    President Portrait URL
-                  </label>
-                  <input
-                    type="text"
+                <div className="sm:col-span-2 bg-stone-50 p-4 rounded-2xl border border-stone-200">
+                  <ImageUploader
+                    key={editingChapter?.id || 'new-session-photo'}
                     name="presidentPhotoUrl"
                     defaultValue={editingChapter?.presidentPhotoUrl || ''}
-                    placeholder="https://... or /images/..."
-                    className="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                    label="President Official Portrait / Headshot"
                   />
                 </div>
               </div>

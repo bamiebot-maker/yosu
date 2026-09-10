@@ -501,6 +501,7 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
                   alt={currentSession.president?.fullName || 'President Portrait'}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                 <div className="absolute bottom-2 left-2 right-2 text-center text-white">

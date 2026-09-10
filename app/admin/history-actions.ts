@@ -107,8 +107,7 @@ export async function createHistoryChapterAction(formData: FormData) {
       },
     });
 
-    revalidatePath('/history');
-    revalidatePath('/admin/history');
+    revalidateHistoryPaths();
     return { success: true, chapter: newChapter, message: 'History chapter created successfully' };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create history chapter' };
@@ -156,8 +155,7 @@ export async function updateHistoryChapterAction(id: string, formData: FormData)
       },
     });
 
-    revalidatePath('/history');
-    revalidatePath('/admin/history');
+    revalidateHistoryPaths();
     return { success: true, chapter: updated, message: 'History chapter updated successfully' };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to update history chapter' };
@@ -170,10 +168,19 @@ export async function deleteHistoryChapterAction(id: string) {
       where: { id },
     });
 
-    revalidatePath('/history');
-    revalidatePath('/admin/history');
+    revalidateHistoryPaths();
     return { success: true, message: 'History chapter deleted successfully' };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete history chapter' };
   }
+}
+
+function revalidateHistoryPaths() {
+  revalidatePath('/history');
+  revalidatePath('/history/past-leadership');
+  revalidatePath('/history/timeline');
+  revalidatePath('/history/leader-stories');
+  revalidatePath('/history/origin');
+  revalidatePath('/history/heritage-archive');
+  revalidatePath('/admin/history');
 }

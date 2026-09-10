@@ -3,12 +3,17 @@ import { db } from '@/lib/db';
 import { HistoryTimelineClient } from '@/components/history/history-timeline-client';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function HistoryTimelinePage() {
   let sessionsData: any[] = [];
   try {
     const sData = await db.administrationSession.findMany({
-      orderBy: { startDate: 'desc' },
+      where: { isPublished: true },
+      orderBy: [
+        { displayOrder: 'desc' },
+        { startDate: 'desc' },
+      ],
       include: {
         appointments: {
           include: {
@@ -23,22 +28,26 @@ export default async function HistoryTimelinePage() {
     sessionsData = sData.map((s) => {
       const pres = s.appointments.find((a) => a.office.title.toLowerCase().includes('president') && !a.office.title.toLowerCase().includes('vice'));
 
+      const presidentName = s.presidentName || pres?.person.fullName || 'Executive Administration';
+      const presidentPhoto = s.presidentPhotoUrl || pres?.person.avatarMedia?.url || null;
+
       return {
         id: s.id,
         title: s.title,
         slug: s.slug,
-        theme: s.theme,
+        theme: s.theme || s.motto || 'Preserving Yoruba Heritage & Student Dignity',
         startDate: s.startDate ? new Date(s.startDate).getFullYear().toString() : '2026',
         endDate: s.endDate ? new Date(s.endDate).getFullYear().toString() : null,
         isCurrent: s.isCurrent,
-        historicalSummary: (s as any).historicalSummary || 'Official administration session.',
-        president: pres ? {
-          id: pres.person.id,
-          fullName: pres.person.fullName,
-          stateOfOrigin: pres.person.stateOfOrigin,
-          avatarUrl: pres.person.avatarMedia?.url || null,
-          officeTitle: pres.office.title,
-        } : null,
+        historicalSummary: s.historicalNarrative || (s as any).historicalSummary || 'Official administration session record.',
+        displayOrder: s.displayOrder,
+        president: {
+          id: pres?.person.id || `pres-${s.id}`,
+          fullName: presidentName,
+          stateOfOrigin: pres?.person.stateOfOrigin || 'Yoruba',
+          avatarUrl: presidentPhoto,
+          officeTitle: pres?.office.title || 'Executive President',
+        },
         vicePresident: null,
         secretaryGeneral: null,
         executives: [],
