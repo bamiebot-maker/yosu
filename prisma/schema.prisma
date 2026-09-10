@@ -221,26 +221,35 @@ model Person {
 }
 
 model AdministrationSession {
-  id            String                @id @default(cuid())
-  title         String                @unique // e.g. "2026/2027 Session"
-  slug          String                @unique // e.g. "2026-2027"
-  startDate     DateTime
-  endDate       DateTime?
-  isCurrent     Boolean               @default(false)
-  theme         String?
-  appointments  OfficeAppointment[]
-  committees    Committee[]
-  albums        Album[]
-  constitutions ConstitutionVersion[]
-  projects              Project[]
-  achievements          SessionAchievement[]
-  dynamicAchievements   Achievement[]
-  houseRepresentatives  HouseRepresentative[]
-  presidentialWelcomes  PresidentialWelcome[]
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  id                  String                @id @default(cuid())
+  title               String                @unique // e.g. "2026/2027 Session"
+  slug                String                @unique // e.g. "2026-2027"
+  startDate           DateTime
+  endDate             DateTime?
+  isCurrent           Boolean               @default(false)
+  theme               String?
+  presidentName       String?
+  presidentPhotoUrl   String?
+  presidentBio        String?
+  historicalNarrative String?
+  motto               String?
+  displayOrder        Int                   @default(0)
+  isPublished         Boolean               @default(true)
+  appointments        OfficeAppointment[]
+  committees          Committee[]
+  albums              Album[]
+  constitutions       ConstitutionVersion[]
+  projects            Project[]
+  achievements        SessionAchievement[]
+  dynamicAchievements Achievement[]
+  houseRepresentatives HouseRepresentative[]
+  presidentialWelcomes PresidentialWelcome[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
 
   @@index([isCurrent])
+  @@index([displayOrder])
+  @@index([isPublished])
 }
 
 model SessionAchievement {
@@ -888,6 +897,7 @@ model StudentRegistration {
   notes                         String?
   ipAddress                     String?
   feedbacks                     MemberFeedback[]
+  payments                      PaymentTransaction[]
   createdAt                     DateTime           @default(now())
   updatedAt                     DateTime           @updatedAt
 
@@ -908,7 +918,44 @@ model RegistrationSettings {
   notice           String?
   closedMessage    String?
   academicSession  String?   @default("2026/2027")
+  duesAmount       Float     @default(2000.00)
+  duesPaymentEnabled Boolean @default(true)
   updatedAt        DateTime  @updatedAt
+}
+
+// ==========================================
+// 21. YOSU DUES PAYMENT TRANSACTION ENGINE
+// ==========================================
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  ABANDONED
+}
+
+model PaymentTransaction {
+  id                 String               @id @default(cuid())
+  reference          String               @unique
+  paystackReference  String?              @unique
+  studentId          String?
+  student            StudentRegistration? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  matricNumber       String
+  email              String
+  fullName           String
+  amount             Float
+  academicSession    String               @default("2026/2027")
+  status             PaymentStatus        @default(PENDING)
+  paymentChannel     String?
+  paystackPayload    String?
+  receiptNumber      String?              @unique
+  paidAt             DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([status, createdAt])
+  @@index([matricNumber, academicSession])
+  @@index([reference])
 }
 
 // ==========================================

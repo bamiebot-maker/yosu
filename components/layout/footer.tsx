@@ -90,6 +90,11 @@ export function Footer() {
                   <span>2026 Unification Constitution</span>
                 </Link>
               </li>
+              <li>
+                <Link href="/member/login" className="text-emerald-400 font-semibold hover:underline flex items-center gap-1">
+                  <span>Pay Yearly Dues (Member Portal)</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

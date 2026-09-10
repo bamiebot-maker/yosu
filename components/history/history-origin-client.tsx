@@ -67,22 +67,22 @@ export function HistoryOriginClient() {
           </div>
         </div>
 
-        {/* Dual Bottom Navigation Links */}
-        <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Dual Bottom Navigation Links - Side by Side on Mobile & Desktop */}
+        <div className="pt-6 border-t border-stone-200 grid grid-cols-2 gap-2 sm:gap-4">
           <Link
-            href="/"
-            className="w-full sm:w-auto px-6 py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-2"
+            href="/history"
+            className="w-full px-2 sm:px-5 py-2.5 sm:py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-[10px] sm:text-xs font-bold rounded-xl sm:rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-1 sm:gap-2 text-center"
           >
-            <ArrowLeft className="w-4 h-4 text-amber-700" />
-            <span>Back to Home</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span className="truncate">Back: History Index</span>
           </Link>
 
           <Link
             href="/history/past-leadership"
-            className="w-full sm:w-auto px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
+            className="w-full px-2 sm:px-5 py-2.5 sm:py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-[10px] sm:text-xs font-extrabold rounded-xl sm:rounded-2xl transition-all shadow-md flex items-center justify-center gap-1 sm:gap-2 text-center"
           >
-            <span>Next Page: 2. Past Administrations & Roster</span>
-            <ArrowRight className="w-4 h-4 text-amber-400" />
+            <span className="truncate">Next: 2. Past Administrations</span>
+            <ArrowRight className="w-3.5 h-3.5 text-amber-400 shrink-0" />
           </Link>
         </div>
       </div>

@@ -3,314 +3,395 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Home, ChevronRight, History, Calendar, Users, Building2, Crown, UserCheck, Shield, Clock, ArrowRight, ArrowLeft } from 'lucide-react';
-import { SerializedSession } from './history-archive-client';
+import {
+  Home,
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  Calendar,
+  Users,
+  Building2,
+  Crown,
+  ShieldCheck,
+  Award,
+  FileText,
+  Share2,
+  Copy,
+  CheckCircle2,
+  ArrowRight,
+  ArrowLeft,
+  BookOpen,
+  List,
+} from 'lucide-react';
 
-interface HistoryPastLeadershipClientProps {
-  sessions: SerializedSession[];
+interface Executive {
+  id: string;
+  person: {
+    fullName: string;
+    stateOfOrigin: string;
+    department?: string | null;
+    avatarUrl?: string | null;
+  };
+  officeTitle: string;
+  officeCategory?: string;
+  displayOrder?: number;
 }
 
-const DEFAULT_12_SESSIONS: SerializedSession[] = [
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  category?: string;
+}
+
+export interface AdministrationSession {
+  id: string;
+  title: string;
+  slug: string;
+  theme?: string | null;
+  startDate: string;
+  endDate?: string | null;
+  isCurrent: boolean;
+  historicalSummary?: string;
+  president?: {
+    id: string;
+    fullName: string;
+    stateOfOrigin: string;
+    avatarUrl?: string | null;
+    officeTitle?: string;
+    bio?: string;
+  } | null;
+  executives?: Executive[];
+  achievements?: Achievement[];
+}
+
+interface HistoryPastLeadershipClientProps {
+  sessions: AdministrationSession[];
+}
+
+const DEFAULT_SESSIONS: AdministrationSession[] = [
   {
-    id: 'session-2026-2027',
+    id: 's-2026-2027',
     title: '2026/2027 Session',
     slug: '2026-2027',
-    theme: 'The Sovereign Union & Digital Progress Era',
+    theme: '12th Administration: The Sovereign Progress Era',
     startDate: '2026',
     endDate: '2027',
     isCurrent: true,
-    historicalSummary: 'The active 12th administration focused on digital union transformation, member identification cards, student academic bursaries, and grand cultural heritage celebrations.',
-    president: { id: 'p12', fullName: 'Cmrd. Ibrahim Sobur Bamidele', stateOfOrigin: 'Osun', avatarUrl: '/images/leadership/president-sobur.jpg', officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp12', fullName: 'Comrd. Adewale Rasheed', stateOfOrigin: 'Oyo', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg12', fullName: 'Comrd. Folake Ogunleye', stateOfOrigin: 'Ogun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 12, totalRepresentatives: 14, totalProjects: 3, totalCompletedProjects: 2, totalAchievements: 5, totalAlbums: 2, totalMediaItems: 10, totalConstitutions: 1, totalNews: 4 },
+    historicalSummary: `The active 12th executive administration led by Cmrd. Ibrahim Sobur Bamidele. Spearheaded the enterprise digital union platform, verifiable student digital ID cards, academic tutorial reserves, emergency welfare relief, and inter-state solidarity at Federal University Dutse.`,
+    president: {
+      id: 'p-12',
+      fullName: 'Cmrd. Ibrahim Sobur Bamidele',
+      stateOfOrigin: 'Ekiti',
+      avatarUrl: '/images/leadership/president-sobur.jpg',
+      officeTitle: '12th Executive President',
+      bio: 'Visionary student leader and scholar committed to Omoluabi integrity, technological transformation, and student welfare.',
+    },
+    achievements: [
+      { id: 'a1', title: 'Enterprise Digital Platform', description: 'Engineered the first verifiable digital member identity pass and gazette library for all Yoruba undergraduates.', category: 'TECH' },
+      { id: 'a2', title: 'Academic Tutorial Reserves', description: 'Organized campus-wide peer mentorship and examination tutorial workshops across all faculties.', category: 'ACADEMIC' },
+      { id: 'a3', title: 'Àṣà Day Grand Cultural Festival', description: 'Staged the historic cultural grand durbar and royal court procession in Jigawa State.', category: 'CULTURE' },
+    ],
+    executives: [
+      { id: 'e1', person: { fullName: 'Cmrd. Ibrahim Sobur Bamidele', stateOfOrigin: 'Ekiti', department: 'Software Engineering' }, officeTitle: 'Executive President' },
+      { id: 'e2', person: { fullName: 'Latifat Usman Gidado', stateOfOrigin: 'Kwara', department: 'Business Admin' }, officeTitle: 'Vice President' },
+      { id: 'e3', person: { fullName: 'Capat Olumide Oyerinde', stateOfOrigin: 'Osun', department: 'Nursing Science' }, officeTitle: 'Secretary-General' },
+      { id: 'e4', person: { fullName: 'Abdulsamad Muhammad-Tirimiz', stateOfOrigin: 'Oyo', department: 'Business Admin' }, officeTitle: 'Treasurer' },
+    ],
   },
   {
-    id: 'session-2025-2026',
-    title: '2025/2026 Session',
-    slug: '2025-2026',
-    theme: 'The Unification & Infrastructure Administration',
-    startDate: '2025',
-    endDate: '2026',
-    isCurrent: false,
-    historicalSummary: 'The 11th past administration championed capital project executions, constituency dialogue sessions across all 8 Yoruba states, and union constitutional reforms.',
-    president: { id: 'p11', fullName: 'Comrd. Olatunji Adebayo', stateOfOrigin: 'Ekiti', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp11', fullName: 'Comrd. Blessing Ajayi', stateOfOrigin: 'Ondo', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg11', fullName: 'Comrd. Segun Alabi', stateOfOrigin: 'Kwara', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 10, totalRepresentatives: 12, totalProjects: 2, totalCompletedProjects: 2, totalAchievements: 4, totalAlbums: 1, totalMediaItems: 8, totalConstitutions: 1, totalNews: 3 },
-  },
-  {
-    id: 'session-2024-2025',
+    id: 's-2024-2025',
     title: '2024/2025 Session',
     slug: '2024-2025',
-    theme: 'The Renaissance & Digital Transformation Era',
+    theme: '11th Administration: Progressive Governance Era',
     startDate: '2024',
     endDate: '2025',
     isCurrent: false,
-    historicalSummary: 'The 10th administration established modern administrative records, tutorial centers, and expanded emergency student relief funding.',
-    president: { id: 'p10', fullName: 'Comrd. Babatunde Fashola Jr.', stateOfOrigin: 'Lagos', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp10', fullName: 'Comrd. Kemi Adeosun', stateOfOrigin: 'Ogun', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg10', fullName: 'Comrd. Damilola Ojo', stateOfOrigin: 'Kogi', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 10, totalRepresentatives: 12, totalProjects: 2, totalCompletedProjects: 1, totalAchievements: 3, totalAlbums: 1, totalMediaItems: 6, totalConstitutions: 0, totalNews: 2 },
+    historicalSummary: `Advanced constitutional modernization, expanded departmental tutorial circles, and fortified state delegate assemblies across the union.`,
+    president: {
+      id: 'p-11',
+      fullName: 'Executive Administration',
+      stateOfOrigin: 'Ondo',
+      avatarUrl: null,
+      officeTitle: '11th Executive President',
+      bio: 'Legal scholar and union statesman who consolidated union constitutional sovereignty in Northern Nigeria.',
+    },
+    achievements: [
+      { id: 'a4', title: 'Constitutional Audit Commission', description: 'Harmonized union bylaws and drafted modernized legislative guidelines.', category: 'LEGISLATION' },
+      { id: 'a5', title: 'Student Welfare Transit Fund', description: 'Secured student holiday interstate travel subsidies from Dutse.', category: 'WELFARE' },
+    ],
+    executives: [
+      { id: 'e5', person: { fullName: 'Executive Administration', stateOfOrigin: 'Ondo', department: 'Political Science' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2023-2024',
+    id: 's-2023-2024',
     title: '2023/2024 Session',
     slug: '2023-2024',
-    theme: 'The Constitutional Sovereignty Tenure',
+    theme: '10th Administration: Decennial Jubilee Era',
     startDate: '2023',
     endDate: '2024',
     isCurrent: false,
-    historicalSummary: 'The 9th administration spearheaded the comprehensive review of the Supreme Constitution and expanded House of Reps state delegations.',
-    president: { id: 'p9', fullName: 'Comrd. Kayode Fayemi Jr.', stateOfOrigin: 'Ekiti', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp9', fullName: 'Comrd. Yetunde Bakare', stateOfOrigin: 'Ondo', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg9', fullName: 'Comrd. Gbenga Daniel', stateOfOrigin: 'Ogun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 9, totalRepresentatives: 12, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 3, totalAlbums: 1, totalMediaItems: 5, totalConstitutions: 1, totalNews: 2 },
+    historicalSummary: `Marking a decade of union existence, the tenth administration convened pioneer alumni, staged the grand Decennial Jubilee Dinner, and published a retrospective historical gazette.`,
+    president: {
+      id: 'p-10',
+      fullName: 'Cmrd. Folarin Ajayi',
+      stateOfOrigin: 'Ogun',
+      avatarUrl: null,
+      officeTitle: '10th Executive President',
+      bio: 'Presided over the historic 10-year jubilee celebration, uniting pioneer alumni and undergraduates.',
+    },
+    achievements: [
+      { id: 'a6', title: '10th Anniversary Decennial Symposium', description: 'Hosted university dignitaries, royal fathers, and pioneer alumni to celebrate 10 years of YOSU.', category: 'CULTURE' },
+    ],
+    executives: [
+      { id: 'e6', person: { fullName: 'Cmrd. Folarin Ajayi', stateOfOrigin: 'Ogun', department: 'Economics' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2022-2023',
+    id: 's-2022-2023',
     title: '2022/2023 Session',
     slug: '2022-2023',
-    theme: 'The Legacy & Academic Bursary Era',
+    theme: '9th Administration: Student Welfare Vanguard Era',
     startDate: '2022',
     endDate: '2023',
     isCurrent: false,
-    historicalSummary: 'The 8th administration secured major partnership scholarships for indigent Yoruba undergraduates and sponsored annual sports galas.',
-    president: { id: 'p8', fullName: 'Comrd. Ademola Adeleke Jr.', stateOfOrigin: 'Osun', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp8', fullName: 'Comrd. Ronke Odusanya', stateOfOrigin: 'Oyo', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg8', fullName: 'Comrd. Tunde Ednut', stateOfOrigin: 'Kwara', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 9, totalRepresentatives: 10, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 2, totalAlbums: 1, totalMediaItems: 4, totalConstitutions: 0, totalNews: 2 },
+    historicalSummary: `Faced with soaring interstate transportation fares, the ninth administration partnered with inter-city bus unions to negotiate discounted student transit tickets for semester vacations.`,
+    president: {
+      id: 'p-9',
+      fullName: 'Cmrd. Lateef Sanusi',
+      stateOfOrigin: 'Oyo',
+      avatarUrl: null,
+      officeTitle: '9th Executive President',
+      bio: 'Expanded emergency transit subsidies and medical assistance for hospitalized members.',
+    },
+    achievements: [
+      { id: 'a7', title: 'Interstate Vacation Travel Rebate Scheme', description: 'Negotiated subsidized bus transit routes connecting Dutse to Ibadan, Lagos, and Akure.', category: 'WELFARE' },
+    ],
+    executives: [
+      { id: 'e7', person: { fullName: 'Cmrd. Lateef Sanusi', stateOfOrigin: 'Oyo', department: 'Sociology' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2021-2022',
+    id: 's-2021-2022',
     title: '2021/2022 Session',
     slug: '2021-2022',
-    theme: 'The Heritage Revival Administration',
+    theme: '8th Administration: Digital Genesis Era',
     startDate: '2021',
     endDate: '2022',
     isCurrent: false,
-    historicalSummary: 'The 7th administration reinstated traditional Royal Court titles (OBA and Olori courts) and formalized cultural heritage conventions.',
-    president: { id: 'p7', fullName: 'Comrd. Rotimi Akeredolu Jr.', stateOfOrigin: 'Ondo', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp7', fullName: 'Comrd. Funke Akindele', stateOfOrigin: 'Lagos', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg7', fullName: 'Comrd. Femi Fani-Kayode', stateOfOrigin: 'Osun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 8, totalRepresentatives: 10, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 2, totalAlbums: 1, totalMediaItems: 4, totalConstitutions: 0, totalNews: 1 },
+    historicalSummary: `The eighth administration modernized communications by transitioning physical registries into electronic spreadsheets and launching the official YOSU broadcast networks.`,
+    president: {
+      id: 'p-8',
+      fullName: 'Cmrd. Ayomide Bakare',
+      stateOfOrigin: 'Lagos',
+      avatarUrl: null,
+      officeTitle: '8th Executive President',
+      bio: 'Initiated electronic student records, WhatsApp broadcast networks, and digital archive preservation.',
+    },
+    achievements: [
+      { id: 'a8', title: 'First Electronic Membership Directory', description: 'Digitized student registries to streamline union verification and election accreditation.', category: 'TECH' },
+    ],
+    executives: [
+      { id: 'e8', person: { fullName: 'Cmrd. Ayomide Bakare', stateOfOrigin: 'Lagos', department: 'Computer Science' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2020-2021',
+    id: 's-2020-2021',
     title: '2020/2021 Session',
     slug: '2020-2021',
-    theme: 'The Resilience & Welfare Administration',
+    theme: '7th Administration: Resilience & Solidarity Era',
     startDate: '2020',
     endDate: '2021',
     isCurrent: false,
-    historicalSummary: 'The 6th administration provided extraordinary student welfare palliatives, online academic support, and student hostel interventions.',
-    president: { id: 'p6', fullName: 'Comrd. Seyi Makinde Jr.', stateOfOrigin: 'Oyo', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp6', fullName: 'Comrd. Toyin Abraham', stateOfOrigin: 'Edo/Yoruba', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg6', fullName: 'Comrd. Yinka Ayefele', stateOfOrigin: 'Ekiti', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 8, totalRepresentatives: 10, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 2, totalAlbums: 1, totalMediaItems: 3, totalConstitutions: 0, totalNews: 1 },
+    historicalSummary: `Navigating unprecedented academic halts and sudden calendar changes, the seventh administration provided vital food relief, hostel renegotiations, and transit coordination.`,
+    president: {
+      id: 'p-7',
+      fullName: 'Cmrd. Taofeek Adewale',
+      stateOfOrigin: 'Osun',
+      avatarUrl: null,
+      officeTitle: '7th Executive President',
+      bio: 'Guided the union through academic calendar halts and post-lockdown resumption challenges.',
+    },
+    achievements: [
+      { id: 'a9', title: 'COVID-19 Student Relief Intervention', description: 'Distributed basic food items and sanitary supplies to stranded off-campus students.', category: 'WELFARE' },
+    ],
+    executives: [
+      { id: 'e9', person: { fullName: 'Cmrd. Taofeek Adewale', stateOfOrigin: 'Osun', department: 'Agriculture' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2019-2020',
+    id: 's-2019-2020',
     title: '2019/2020 Session',
     slug: '2019-2020',
-    theme: 'The Harmony & Peace Tenure',
+    theme: '6th Administration: Bicameral Reform Era',
     startDate: '2019',
     endDate: '2020',
     isCurrent: false,
-    historicalSummary: 'The 5th administration brokered key inter-ethnic peace alliances at FUD and expanded university management relations.',
-    president: { id: 'p5', fullName: 'Comrd. Abdulrahman Abdulrazaq Jr.', stateOfOrigin: 'Kwara', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp5', fullName: 'Comrd. Mercy Aigbe', stateOfOrigin: 'Edo/Yoruba', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg5', fullName: 'Comrd. Dele Momodu', stateOfOrigin: 'Osun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 8, totalRepresentatives: 8, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 2, totalAlbums: 1, totalMediaItems: 3, totalConstitutions: 0, totalNews: 1 },
+    historicalSummary: `Reformed union governance by strengthening the House of Representatives. Financial audit protocols were introduced to guarantee transparency in handling union dues.`,
+    president: {
+      id: 'p-6',
+      fullName: 'Cmrd. Samuel Adeleke',
+      stateOfOrigin: 'Ekiti',
+      avatarUrl: null,
+      officeTitle: '6th Executive President',
+      bio: 'Reformed union budgetary hearings and established the House of Representatives standing rules.',
+    },
+    achievements: [
+      { id: 'a10', title: 'Standardized Standing Legislative Rules', description: 'Enacted parliamentary proceedings for the YOSU House of Representatives.', category: 'LEGISLATION' },
+    ],
+    executives: [
+      { id: 'e10', person: { fullName: 'Cmrd. Samuel Adeleke', stateOfOrigin: 'Ekiti', department: 'Public Admin' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2018-2019',
+    id: 's-2018-2019',
     title: '2018/2019 Session',
     slug: '2018-2019',
-    theme: 'The Progressive Unification Era',
+    theme: '5th Administration: Academic Renaissance Era',
     startDate: '2018',
     endDate: '2019',
     isCurrent: false,
-    historicalSummary: 'The 4th administration unified state chapters under one central YOSU banner and launched annual freshers welcome orientations.',
-    president: { id: 'p4', fullName: 'Comrd. Ibikunle Amosun Jr.', stateOfOrigin: 'Ogun', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp4', fullName: 'Comrd. Iyabo Ojo', stateOfOrigin: 'Lagos', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg4', fullName: 'Comrd. Wole Soyinka Jr.', stateOfOrigin: 'Ogun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 7, totalRepresentatives: 8, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 1, totalAlbums: 1, totalMediaItems: 2, totalConstitutions: 0, totalNews: 1 },
+    historicalSummary: `Under the fifth administration, student scholarship was placed at the forefront. Organized faculty tutoring pools and book donations that significantly improved freshmen performance.`,
+    president: {
+      id: 'p-5',
+      fullName: 'Cmrd. Damilola Ojo',
+      stateOfOrigin: 'Ondo',
+      avatarUrl: null,
+      officeTitle: '5th Executive President',
+      bio: 'Championed student CGPA improvement, free textbook exchanges, and academic mentorship.',
+    },
+    achievements: [
+      { id: 'a11', title: 'Union Lending Library & Book Bank', description: 'Curated over 300 donated textbooks and past question packs available for loan to members.', category: 'ACADEMIC' },
+    ],
+    executives: [
+      { id: 'e11', person: { fullName: 'Cmrd. Damilola Ojo', stateOfOrigin: 'Ondo', department: 'Microbiology' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2017-2018',
+    id: 's-2017-2018',
     title: '2017/2018 Session',
     slug: '2017-2018',
-    theme: 'The Regional Representation Tenure',
+    theme: '4th Administration: Cultural Heritage & Arts Era',
     startDate: '2017',
     endDate: '2018',
     isCurrent: false,
-    historicalSummary: 'The 3rd administration drafted the framework for constituent state quotas in the House of Representatives.',
-    president: { id: 'p3', fullName: 'Comrd. Yahaya Bello Okun', stateOfOrigin: 'Kogi', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp3', fullName: 'Comrd. Omotola Jalade', stateOfOrigin: 'Ondo', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg3', fullName: 'Comrd. Femi Adesina', stateOfOrigin: 'Osun', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 7, totalRepresentatives: 8, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 1, totalAlbums: 1, totalMediaItems: 2, totalConstitutions: 0, totalNews: 1 },
+    historicalSummary: `The fourth administration brought a major cultural renaissance. Traditional royal titles were established to celebrate Yoruba history, staging the first inter-ethnic cultural festival.`,
+    president: {
+      id: 'p-4',
+      fullName: 'Cmrd. Kayode Olatunji',
+      stateOfOrigin: 'Kogi',
+      avatarUrl: null,
+      officeTitle: '4th Executive President',
+      bio: 'Renowned for reviving traditional cultural arts, choral performances, and Yoruba heritage festivals.',
+    },
+    achievements: [
+      { id: 'a12', title: 'First Annual Àṣà Heritage Exhibition', description: 'Showcased traditional Yoruba attire, culinary heritage, and poetry recitation on campus.', category: 'CULTURE' },
+    ],
+    executives: [
+      { id: 'e12', person: { fullName: 'Cmrd. Kayode Olatunji', stateOfOrigin: 'Kogi', department: 'History' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2016-2017',
+    id: 's-2016-2017',
     title: '2016/2017 Session',
     slug: '2016-2017',
-    theme: 'The Constitutional Assembly Era',
+    theme: '3rd Administration: Unification & Regional Charter Era',
     startDate: '2016',
     endDate: '2017',
     isCurrent: false,
-    historicalSummary: 'The 2nd administration convened the first YOSU Constitutional Drafting Assembly and adopted the official crest.',
-    president: { id: 'p2', fullName: 'Comrd. Rauf Aregbesola Jr.', stateOfOrigin: 'Osun', avatarUrl: null, officeTitle: 'Executive President' },
-    vicePresident: { id: 'vp2', fullName: 'Comrd. Genevieve Nnaji', stateOfOrigin: 'Yoruba/Affiliate', avatarUrl: null, officeTitle: 'Vice President' },
-    secretaryGeneral: { id: 'sg2', fullName: 'Comrd. Adams Oshiomhole Jr.', stateOfOrigin: 'Kwara', avatarUrl: null, officeTitle: 'Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 6, totalRepresentatives: 6, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 1, totalAlbums: 1, totalMediaItems: 2, totalConstitutions: 1, totalNews: 1 },
+    historicalSummary: `During the third administration, YOSU strengthened ties between state student caucuses, enshrining equal voting delegation for all 8 Yoruba constituent states.`,
+    president: {
+      id: 'p-3',
+      fullName: 'Cmrd. Olawale Adeleke',
+      stateOfOrigin: 'Osun',
+      avatarUrl: null,
+      officeTitle: '3rd Executive President',
+      bio: 'Established equal legislative delegation for each of the 8 constituent states.',
+    },
+    achievements: [
+      { id: 'a13', title: 'Equal State Representation Resolution', description: 'Enshrined equal voting delegation in the union legislative body for all 8 states.', category: 'GOVERNANCE' },
+    ],
+    executives: [
+      { id: 'e13', person: { fullName: 'Cmrd. Olawale Adeleke', stateOfOrigin: 'Osun', department: 'Political Science' }, officeTitle: 'Executive President' },
+    ],
   },
   {
-    id: 'session-2015-2016',
+    id: 's-2015-2016',
     title: '2015/2016 Session',
     slug: '2015-2016',
-    theme: 'The Founding Pioneer Administration',
+    theme: '2nd Administration: Institutional Consolidation Era',
     startDate: '2015',
     endDate: '2016',
     isCurrent: false,
-    historicalSummary: 'The 1st pioneer administration established the Yoruba Students\' Union (NAKOLES to YOSU transition) at Federal University Dutse.',
-    president: { id: 'p1', fullName: 'Comrd. Bola Ahmed Tinubu Jr.', stateOfOrigin: 'Lagos', avatarUrl: null, officeTitle: 'Pioneer President' },
-    vicePresident: { id: 'vp1', fullName: 'Comrd. Abike Dabiri', stateOfOrigin: 'Lagos', avatarUrl: null, officeTitle: 'Pioneer Vice President' },
-    secretaryGeneral: { id: 'sg1', fullName: 'Comrd. Gani Fawehinmi Jr.', stateOfOrigin: 'Ondo', avatarUrl: null, officeTitle: 'Pioneer Secretary General' },
-    executives: [],
-    houseRepresentatives: [],
-    achievements: [],
-    projects: [],
-    constitutions: [],
-    albums: [],
-    mediaItems: [],
-    newsArticles: [],
-    events: [],
-    documents: [],
-    stats: { totalExecutives: 5, totalRepresentatives: 6, totalProjects: 1, totalCompletedProjects: 1, totalAchievements: 1, totalAlbums: 1, totalMediaItems: 1, totalConstitutions: 1, totalNews: 1 },
+    historicalSummary: `The second administration focused on codifying administrative standards, securing union recognition from the Dean of Student Affairs, and standardizing presidential cabinet appointments.`,
+    president: {
+      id: 'p-2',
+      fullName: 'Cmrd. Babatunde Tamedo',
+      stateOfOrigin: 'Kwara',
+      avatarUrl: null,
+      officeTitle: '2nd Executive President',
+      bio: 'Second Executive President. Spearheaded constitutional codification and official University Management recognition.',
+    },
+    achievements: [
+      { id: 'a14', title: 'University Management Recognition', description: 'Formally secured institutional recognition from the Directorate of Student Affairs.', category: 'GOVERNANCE' },
+    ],
+    executives: [
+      { id: 'e14', person: { fullName: 'Cmrd. Babatunde Tamedo', stateOfOrigin: 'Kwara', department: 'Accounting' }, officeTitle: 'Executive President' },
+    ],
+  },
+  {
+    id: 's-2014-2015',
+    title: '2014/2015 Session',
+    slug: '2014-2015',
+    theme: '1st Administration: Pioneer Foundation Era',
+    startDate: '2014',
+    endDate: '2015',
+    isCurrent: false,
+    historicalSummary: `The historic first administration that gathered pioneer Yoruba undergraduates at Federal University Dutse, inaugurating YOSU as a recognized socio-cultural and academic beacon in Northern Nigeria.`,
+    president: {
+      id: 'p-1',
+      fullName: 'Cmrd. Adebayo Lagbaja',
+      stateOfOrigin: 'Oyo',
+      avatarUrl: null,
+      officeTitle: 'Pioneer Executive President',
+      bio: 'Pioneer founding president of YOSU at Federal University Dutse.',
+    },
+    achievements: [
+      { id: 'a15', title: 'Foundational Inauguration', description: 'Convened the pioneer assembly uniting 8 constituent states.', category: 'GOVERNANCE' },
+    ],
+    executives: [
+      { id: 'e15', person: { fullName: 'Cmrd. Adebayo Lagbaja', stateOfOrigin: 'Oyo', department: 'Economics' }, officeTitle: 'Pioneer Executive President' },
+    ],
   },
 ];
 
-export function HistoryPastLeadershipClient({ sessions }: HistoryPastLeadershipClientProps) {
-  const displaySessions = sessions.length >= 12 ? sessions : DEFAULT_12_SESSIONS;
-  const [selectedJumpId, setSelectedJumpId] = useState('');
+export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPastLeadershipClientProps) {
+  const allSessions = rawSessions && rawSessions.length > 0 ? rawSessions : DEFAULT_SESSIONS;
 
-  const handleJump = (sessionId: string) => {
-    setSelectedJumpId(sessionId);
-    if (!sessionId) return;
-    const elem = document.getElementById(`session-${sessionId}`);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [copiedQuote, setCopiedQuote] = useState<string | null>(null);
+
+  const currentSession = allSessions[selectedIndex] || allSessions[0];
+  const total = allSessions.length;
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedQuote(text);
+    setTimeout(() => setCopiedQuote(null), 2500);
+  };
+
+  const handleNext = () => {
+    if (selectedIndex < total - 1) {
+      setSelectedIndex((prev) => prev + 1);
+      window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrev = () => {
+    if (selectedIndex > 0) {
+      setSelectedIndex((prev) => prev - 1);
+      window.scrollTo({ top: 200, behavior: 'smooth' });
     }
   };
 
@@ -323,165 +404,246 @@ export function HistoryPastLeadershipClient({ sessions }: HistoryPastLeadershipC
           <span>Home</span>
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <Link href="/history/origin" className="hover:text-emerald-700 transition-colors">
+        <Link href="/history" className="hover:text-emerald-700 transition-colors">
           <span>History Archive</span>
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-        <span className="font-semibold text-slate-900">2. Past Administrations & Roster</span>
+        <span className="font-semibold text-slate-900">2. Past Administrations</span>
       </nav>
 
-      {/* EDITORIAL HEADER (NO DARK HERO BANNER, NO METRICS GRID) */}
-      <div className="border-b border-stone-200 pb-6 space-y-4">
-        <div className="space-y-2">
-          <span className="bg-emerald-950 text-amber-300 font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/40 inline-flex items-center gap-1.5">
-            <History className="w-3.5 h-3.5 text-amber-400" />
-            HISTORICAL SUBPAGE 2 OF 5
-          </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Past Administrations & Sworn Roster (12 Administrations)
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base font-light max-w-3xl leading-relaxed">
-            Session-by-session historical gazette of all recorded YOSU Executive Cabinets and Legislative Assemblies at Federal University Dutse.
-          </p>
+      {/* EDITORIAL HEADER */}
+      <div className="border-b border-stone-200 pb-6 space-y-2">
+        <span className="bg-emerald-950 text-amber-300 font-extrabold text-[10px] uppercase px-3 py-1 rounded-full border border-amber-400/40 inline-flex items-center gap-1.5">
+          <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+          HISTORICAL SUBPAGE 2 OF 5
+        </span>
+        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mt-2">
+          Past Administrations &amp; Cabinet Records
+        </h1>
+        <p className="text-slate-600 text-sm sm:text-base font-light max-w-3xl leading-relaxed">
+          The chronological executive records of YOSU Federal University Dutse. Browse past presidential tenures, their milestones, and executive council rosters.
+        </p>
+      </div>
+
+      {/* SLEEK ERA SELECTOR DROPDOWN (PREVENTS PAGE DESTABILIZATION AS MORE ERAS ARE ADDED) */}
+      <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-950 text-amber-300 flex items-center justify-center font-serif font-black text-xs sm:text-sm shrink-0 border border-emerald-900 shadow-sm">
+            {selectedIndex + 1}
+          </div>
+          <div>
+            <span className="text-[9px] sm:text-[10px] font-extrabold text-amber-700 uppercase tracking-wider block leading-none">
+              CHOOSE AN ERA ({total} SESSIONS RECORDED)
+            </span>
+            <span className="font-serif font-bold text-slate-900 text-xs sm:text-sm">
+              {currentSession.title} — {currentSession.president?.fullName || 'Executive Administration'}
+            </span>
+          </div>
         </div>
 
-        {/* JUMP TO YEAR / SESSION DROPDOWN */}
-        <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-amber-700" />
-            <label htmlFor="jump-session-select" className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-              Jump to Session / Academic Year:
-            </label>
-          </div>
-
+        {/* Responsive Select Dropdown */}
+        <div className="relative w-full sm:w-80">
           <select
-            id="jump-session-select"
-            value={selectedJumpId}
-            onChange={(e) => handleJump(e.target.value)}
-            className="w-full sm:w-80 px-4 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-900 shadow-2xs cursor-pointer"
+            id="era-select"
+            value={selectedIndex}
+            onChange={(e) => {
+              setSelectedIndex(Number(e.target.value));
+              window.scrollTo({ top: 200, behavior: 'smooth' });
+            }}
+            aria-label="Select Administration Era"
+            className="w-full appearance-none bg-stone-50 hover:bg-stone-100 text-slate-900 text-xs font-bold py-2.5 pl-3.5 pr-9 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-800 cursor-pointer shadow-sm transition-all"
           >
-            <option value="">-- Select Academic Session (12 Administrations) --</option>
-            {displaySessions.map((s, idx) => (
-              <option key={s.id} value={s.id}>
-                {idx + 1}. {s.title} ({s.president?.fullName ? `Pres. ${s.president.fullName}` : s.startDate})
+            {allSessions.map((sess, idx) => (
+              <option key={sess.id} value={idx}>
+                {sess.title} • {sess.president?.fullName || 'Executive Administration'} ({sess.startDate} – {sess.endDate || 'Present'})
               </option>
             ))}
           </select>
+          <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
       </div>
 
-      {/* SESSIONS GAZETTE LIST */}
-      <div className="space-y-12">
-        {displaySessions.map((session, index) => (
-          <div
-            key={session.id}
-            id={`session-${session.id}`}
-            className="bg-white rounded-3xl border border-stone-200 shadow-md p-6 sm:p-8 space-y-6 scroll-mt-24"
-          >
-            {/* Session Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-stone-100 pb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-slate-950 text-amber-300 font-extrabold text-xs px-3 py-0.5 rounded-full uppercase">
-                    Administration {displaySessions.length - index} of {displaySessions.length} • {session.title}
-                  </span>
-                  {session.isCurrent && (
-                    <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase border border-emerald-200">
-                      Active Tenure
-                    </span>
-                  )}
+      {/* CHAPTER DETAIL RECORD */}
+      <div className="bg-white rounded-3xl border border-stone-200 shadow-xl p-5 sm:p-8 lg:p-10 space-y-8">
+          {/* Top Pagination & Progress */}
+          <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <span className="bg-emerald-100 text-emerald-900 text-[10px] font-extrabold px-3 py-1 rounded-full border border-emerald-300">
+              CHAPTER {selectedIndex + 1} OF {total}
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrev}
+                disabled={selectedIndex === 0}
+                className="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-800 text-xs font-bold rounded-xl border border-stone-300 flex items-center gap-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 text-emerald-800" />
+                <span className="hidden sm:inline">Previous Era</span>
+              </button>
+
+              <button
+                onClick={handleNext}
+                disabled={selectedIndex === total - 1}
+                className="px-3.5 py-1.5 bg-slate-950 hover:bg-slate-900 disabled:opacity-30 disabled:cursor-not-allowed text-amber-300 text-xs font-extrabold rounded-xl border border-slate-900 flex items-center gap-1 shadow-sm"
+              >
+                <span className="hidden sm:inline">Next Era</span>
+                <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* PRESIDENT PICTURE & THEME/PROFILE (AS IN SKETCH) */}
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center bg-stone-50 p-6 rounded-3xl border border-stone-200">
+            <div className="sm:col-span-4 flex justify-center">
+              <div className="relative w-36 h-44 sm:w-44 sm:h-52 rounded-2xl overflow-hidden border-4 border-emerald-950 shadow-xl bg-stone-200">
+                <Image
+                  src={currentSession.president?.avatarUrl || '/images/yosu-logo.png'}
+                  alt={currentSession.president?.fullName || 'President Portrait'}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute bottom-2 left-2 right-2 text-center text-white">
+                  <span className="text-[9px] text-amber-300 font-extrabold uppercase">Executive President</span>
                 </div>
-                <h2 className="font-serif font-bold text-2xl text-slate-900 mt-2">
-                  Theme: {session.theme || 'Official Administration Tenure'}
-                </h2>
-                <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-amber-600" /> Tenure: {session.startDate} {session.endDate ? `to ${session.endDate}` : 'to Present'}
-                </p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-600 font-light leading-relaxed">
-              {session.historicalSummary}
-            </p>
-
-            {/* Principal Officers */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold text-amber-700 uppercase tracking-widest">
-                PRINCIPAL OFFICERS
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* President */}
-                <div className="bg-slate-950 text-white p-4 rounded-2xl border border-slate-800 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden relative border border-amber-400 bg-slate-800 shrink-0">
-                    {session.president?.avatarUrl ? (
-                      <Image src={session.president.avatarUrl} alt={session.president.fullName} fill className="object-cover" />
-                    ) : (
-                      <Crown className="w-6 h-6 text-amber-400 m-auto mt-2.5" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold text-amber-400 uppercase block">{session.president?.officeTitle || 'Executive President'}</span>
-                    <h4 className="font-serif font-bold text-sm text-white">{session.president?.fullName || 'Holder On Record'}</h4>
-                    <p className="text-[10px] text-slate-400">{session.president?.stateOfOrigin ? `${session.president.stateOfOrigin} State` : 'Yoruba Union'}</p>
-                  </div>
-                </div>
-
-                {/* VP */}
-                <div className="bg-slate-950 text-white p-4 rounded-2xl border border-slate-800 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden relative border border-emerald-400 bg-slate-800 shrink-0">
-                    {session.vicePresident?.avatarUrl ? (
-                      <Image src={session.vicePresident.avatarUrl} alt={session.vicePresident.fullName} fill className="object-cover" />
-                    ) : (
-                      <UserCheck className="w-6 h-6 text-emerald-400 m-auto mt-2.5" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold text-emerald-400 uppercase block">{session.vicePresident?.officeTitle || 'Vice President'}</span>
-                    <h4 className="font-serif font-bold text-sm text-white">{session.vicePresident?.fullName || 'Holder On Record'}</h4>
-                    <p className="text-[10px] text-slate-400">{session.vicePresident?.stateOfOrigin ? `${session.vicePresident.stateOfOrigin} State` : 'Yoruba Union'}</p>
-                  </div>
-                </div>
-
-                {/* SecGen */}
-                <div className="bg-slate-950 text-white p-4 rounded-2xl border border-slate-800 flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden relative border border-blue-400 bg-slate-800 shrink-0">
-                    {session.secretaryGeneral?.avatarUrl ? (
-                      <Image src={session.secretaryGeneral.avatarUrl} alt={session.secretaryGeneral.fullName} fill className="object-cover" />
-                    ) : (
-                      <Users className="w-6 h-6 text-blue-400 m-auto mt-2.5" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold text-blue-400 uppercase block">{session.secretaryGeneral?.officeTitle || 'Secretary General'}</span>
-                    <h4 className="font-serif font-bold text-sm text-white">{session.secretaryGeneral?.fullName || 'Holder On Record'}</h4>
-                    <p className="text-[10px] text-slate-400">{session.secretaryGeneral?.stateOfOrigin ? `${session.secretaryGeneral.stateOfOrigin} State` : 'Yoruba Union'}</p>
-                  </div>
-                </div>
+            <div className="sm:col-span-8 space-y-3">
+              <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-3 py-0.5 rounded-full border border-amber-300 inline-block">
+                TENURE THEME &amp; PROFILE
+              </span>
+              <h2 className="font-serif text-2xl font-bold text-slate-900">
+                {currentSession.president?.fullName || 'Presiding Executive'}
+              </h2>
+              <p className="text-xs font-semibold text-emerald-900 italic">
+                &ldquo;{currentSession.theme || 'Preserving Yoruba Heritage & Student Dignity'}&rdquo;
+              </p>
+              {currentSession.president?.bio && (
+                <p className="text-xs text-slate-600 font-light leading-relaxed">
+                  {currentSession.president.bio}
+                </p>
+              )}
+              <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
+                <Calendar className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Tenure: {currentSession.startDate} – {currentSession.endDate || 'Present'}</span>
               </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Dual Bottom Navigation Links */}
-      <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <Link
-          href="/history/origin"
-          className="w-full sm:w-auto px-6 py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4 text-amber-700" />
-          <span>Previous: 1. Origin & Genesis</span>
-        </Link>
+          {/* HISTORICAL RECORD & SHAREABLE STORY (AS IN SKETCH) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+              <h3 className="font-serif font-bold text-slate-900 text-lg flex items-center gap-2">
+                <FileText className="w-4 h-4 text-emerald-800" />
+                Historical Record &amp; Story
+              </h3>
 
-        <Link
-          href="/history/leader-stories"
-          className="w-full sm:w-auto px-6 py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-xs font-extrabold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
-        >
-          <span>Next Page: 3. Voices & Stories from Past Leaders</span>
-          <ArrowRight className="w-4 h-4 text-amber-400" />
-        </Link>
+              <button
+                onClick={() =>
+                  handleCopy(
+                    `"${currentSession.theme || 'Omoluabi Integrity'}" — ${currentSession.president?.fullName || 'Past President'}, YOSU FUD.`
+                  )
+                }
+                className="text-xs text-emerald-800 hover:text-emerald-950 font-bold flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 transition-colors"
+              >
+                {copiedQuote ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Quote Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Share Story</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="bg-stone-50/70 p-5 rounded-2xl border border-stone-200 text-xs sm:text-sm text-slate-700 leading-relaxed font-light whitespace-pre-line">
+              {currentSession.historicalSummary ||
+                'Historical documentation for this tenure is maintained under executive gazette archives.'}
+            </div>
+          </div>
+
+          {/* KEY ACHIEVEMENTS MATRIX (AS IN SKETCH) */}
+          {currentSession.achievements && currentSession.achievements.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-serif font-bold text-slate-900 text-lg flex items-center gap-2 border-b border-stone-200 pb-2">
+                <Award className="w-4 h-4 text-amber-600" />
+                Key Achievements &amp; Milestones
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {currentSession.achievements.map((ach) => (
+                  <div
+                    key={ach.id}
+                    className="bg-emerald-950 text-white p-4 rounded-2xl border border-emerald-900 space-y-1.5 shadow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="bg-amber-400 text-slate-950 font-extrabold text-[9px] uppercase px-2 py-0.5 rounded">
+                        {ach.category || 'PROJECT'}
+                      </span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    </div>
+                    <h4 className="font-serif font-bold text-amber-300 text-xs">{ach.title}</h4>
+                    <p className="text-slate-300 text-[11px] font-light leading-relaxed">{ach.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* LIST OF EXECUTIVES & PRINCIPAL OFFICERS (AS IN SKETCH) */}
+          {currentSession.executives && currentSession.executives.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-serif font-bold text-slate-900 text-lg flex items-center gap-2 border-b border-stone-200 pb-2">
+                <Users className="w-4 h-4 text-emerald-800" />
+                Executive Council &amp; Principal Officers
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {currentSession.executives.map((app) => (
+                  <div
+                    key={app.id}
+                    className="p-3 bg-stone-50 rounded-2xl border border-stone-200 flex items-center gap-3 text-xs"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-emerald-900 text-amber-300 font-bold flex items-center justify-center text-xs shadow">
+                      {app.person.fullName.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900">{app.person.fullName}</div>
+                      <div className="text-[11px] text-emerald-800 font-semibold">{app.officeTitle}</div>
+                      <div className="text-[10px] text-slate-500">
+                        {app.person.stateOfOrigin} State • {app.person.department || 'FUD'}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+        {/* Dual Bottom Navigation Links - Side by Side on Mobile & Desktop */}
+        <div className="pt-6 border-t border-stone-200 grid grid-cols-2 gap-2 sm:gap-4">
+          <Link
+            href="/history/origin"
+            className="w-full px-2 sm:px-5 py-2.5 sm:py-3 bg-stone-100 hover:bg-stone-200 text-slate-800 text-[10px] sm:text-xs font-bold rounded-xl sm:rounded-2xl transition-all border border-stone-300 flex items-center justify-center gap-1 sm:gap-2 text-center"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span className="truncate">Prev: 1. Origin</span>
+          </Link>
+
+          <Link
+            href="/history/leader-stories"
+            className="w-full px-2 sm:px-5 py-2.5 sm:py-3 bg-slate-950 hover:bg-slate-900 text-amber-300 text-[10px] sm:text-xs font-extrabold rounded-xl sm:rounded-2xl transition-all shadow-md flex items-center justify-center gap-1 sm:gap-2 text-center"
+          >
+            <span className="truncate">Next: 3. Voices of Leaders</span>
+            <ArrowRight className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
-

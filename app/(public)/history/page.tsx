@@ -1,8 +1,8 @@
 import React from 'react';
-import { HistoryOriginClient } from '@/components/history/history-origin-client';
+import { HistoryIndexClient } from '@/components/history/history-index-client';
 
 export const dynamic = 'force-dynamic';
 
-export default function HistoryOriginPage() {
-  return <HistoryOriginClient />;
+export default function HistoryPage() {
+  return <HistoryIndexClient />;
 }

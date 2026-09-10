@@ -65,6 +65,8 @@ export function Sidebar({ session }: SidebarProps) {
         { name: 'House Representatives', href: '/admin/representatives', icon: FolderGit2 },
         { name: 'Era Achievements', href: '/admin/achievements', icon: BarChart3 },
         { name: 'Sessions & Timeline', href: '/admin/sessions', icon: BarChart3 },
+        { name: 'History Chapters CMS', href: '/admin/history', icon: BookOpen },
+        { name: 'Dues & Revenue Audit', href: '/admin/payments', icon: BarChart3 },
       ],
     },
     {
