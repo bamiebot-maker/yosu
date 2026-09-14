@@ -82,6 +82,42 @@ export async function createHistoryChapterAction(formData: FormData) {
     const startDate = startDateStr ? new Date(startDateStr) : new Date();
     const endDate = endDateStr ? new Date(endDateStr) : null;
 
+    const archivalPhotosRaw = formData.get('archivalPhotos') as string | null;
+    let archivalPhotos: any = undefined;
+    if (archivalPhotosRaw) {
+      try {
+        const parsed = JSON.parse(archivalPhotosRaw);
+        if (Array.isArray(parsed)) {
+          archivalPhotos = parsed.slice(0, 10).map((p: any) => ({
+            url: typeof p.url === 'string' ? p.url.trim() : '',
+            caption: typeof p.caption === 'string' ? p.caption.trim() : '',
+          })).filter((p: any) => p.url.length > 0);
+        }
+      } catch (err) {
+        console.error('Failed to parse archivalPhotos JSON:', err);
+      }
+    }
+
+    const cabinetMembersRaw = formData.get('cabinetMembers') as string | null;
+    let cabinetMembers: any = undefined;
+    if (cabinetMembersRaw) {
+      try {
+        const parsed = JSON.parse(cabinetMembersRaw);
+        if (Array.isArray(parsed)) {
+          cabinetMembers = parsed.map((m: any, idx: number) => ({
+            id: m.id || `cab-${Date.now()}-${idx}`,
+            fullName: typeof m.fullName === 'string' ? m.fullName.trim() : '',
+            officeTitle: typeof m.officeTitle === 'string' ? m.officeTitle.trim() : '',
+            stateOfOrigin: typeof m.stateOfOrigin === 'string' ? m.stateOfOrigin.trim() : 'Yoruba',
+            department: typeof m.department === 'string' ? m.department.trim() : '',
+            avatarUrl: typeof m.avatarUrl === 'string' ? m.avatarUrl.trim() : '',
+          })).filter((m: any) => m.fullName.length > 0 && m.officeTitle.length > 0);
+        }
+      } catch (err) {
+        console.error('Failed to parse cabinetMembers JSON:', err);
+      }
+    }
+
     if (isCurrent) {
       await db.administrationSession.updateMany({
         where: { isCurrent: true },
@@ -104,7 +140,9 @@ export async function createHistoryChapterAction(formData: FormData) {
         isCurrent,
         startDate,
         endDate,
-      },
+        ...(archivalPhotos !== undefined ? { archivalPhotos } : {}),
+        ...(cabinetMembers !== undefined ? { cabinetMembers } : {}),
+      } as any,
     });
 
     revalidateHistoryPaths();
@@ -130,6 +168,42 @@ export async function updateHistoryChapterAction(id: string, formData: FormData)
     const startDateStr = formData.get('startDate') as string;
     const endDateStr = formData.get('endDate') as string;
 
+    const archivalPhotosRaw = formData.get('archivalPhotos') as string | null;
+    let archivalPhotos: any = undefined;
+    if (archivalPhotosRaw) {
+      try {
+        const parsed = JSON.parse(archivalPhotosRaw);
+        if (Array.isArray(parsed)) {
+          archivalPhotos = parsed.slice(0, 10).map((p: any) => ({
+            url: typeof p.url === 'string' ? p.url.trim() : '',
+            caption: typeof p.caption === 'string' ? p.caption.trim() : '',
+          })).filter((p: any) => p.url.length > 0);
+        }
+      } catch (err) {
+        console.error('Failed to parse archivalPhotos JSON:', err);
+      }
+    }
+
+    const cabinetMembersRaw = formData.get('cabinetMembers') as string | null;
+    let cabinetMembers: any = undefined;
+    if (cabinetMembersRaw) {
+      try {
+        const parsed = JSON.parse(cabinetMembersRaw);
+        if (Array.isArray(parsed)) {
+          cabinetMembers = parsed.map((m: any, idx: number) => ({
+            id: m.id || `cab-${Date.now()}-${idx}`,
+            fullName: typeof m.fullName === 'string' ? m.fullName.trim() : '',
+            officeTitle: typeof m.officeTitle === 'string' ? m.officeTitle.trim() : '',
+            stateOfOrigin: typeof m.stateOfOrigin === 'string' ? m.stateOfOrigin.trim() : 'Yoruba',
+            department: typeof m.department === 'string' ? m.department.trim() : '',
+            avatarUrl: typeof m.avatarUrl === 'string' ? m.avatarUrl.trim() : '',
+          })).filter((m: any) => m.fullName.length > 0 && m.officeTitle.length > 0);
+        }
+      } catch (err) {
+        console.error('Failed to parse cabinetMembers JSON:', err);
+      }
+    }
+
     if (isCurrent) {
       await db.administrationSession.updateMany({
         where: { isCurrent: true, NOT: { id } },
@@ -150,9 +224,11 @@ export async function updateHistoryChapterAction(id: string, formData: FormData)
         displayOrder,
         isPublished,
         isCurrent,
+        ...(archivalPhotos !== undefined ? { archivalPhotos } : {}),
+        ...(cabinetMembers !== undefined ? { cabinetMembers } : {}),
         ...(startDateStr ? { startDate: new Date(startDateStr) } : {}),
         ...(endDateStr ? { endDate: new Date(endDateStr) } : {}),
-      },
+      } as any,
     });
 
     revalidateHistoryPaths();

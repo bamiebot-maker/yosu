@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -22,6 +22,10 @@ import {
   ArrowLeft,
   BookOpen,
   List,
+  Camera,
+  Maximize2,
+  X,
+  Sparkles,
 } from 'lucide-react';
 
 interface Executive {
@@ -44,6 +48,11 @@ interface Achievement {
   category?: string;
 }
 
+export interface ArchivalPhoto {
+  url: string;
+  caption?: string;
+}
+
 export interface AdministrationSession {
   id: string;
   title: string;
@@ -53,6 +62,7 @@ export interface AdministrationSession {
   endDate?: string | null;
   isCurrent: boolean;
   historicalSummary?: string;
+  archivalPhotos?: ArchivalPhoto[];
   president?: {
     id: string;
     fullName: string;
@@ -97,6 +107,12 @@ const DEFAULT_SESSIONS: AdministrationSession[] = [
       { id: 'e2', person: { fullName: 'Latifat Usman Gidado', stateOfOrigin: 'Kwara', department: 'Business Admin' }, officeTitle: 'Vice President' },
       { id: 'e3', person: { fullName: 'Capat Olumide Oyerinde', stateOfOrigin: 'Osun', department: 'Nursing Science' }, officeTitle: 'Secretary-General' },
       { id: 'e4', person: { fullName: 'Abdulsamad Muhammad-Tirimiz', stateOfOrigin: 'Oyo', department: 'Business Admin' }, officeTitle: 'Treasurer' },
+    ],
+    archivalPhotos: [
+      { url: '/images/gallery/inauguration-handover.jpg', caption: 'Official Executive Swearing-In & Presidential Handover Ceremony at FUD' },
+      { url: '/images/gallery/sobur-administration-lineup.jpg', caption: '12th Executive Council & Senate Principal Officers Official Portrait' },
+      { url: '/images/gallery/cultural-celebration-dance.jpg', caption: 'Àṣà Day Grand Cultural Festival: Traditional Choreography & Royal Durbar' },
+      { url: '/images/gallery/certificate-service-presentation.jpg', caption: 'Executive Certificate of Service Presentation & Academic Merit Honors' },
     ],
   },
   {
@@ -371,9 +387,30 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
 
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [copiedQuote, setCopiedQuote] = useState<string | null>(null);
+  const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null);
 
   const currentSession = allSessions[selectedIndex] || allSessions[0];
   const total = allSessions.length;
+  const currentPhotos = currentSession.archivalPhotos || [];
+
+  useEffect(() => {
+    if (activePhotoIndex === null) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActivePhotoIndex(null);
+      if (e.key === 'ArrowLeft') {
+        if (currentPhotos.length > 0) {
+          setActivePhotoIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : currentPhotos.length - 1));
+        }
+      }
+      if (e.key === 'ArrowRight') {
+        if (currentPhotos.length > 0) {
+          setActivePhotoIndex((prev) => (prev !== null && prev < currentPhotos.length - 1 ? prev + 1 : 0));
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activePhotoIndex, currentPhotos]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -384,6 +421,7 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
   const handleNext = () => {
     if (selectedIndex < total - 1) {
       setSelectedIndex((prev) => prev + 1);
+      setActivePhotoIndex(null);
       window.scrollTo({ top: 200, behavior: 'smooth' });
     }
   };
@@ -391,6 +429,7 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
   const handlePrev = () => {
     if (selectedIndex > 0) {
       setSelectedIndex((prev) => prev - 1);
+      setActivePhotoIndex(null);
       window.scrollTo({ top: 200, behavior: 'smooth' });
     }
   };
@@ -568,6 +607,59 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
             </div>
           </div>
 
+          {/* ARCHIVAL PHOTO GALLERY & VISUAL RELICS (UP TO 10 PHOTOS) */}
+          {currentPhotos.length > 0 && (
+            <div className="space-y-4 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-emerald-800" />
+                  <h3 className="font-serif font-bold text-slate-900 text-lg">
+                    Archival Photo Gallery &amp; Relics
+                  </h3>
+                </div>
+
+                <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-3 py-0.5 rounded-full border border-amber-300 self-start sm:self-auto inline-flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3 h-3 text-amber-600" />
+                  {currentPhotos.length} {currentPhotos.length === 1 ? 'Relic' : 'Relics'} Preserved • Click to Expand
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {currentPhotos.map((photo, pIdx) => (
+                  <div
+                    key={pIdx}
+                    onClick={() => setActivePhotoIndex(pIdx)}
+                    className="group bg-stone-50 hover:bg-white rounded-2xl border border-stone-200 hover:border-amber-400 p-2.5 space-y-2 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div className="relative aspect-4/3 w-full rounded-xl overflow-hidden bg-slate-950 border border-stone-200 shadow-inner">
+                      <Image
+                        src={photo.url}
+                        alt={photo.caption || `Archival photo ${pIdx + 1}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="p-2 bg-slate-900/85 text-amber-300 rounded-full border border-amber-400/40 shadow">
+                          <Maximize2 className="w-4 h-4" />
+                        </div>
+                      </div>
+                      <span className="absolute top-1.5 left-1.5 bg-slate-950/80 text-amber-300 font-extrabold text-[9px] px-1.5 py-0.2 rounded-md border border-amber-400/30">
+                        #{pIdx + 1}
+                      </span>
+                    </div>
+
+                    {photo.caption && (
+                      <p className="text-[11px] text-slate-700 font-medium line-clamp-2 leading-tight px-0.5 group-hover:text-emerald-950 transition-colors">
+                        {photo.caption}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* KEY ACHIEVEMENTS MATRIX (AS IN SKETCH) */}
           {currentSession.achievements && currentSession.achievements.length > 0 && (
             <div className="space-y-3">
@@ -610,8 +702,18 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
                     key={app.id}
                     className="p-3 bg-stone-50 rounded-2xl border border-stone-200 flex items-center gap-3 text-xs"
                   >
-                    <div className="w-8 h-8 rounded-full bg-emerald-900 text-amber-300 font-bold flex items-center justify-center text-xs shadow">
-                      {app.person.fullName.charAt(0)}
+                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-950 text-amber-300 font-bold flex items-center justify-center text-xs shadow-sm shrink-0 relative border border-amber-400/30">
+                      {app.person.avatarUrl ? (
+                        <Image
+                          src={app.person.avatarUrl}
+                          alt={app.person.fullName}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <span>{app.person.fullName.charAt(0).toUpperCase()}</span>
+                      )}
                     </div>
                     <div>
                       <div className="font-bold text-slate-900">{app.person.fullName}</div>
@@ -645,6 +747,94 @@ export function HistoryPastLeadershipClient({ sessions: rawSessions }: HistoryPa
           </Link>
         </div>
       </div>
+
+      {/* FULL-SCREEN LIGHTBOX MODAL */}
+      {activePhotoIndex !== null && currentPhotos[activePhotoIndex] && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none animate-in fade-in duration-200"
+          onClick={() => setActivePhotoIndex(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[92vh] bg-slate-900 border border-amber-400/30 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Modal Bar */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-stone-800 bg-slate-950/90 text-white">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="bg-emerald-900 text-amber-300 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full border border-amber-400/30">
+                  PHOTO {activePhotoIndex + 1} OF {currentPhotos.length}
+                </span>
+                <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
+                  {currentSession.title} ({currentSession.startDate} – {currentSession.endDate || 'Present'})
+                </span>
+              </div>
+
+              <button
+                onClick={() => setActivePhotoIndex(null)}
+                className="p-1.5 text-slate-400 hover:text-white bg-stone-800/80 hover:bg-rose-600 rounded-xl transition-colors cursor-pointer"
+                aria-label="Close photo preview"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Main Photo View Area */}
+            <div className="relative w-full h-[50vh] sm:h-[62vh] bg-black flex items-center justify-center overflow-hidden">
+              <Image
+                src={currentPhotos[activePhotoIndex].url}
+                alt={currentPhotos[activePhotoIndex].caption || `Archival photo ${activePhotoIndex + 1}`}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+
+              {/* Prev / Next navigation buttons */}
+              {currentPhotos.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePhotoIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : currentPhotos.length - 1));
+                    }}
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 bg-slate-950/80 hover:bg-amber-400 hover:text-slate-950 text-white rounded-full transition-all border border-stone-700 shadow-xl cursor-pointer"
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePhotoIndex((prev) => (prev !== null && prev < currentPhotos.length - 1 ? prev + 1 : 0));
+                    }}
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 bg-slate-950/80 hover:bg-amber-400 hover:text-slate-950 text-white rounded-full transition-all border border-stone-700 shadow-xl cursor-pointer"
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Bottom Caption Bar */}
+            <div className="px-5 sm:px-6 py-3.5 bg-slate-950 border-t border-stone-800 text-white space-y-1">
+              {currentPhotos[activePhotoIndex].caption ? (
+                <p className="text-xs sm:text-sm font-medium text-amber-100 leading-relaxed">
+                  {currentPhotos[activePhotoIndex].caption}
+                </p>
+              ) : (
+                <p className="text-xs text-slate-400 italic">Official YOSU administration archival relic.</p>
+              )}
+              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1">
+                <span>{currentSession.title} Historical Archive</span>
+                <span className="hidden sm:inline">Use Left/Right arrow keys to navigate • Esc to exit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

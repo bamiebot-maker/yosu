@@ -42,6 +42,79 @@ export default async function HistoryPastLeadershipPage() {
       const presidentState = pres?.person.stateOfOrigin || 'Yoruba';
       const presidentOffice = pres?.office.title || 'Executive President';
 
+      let archivalPhotos: Array<{ url: string; caption?: string }> = [];
+      if ((s as any).archivalPhotos && Array.isArray((s as any).archivalPhotos)) {
+        archivalPhotos = ((s as any).archivalPhotos as any[])
+          .filter((p) => p && typeof p.url === 'string' && p.url.trim().length > 0)
+          .slice(0, 10);
+      }
+
+      let cabinetFromSession: any[] = [];
+      if ((s as any).cabinetMembers && Array.isArray((s as any).cabinetMembers)) {
+        cabinetFromSession = ((s as any).cabinetMembers as any[])
+          .filter((m) => m && m.fullName && m.officeTitle)
+          .map((m, idx) => ({
+            id: m.id || `cab-${s.id}-${idx}`,
+            person: {
+              id: m.id || `p-cab-${s.id}-${idx}`,
+              fullName: m.fullName,
+              stateOfOrigin: m.stateOfOrigin || 'Yoruba',
+              department: m.department || '',
+              avatarUrl: m.avatarUrl || null,
+            },
+            officeTitle: m.officeTitle,
+            officeCategory: 'EXECUTIVE_COUNCIL',
+            displayOrder: idx,
+          }));
+      }
+
+      const appointmentExecutives = s.appointments.map((a) => ({
+        id: a.id,
+        person: {
+          id: a.person.id,
+          fullName: a.person.fullName,
+          stateOfOrigin: a.person.stateOfOrigin,
+          department: a.person.department,
+          avatarUrl: a.person.avatarMedia?.url || null,
+        },
+        officeTitle: a.office.title,
+        officeCategory: a.office.category,
+        displayOrder: a.displayOrder,
+      }));
+
+      const executives = cabinetFromSession.length > 0 ? cabinetFromSession : appointmentExecutives;
+
+      const cabVp = cabinetFromSession.find((c) => c.officeTitle.toLowerCase().includes('vice president'));
+      const cabSecGen = cabinetFromSession.find((c) => c.officeTitle.toLowerCase().includes('secretary general'));
+
+      const vicePresident = vp ? {
+        id: vp.person.id,
+        fullName: vp.person.fullName,
+        stateOfOrigin: vp.person.stateOfOrigin,
+        avatarUrl: vp.person.avatarMedia?.url || null,
+        officeTitle: vp.office.title,
+      } : (cabVp ? {
+        id: cabVp.id,
+        fullName: cabVp.person.fullName,
+        stateOfOrigin: cabVp.person.stateOfOrigin,
+        avatarUrl: cabVp.person.avatarUrl,
+        officeTitle: cabVp.officeTitle,
+      } : null);
+
+      const secretaryGeneral = secGen ? {
+        id: secGen.person.id,
+        fullName: secGen.person.fullName,
+        stateOfOrigin: secGen.person.stateOfOrigin,
+        avatarUrl: secGen.person.avatarMedia?.url || null,
+        officeTitle: secGen.office.title,
+      } : (cabSecGen ? {
+        id: cabSecGen.id,
+        fullName: cabSecGen.person.fullName,
+        stateOfOrigin: cabSecGen.person.stateOfOrigin,
+        avatarUrl: cabSecGen.person.avatarUrl,
+        officeTitle: cabSecGen.officeTitle,
+      } : null);
+
       return {
         id: s.id,
         title: s.title,
@@ -51,6 +124,7 @@ export default async function HistoryPastLeadershipPage() {
         endDate: s.endDate ? new Date(s.endDate).getFullYear().toString() : null,
         isCurrent: s.isCurrent,
         historicalSummary: s.historicalNarrative || (s as any).historicalSummary || 'Official administration session record and historical proceedings.',
+        archivalPhotos,
         president: {
           id: pres?.person.id || `pres-${s.id}`,
           fullName: presidentName,
@@ -59,33 +133,9 @@ export default async function HistoryPastLeadershipPage() {
           officeTitle: presidentOffice,
           bio: presidentBio,
         },
-        vicePresident: vp ? {
-          id: vp.person.id,
-          fullName: vp.person.fullName,
-          stateOfOrigin: vp.person.stateOfOrigin,
-          avatarUrl: vp.person.avatarMedia?.url || null,
-          officeTitle: vp.office.title,
-        } : null,
-        secretaryGeneral: secGen ? {
-          id: secGen.person.id,
-          fullName: secGen.person.fullName,
-          stateOfOrigin: secGen.person.stateOfOrigin,
-          avatarUrl: secGen.person.avatarMedia?.url || null,
-          officeTitle: secGen.office.title,
-        } : null,
-        executives: s.appointments.map((a) => ({
-          id: a.id,
-          person: {
-            id: a.person.id,
-            fullName: a.person.fullName,
-            stateOfOrigin: a.person.stateOfOrigin,
-            department: a.person.department,
-            avatarUrl: a.person.avatarMedia?.url || null,
-          },
-          officeTitle: a.office.title,
-          officeCategory: a.office.category,
-          displayOrder: a.displayOrder,
-        })),
+        vicePresident,
+        secretaryGeneral,
+        executives,
         houseRepresentatives: s.houseRepresentatives.map((r) => ({
           id: r.id,
           fullName: r.fullName,

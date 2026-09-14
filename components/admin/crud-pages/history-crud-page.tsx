@@ -17,6 +17,10 @@ import {
   Image as ImageIcon,
   FileText,
   Clock,
+  UploadCloud,
+  Loader2,
+  Camera,
+  Users,
 } from 'lucide-react';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import {
@@ -24,6 +28,37 @@ import {
   updateHistoryChapterAction,
   deleteHistoryChapterAction,
 } from '@/app/admin/history-actions';
+
+export interface ArchivalPhotoItem {
+  url: string;
+  caption?: string;
+}
+
+export interface CabinetMemberItem {
+  id?: string;
+  fullName: string;
+  officeTitle: string;
+  stateOfOrigin: string;
+  department?: string;
+  avatarUrl?: string;
+}
+
+const YORUBA_STATES = ['Ekiti', 'Kogi', 'Kwara', 'Lagos', 'Ogun', 'Ondo', 'Osun', 'Oyo'];
+
+const COMMON_PORTFOLIOS = [
+  'Vice President',
+  'Secretary-General',
+  'Assistant Secretary-General',
+  'Financial Secretary',
+  'Treasurer',
+  'Public Relations Officer (P.R.O)',
+  'Director of Socials',
+  'Welfare Director',
+  'Director of Sports',
+  'Auditor-General',
+  'Chief Whip',
+  'Legal Adviser',
+];
 
 interface HistoryChapter {
   id: string;
@@ -37,6 +72,8 @@ interface HistoryChapter {
   presidentPhotoUrl?: string | null;
   presidentBio?: string | null;
   historicalNarrative?: string | null;
+  archivalPhotos?: ArchivalPhotoItem[] | null;
+  cabinetMembers?: CabinetMemberItem[] | null;
   motto?: string | null;
   displayOrder: number;
   isPublished: boolean;
@@ -50,16 +87,32 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
   const [chapters, setChapters] = useState<HistoryChapter[]>(initialChapters);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChapter, setEditingChapter] = useState<HistoryChapter | null>(null);
+  const [photos, setPhotos] = useState<ArchivalPhotoItem[]>([]);
+  const [cabinet, setCabinet] = useState<CabinetMemberItem[]>([]);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [uploadingCabinetIndex, setUploadingCabinetIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const openCreateModal = () => {
     setEditingChapter(null);
+    setPhotos([]);
+    setCabinet([]);
     setIsModalOpen(true);
   };
 
   const openEditModal = (chapter: HistoryChapter) => {
     setEditingChapter(chapter);
+    const existingPhotos = Array.isArray(chapter.archivalPhotos)
+      ? chapter.archivalPhotos.filter((p) => p && p.url)
+      : [];
+    setPhotos(existingPhotos);
+
+    const existingCabinet = Array.isArray(chapter.cabinetMembers)
+      ? chapter.cabinetMembers.filter((m) => m && m.fullName && m.officeTitle)
+      : [];
+    setCabinet(existingCabinet);
+
     setIsModalOpen(true);
   };
 
@@ -76,19 +129,143 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
     }
   };
 
+  const handlePhotoFileUpload = async (index: number, file: File) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds 10MB limit.');
+      return;
+    }
+
+    setUploadingIndex(index);
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: fd,
+      });
+      const data = await res.json();
+      if (res.ok && (data.secure_url || data.url)) {
+        const finalUrl = data.secure_url || data.url;
+        setPhotos((prev) => {
+          const next = [...prev];
+          next[index] = { ...next[index], url: finalUrl };
+          return next;
+        });
+      } else {
+        alert(data.error || 'Failed to upload photo');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Network error uploading photo');
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
+
+  const addPhotoSlot = () => {
+    if (photos.length >= 10) return;
+    setPhotos((prev) => [...prev, { url: '', caption: '' }]);
+  };
+
+  const removePhotoSlot = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updatePhotoUrl = (index: number, url: string) => {
+    setPhotos((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], url };
+      return next;
+    });
+  };
+
+  const updatePhotoCaption = (index: number, caption: string) => {
+    setPhotos((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], caption };
+      return next;
+    });
+  };
+
+  // Cabinet & Exco Handlers
+  const addCabinetMemberSlot = () => {
+    setCabinet((prev) => [
+      ...prev,
+      {
+        id: `cab-${Date.now()}-${prev.length}`,
+        fullName: '',
+        officeTitle: prev.length === 0 ? 'Vice President' : prev.length === 1 ? 'Secretary-General' : 'Treasurer',
+        stateOfOrigin: 'Ekiti',
+        department: '',
+        avatarUrl: '',
+      },
+    ]);
+  };
+
+  const removeCabinetMemberSlot = (index: number) => {
+    setCabinet((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateCabinetMemberField = (index: number, field: keyof CabinetMemberItem, value: string) => {
+    setCabinet((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const handleCabinetAvatarUpload = async (index: number, file: File) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds 10MB limit.');
+      return;
+    }
+
+    setUploadingCabinetIndex(index);
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: fd,
+      });
+      const data = await res.json();
+      if (res.ok && (data.secure_url || data.url)) {
+        const finalUrl = data.secure_url || data.url;
+        updateCabinetMemberField(index, 'avatarUrl', finalUrl);
+      } else {
+        alert(data.error || 'Failed to upload photo');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Network error uploading photo');
+    } finally {
+      setUploadingCabinetIndex(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
     const formData = new FormData(e.currentTarget);
+    const validPhotos = photos.filter((p) => p.url && p.url.trim().length > 0);
+    const validCabinet = cabinet.filter(
+      (m) => m.fullName && m.fullName.trim().length > 0 && m.officeTitle && m.officeTitle.trim().length > 0
+    );
 
     if (editingChapter) {
       const res = await updateHistoryChapterAction(editingChapter.id, formData);
       setLoading(false);
       if (res.success && res.chapter) {
         setChapters((prev) =>
-          prev.map((c) => (c.id === editingChapter.id ? (res.chapter as any) : c))
+          prev.map((c) =>
+            c.id === editingChapter.id
+              ? { ...(res.chapter as any), archivalPhotos: validPhotos, cabinetMembers: validCabinet }
+              : c
+          )
         );
         setIsModalOpen(false);
         setMessage({ type: 'success', text: 'History chapter updated successfully!' });
@@ -99,7 +276,10 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
       const res = await createHistoryChapterAction(formData);
       setLoading(false);
       if (res.success && res.chapter) {
-        setChapters((prev) => [...prev, res.chapter as any]);
+        setChapters((prev) => [
+          ...prev,
+          { ...(res.chapter as any), archivalPhotos: validPhotos, cabinetMembers: validCabinet },
+        ]);
         setIsModalOpen(false);
         setMessage({ type: 'success', text: 'History chapter created successfully!' });
       } else {
@@ -221,6 +401,21 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
               </div>
             )}
 
+            <div className="flex flex-wrap items-center gap-2">
+              {ch.archivalPhotos && ch.archivalPhotos.length > 0 && (
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/80">
+                  <Camera className="w-3.5 h-3.5 text-amber-600" />
+                  <span>{ch.archivalPhotos.length} {ch.archivalPhotos.length === 1 ? 'Photo' : 'Photos'}</span>
+                </div>
+              )}
+              {ch.cabinetMembers && ch.cabinetMembers.length > 0 && (
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/80">
+                  <Users className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>{ch.cabinetMembers.length} {ch.cabinetMembers.length === 1 ? 'Cabinet Officer' : 'Cabinet Officers'}</span>
+                </div>
+              )}
+            </div>
+
             {ch.historicalNarrative && (
               <p className="text-xs text-slate-600 line-clamp-3 bg-stone-50/50 p-3 rounded-xl border border-stone-100 font-light">
                 {ch.historicalNarrative}
@@ -248,7 +443,7 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-stone-200 my-8">
+          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-stone-200 my-8">
             <div className="flex items-center justify-between border-b border-stone-200 pb-4">
               <h2 className="font-serif text-xl font-bold text-slate-900 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-emerald-800" />
@@ -377,6 +572,318 @@ export function HistoryCrudPage({ initialChapters }: HistoryCrudPageProps) {
                   placeholder="Write or paste authentic history received from past presidents..."
                   className="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none font-mono text-xs"
                 />
+              </div>
+
+              {/* CABINET & EXECUTIVE COUNCIL (EXCO) ROSTER */}
+              <div className="space-y-3 bg-stone-50 p-4 sm:p-5 rounded-2xl border border-stone-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                  <div>
+                    <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Users className="w-4 h-4 text-emerald-800" />
+                      Executive Council &amp; Cabinet Roster ({cabinet.length} Officers)
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-light">
+                      Add, edit or update the Vice President, Secretary-General, Treasurer, and directors for this administration.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addCabinetMemberSlot}
+                    className="px-3.5 py-1.5 bg-emerald-900 hover:bg-emerald-800 text-amber-300 text-xs font-bold rounded-xl flex items-center gap-1.5 self-start sm:self-auto shadow-sm transition-all cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Cabinet Member</span>
+                  </button>
+                </div>
+
+                {/* Hidden JSON input for Form submission */}
+                <input
+                  type="hidden"
+                  name="cabinetMembers"
+                  value={JSON.stringify(
+                    cabinet.filter(
+                      (m) => m.fullName && m.fullName.trim().length > 0 && m.officeTitle && m.officeTitle.trim().length > 0
+                    )
+                  )}
+                />
+
+                {cabinet.length === 0 ? (
+                  <div className="text-center py-6 border-2 border-dashed border-stone-300 rounded-xl space-y-2 bg-white/60">
+                    <Users className="w-8 h-8 text-stone-400 mx-auto" />
+                    <p className="text-xs text-slate-500 font-medium">No cabinet or exco members recorded for this administration yet.</p>
+                    <button
+                      type="button"
+                      onClick={addCabinetMemberSlot}
+                      className="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 text-amber-300 text-xs font-extrabold rounded-xl inline-flex items-center gap-1 shadow-sm cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add First Officer</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                    {cabinet.map((member, cIdx) => (
+                      <div
+                        key={member.id || cIdx}
+                        className="bg-white p-3.5 rounded-2xl border border-stone-200 shadow-sm space-y-3 relative"
+                      >
+                        <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+                          <span className="text-[11px] font-extrabold text-emerald-950 flex items-center gap-1.5">
+                            <span className="w-5 h-5 rounded-full bg-slate-950 text-amber-300 text-[10px] flex items-center justify-center font-bold">
+                              {cIdx + 1}
+                            </span>
+                            Officer Portfolio #{cIdx + 1}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => removeCabinetMemberSlot(cIdx)}
+                            title="Remove officer"
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                          {/* Avatar thumbnail & upload */}
+                          <div className="sm:col-span-3 flex flex-col items-center gap-1.5">
+                            <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-amber-400/40 relative overflow-hidden flex items-center justify-center text-amber-300 font-bold text-base shadow-inner">
+                              {member.avatarUrl ? (
+                                <Image
+                                  src={member.avatarUrl}
+                                  alt={member.fullName || 'Officer'}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              ) : (
+                                <span>{member.fullName ? member.fullName.charAt(0).toUpperCase() : '👤'}</span>
+                              )}
+                            </div>
+
+                            <label className="cursor-pointer text-[10px] font-bold text-emerald-800 hover:underline flex items-center gap-1">
+                              {uploadingCabinetIndex === cIdx ? (
+                                <Loader2 className="w-3 h-3 animate-spin text-amber-600" />
+                              ) : (
+                                <UploadCloud className="w-3 h-3 text-emerald-700" />
+                              )}
+                              <span>{member.avatarUrl ? 'Change Photo' : 'Upload Photo'}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={uploadingCabinetIndex === cIdx}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleCabinetAvatarUpload(cIdx, file);
+                                }}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          {/* Inputs: Title, Name, State, Dept */}
+                          <div className="sm:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                              <label className="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
+                                Office Title / Portfolio *
+                              </label>
+                              <input
+                                type="text"
+                                list={`portfolio-suggestions-${cIdx}`}
+                                value={member.officeTitle}
+                                onChange={(e) => updateCabinetMemberField(cIdx, 'officeTitle', e.target.value)}
+                                placeholder="e.g. Vice President, Secretary-General"
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                              />
+                              <datalist id={`portfolio-suggestions-${cIdx}`}>
+                                {COMMON_PORTFOLIOS.map((p) => (
+                                  <option key={p} value={p} />
+                                ))}
+                              </datalist>
+                            </div>
+
+                            <div>
+                              <label className="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
+                                Full Name *
+                              </label>
+                              <input
+                                type="text"
+                                value={member.fullName}
+                                onChange={(e) => updateCabinetMemberField(cIdx, 'fullName', e.target.value)}
+                                placeholder="e.g. Latifat Usman Gidado"
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
+                                State of Origin *
+                              </label>
+                              <select
+                                value={member.stateOfOrigin}
+                                onChange={(e) => updateCabinetMemberField(cIdx, 'stateOfOrigin', e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white"
+                              >
+                                {YORUBA_STATES.map((st) => (
+                                  <option key={st} value={st}>
+                                    {st} State
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-0.5">
+                                Academic Department (Optional)
+                              </label>
+                              <input
+                                type="text"
+                                value={member.department || ''}
+                                onChange={(e) => updateCabinetMemberField(cIdx, 'department', e.target.value)}
+                                placeholder="e.g. Business Administration"
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs font-medium text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ARCHIVAL PHOTO GALLERY (UP TO 10 PHOTOS) */}
+              <div className="space-y-3 bg-stone-50 p-4 sm:p-5 rounded-2xl border border-stone-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                  <div>
+                    <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Camera className="w-4 h-4 text-emerald-800" />
+                      Archival Photo Gallery &amp; Relics ({photos.length}/10)
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-light">
+                      Preserve up to 10 historical photos (ceremonies, exco groups, cultural days) with descriptions.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addPhotoSlot}
+                    disabled={photos.length >= 10}
+                    className="px-3.5 py-1.5 bg-emerald-900 hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed text-amber-300 text-xs font-bold rounded-xl flex items-center gap-1.5 self-start sm:self-auto shadow-sm transition-all cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Archival Photo ({photos.length}/10)</span>
+                  </button>
+                </div>
+
+                {/* Hidden JSON input for Form submission */}
+                <input
+                  type="hidden"
+                  name="archivalPhotos"
+                  value={JSON.stringify(photos.filter((p) => p.url && p.url.trim().length > 0))}
+                />
+
+                {photos.length === 0 ? (
+                  <div className="text-center py-6 border-2 border-dashed border-stone-300 rounded-xl space-y-2 bg-white/60">
+                    <Camera className="w-8 h-8 text-stone-400 mx-auto" />
+                    <p className="text-xs text-slate-500 font-medium">No archival photos added yet for this tenure.</p>
+                    <button
+                      type="button"
+                      onClick={addPhotoSlot}
+                      className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold rounded-xl inline-flex items-center gap-1 shadow-sm cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add First Archival Photo</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                    {photos.map((photo, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-white p-3.5 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row gap-3 items-start relative"
+                      >
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="w-6 h-6 rounded-full bg-slate-900 text-amber-300 font-extrabold text-[10px] flex items-center justify-center">
+                            {idx + 1}
+                          </span>
+
+                          {photo.url ? (
+                            <div className="w-20 h-20 rounded-xl overflow-hidden relative border border-emerald-900 shadow-sm bg-stone-100">
+                              <Image
+                                src={photo.url}
+                                alt={`Archival photo ${idx + 1}`}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-20 h-20 rounded-xl bg-stone-100 border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 text-[10px] font-bold">
+                              <Camera className="w-5 h-5 text-stone-400" />
+                              <span>No image</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 space-y-2 w-full">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <label className="cursor-pointer px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all">
+                              {uploadingIndex === idx ? (
+                                <>
+                                  <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+                                  <span>Uploading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UploadCloud className="w-3 h-3 text-amber-400" />
+                                  <span>{photo.url ? 'Replace Photo' : 'Upload from Device'}</span>
+                                </>
+                              )}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                disabled={uploadingIndex === idx}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handlePhotoFileUpload(idx, file);
+                                }}
+                                className="hidden"
+                              />
+                            </label>
+
+                            <input
+                              type="text"
+                              value={photo.url}
+                              onChange={(e) => updatePhotoUrl(idx, e.target.value)}
+                              placeholder="Or paste photo URL directly..."
+                              className="flex-1 min-w-[180px] px-3 py-1.5 rounded-xl border border-stone-200 text-xs font-mono text-slate-700 bg-stone-50/60 focus:bg-white focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                            />
+                          </div>
+
+                          <input
+                            type="text"
+                            value={photo.caption || ''}
+                            onChange={(e) => updatePhotoCaption(idx, e.target.value)}
+                            placeholder="Caption / Description (e.g. Swearing-in Ceremony at FUD Senate Building)..."
+                            className="w-full px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => removePhotoSlot(idx)}
+                          title="Remove photo"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors shrink-0 self-end sm:self-center cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-stone-200 pt-4">

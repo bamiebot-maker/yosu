@@ -232,6 +232,8 @@ model AdministrationSession {
   presidentPhotoUrl   String?
   presidentBio        String?
   historicalNarrative String?
+  archivalPhotos      Json?
+  cabinetMembers      Json?
   motto               String?
   displayOrder        Int                   @default(0)
   isPublished         Boolean               @default(true)
